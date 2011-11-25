@@ -1,0 +1,23 @@
+<h1>New survey_user</h1>
+
+<% form_for(@survey_user) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :survey_id %><br />
+    <%= f.collection_select :survey_id, Survey.find(:all), :id, :survey_name %>
+  </p>
+  <p>
+    <%= f.label :user_id %><br />
+    <%= f.collection_select :user_id, User.find(:all), :id, :full_name %>
+  </p>
+  <p>
+    <%= f.label :owner %><br />
+    <%= f.check_box :owner %>
+  </p>
+  <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', survey_users_path %>

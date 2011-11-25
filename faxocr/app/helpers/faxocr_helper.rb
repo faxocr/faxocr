@@ -1,0 +1,2 @@
+module FaxocrHelper
+end

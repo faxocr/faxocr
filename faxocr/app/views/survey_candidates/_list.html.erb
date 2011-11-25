@@ -1,0 +1,45 @@
+<div class="surveysobject_new">
+<% if params[:controller] == "survey_candidates" %>
+<% if @current_user.has_survey_role(@group.id) %>
+<%= link_to 'サーベイに調査対象を追加', new_group_survey_survey_candidate_path(@group, @survey) %>
+<% end %>
+<% end %>
+</div>
+<table class="surveysobject">
+  <tr class="surveysobject">
+    <th class="surveysobject">コード</th>
+    <th class="surveysobject">名称</th>
+    <th class="surveysobject">TEL番号</th>
+    <th class="surveysobject">FAX番号</th>
+    <th class="surveysobject">役割</th>
+	<% if params[:controller] == "survey_candidates" %>
+    <th class="surveysobject">操作</th>
+	<% end %>
+  </tr>
+  <% count = 0 %>
+  <% @survey_candidates.each do |survey_candidate| %>
+  <% count = (count + 1) & 1 %>
+  <% if count == 0 %>
+  <tr class="surveysobject">
+  <% else %>
+  <tr class="surveysobject_dark">
+  <% end %>
+   	<td class="surveysobject"><%=h survey_candidate.candidate.candidate_code %></td>
+   	<td class="surveysobject"><%=h survey_candidate.candidate.candidate_name %></td>
+   	<td class="surveysobject"><%=h survey_candidate.candidate.tel_number %></td>
+   	<td class="surveysobject"><%=h survey_candidate.candidate.fax_number %></td>
+   	<td class="surveysobject"><%=h survey_candidate.printable_role %></td>
+	<% if params[:controller] == "survey_candidates" %>
+    <% if @current_user.has_survey_role(@group.id) %>
+    <td class="surveysobject_manage">
+    	<%= link_to '編集', edit_group_survey_survey_candidate_path(@group, @survey, survey_candidate) %> 
+    	<%= link_to '削除', group_survey_survey_candidate_path(@group, @survey, survey_candidate), :confirm => '削除してもよろしいですか？', :method => :delete %>
+	</td>
+    <% else %>
+    <td class="surveysobject_manage">操作できません</td>
+    <% end %>
+    <% end %>
+  </tr>
+<% end %>
+</table>
+

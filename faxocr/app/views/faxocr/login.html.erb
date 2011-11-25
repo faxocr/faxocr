@@ -1,0 +1,27 @@
+<h1>サーベイランスシステム</h1>
+<% form_tag do %>
+<fieldset>
+  <legend>サーベイランスシステムのご利用にはログインが必要です</legend>
+  <table>
+  	<tr>
+  		<td>
+  			<label for="login_name">ユーザ名</label>
+  		</td>
+		<td>
+			<%= text_field_tag :login_name, params[:login_name] %>
+		</td>
+  	</tr>
+  	<tr>
+  		<td>
+  			<label for="password">パスワード</label>
+  		</td>
+		<td>
+			<%= password_field_tag :password, params[:password] %>
+		</td>
+  	</tr>
+  </table>
+  <div>
+    <%= submit_tag "ログイン" %>
+  </div>
+</fieldset>
+<% end %>

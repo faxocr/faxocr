@@ -1,0 +1,45 @@
+<%
+  role_mapping = RoleMapping.find_by_group_id_and_user_id(@authorized_group.id, @user.id)
+%>
+<p>
+  <b>Login name:</b>
+  <%=h @user.login_name %>
+</p>
+
+<p>
+  <b>Full name:</b>
+  <%=h @user.full_name %>
+</p>
+
+<p>
+  <b>Organization:</b>
+  <%=h @user.organization %>
+</p>
+
+<p>
+  <b>Section:</b>
+  <%=h @user.section %>
+</p>
+
+<p>
+  <b>Tel number:</b>
+  <%=h @user.tel_number %>
+</p>
+
+<p>
+  <b>Fax number:</b>
+  <%=h @user.fax_number %>
+</p>
+
+<p>
+  <b>Email:</b>
+  <%=h @user.email %>
+</p>
+
+<p>
+  <b>Role:</b>
+  <%=h role_mapping ? role_mapping.role : nil %>
+</p>
+
+<%= link_to 'Edit', edit_group_user_path(@group, @user) %> |
+<%= link_to 'Back', group_users_path(@group) %>

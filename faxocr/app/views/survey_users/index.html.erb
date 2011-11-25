@@ -1,0 +1,24 @@
+<h1>Listing survey_users</h1>
+
+<table>
+  <tr>
+    <th>Survey Name</th>
+    <th>User Name</th>
+    <th>Owner</th>
+  </tr>
+
+<% @survey_users.each do |su| %>
+  <tr>
+    <td><%=h su.survey.survey_code %>|<%=h su.survey.survey_name %></td>
+    <td><%=h su.user.login_name %>|<%=h su.user.full_name %></td>
+    <td><%= su.owner == true ? "Yes" : ""%></td>
+    <td><%= link_to 'Show', su %></td>
+    <td><%= link_to 'Edit', edit_survey_user_path(su) %></td>
+    <td><%= link_to 'Destroy', su, :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New survey_user', new_survey_user_path %>

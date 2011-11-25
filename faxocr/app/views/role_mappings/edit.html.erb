@@ -1,0 +1,28 @@
+<h1>Editing role_mapping</h1>
+
+<% form_for(@role_mapping) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :group_id %><br />
+    <%= f.collection_select :group_id, Group.find(:all), :id, :group_name %>
+  </p>
+  <p>
+    <%= f.label :user_id %><br />
+    <%= f.collection_select :user_id, User.find(:all), :id, :full_name %>
+  </p>
+<%
+  RoleMapping::ROLES.each do |r|
+    checked = @role_mapping.role_by_array.include?(r[1]) ? true : false
+%>
+    <%= check_box_tag "role_mapping[role_by_array][]", r[1], checked %><%= r[0] %><br />
+<% 
+  end
+%>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @role_mapping %> |
+<%= link_to 'Back', role_mappings_path %>

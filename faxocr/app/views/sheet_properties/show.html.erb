@@ -1,0 +1,24 @@
+<h1 class="surveysobject">シートに使用する調査項目情報</h1> 
+<table><tr><td>
+<h2 class="surveysobject_title">基本情報</h2>
+</td><td>
+<% if @current_user.has_survey_role(@current_group.id) %>
+<%= link_to '編集', edit_group_survey_sheet_sheet_property_path(@group, @survey, @sheet, @sheet_property) %>
+<% end %>
+</td></tr></table>
+<div>
+  <h3>調査項目</h3>
+  <%=h @sheet_property.survey_property.ocr_name_full %>
+</div>
+<div>
+  <h3>横の場所</h3>
+  <%=h @sheet_property.position_x %>
+</div>
+<div>
+  <h3>縦の場所</h3>
+  <%=h @sheet_property.position_y %>
+</div>
+<div>
+  <h3>文字数</h3>
+  <%=h @sheet_property.colspan %>
+</div>

@@ -1,0 +1,62 @@
+<!-- Answer sheet -->
+<table>
+  <tr>
+    <td align="right">受信日時:</td>
+    <td><%= @authorized_answer_sheet.date %></td>
+  </tr>
+  <tr>
+    <td align="right">送信者:</td>
+    <td><%= @authorized_answer_sheet.candidate.candidate_code %>
+      <%= @authorized_answer_sheet.candidate.candidate_name %></td>
+  </tr>
+  <tr>
+    <td align="right">シート:</td>
+    <td><%= @authorized_answer_sheet.sheet.sheet_code %>
+      <%= @authorized_answer_sheet.sheet.sheet_name %></td>
+  </tr>
+</table>
+
+<!-- Response Properties -->
+<table>
+  <tr>
+    <th>Ocr name</th>
+    <th>Ocr image</th>
+    <th>Ocr value</th>
+  </tr>
+
+<%
+form_tag :controller => 'inbox', :action => 'update_answer_sheet_properties' do
+  prop_names = Hash.new
+  SurveyProperty.find_all_by_survey_id(@authorized_survey).each do |sp|
+    prop_names.store(sp.ocr_name, sp.ocr_name_full)
+  end
+  @answer_sheet_properties.each do |asp|
+%>
+
+  <tr>
+    <td>
+      <%= prop_names[asp.ocr_name] || asp.ocr_name %>
+    </td>
+    <td>
+      <img src="/images/ocr/<%= asp.ocr_image %>" height="32"/>
+    </td>
+    <td>
+      <%= text_field_tag("ocr_values[#{asp.id}]", asp.ocr_value) %>
+    </td>
+  </tr>
+
+<%
+  end
+%>
+  <tr>
+    <td colspan="2"></td>
+    <td>
+      <%= submit_tag 'Save and set status "checked"'%>
+    </td>
+  </tr>
+<%
+end
+%>
+</table>
+<%= link_to 'Back', request.request_uri.sub(/\/[0-9]+$/, '') %>
+

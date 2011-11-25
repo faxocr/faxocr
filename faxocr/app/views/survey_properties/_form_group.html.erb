@@ -1,0 +1,35 @@
+<% form_for([@group,@survey,@survey_property]) do |f| %>
+  <%= f.error_messages %>
+  <%= f.hidden_field :survey_id %>
+  <h2 class="surveysobject">名称</h2>
+  <div class="surveysobject">
+  	調査項目の名称を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :ocr_name_full %>
+  </p>
+  <h2 class="surveysobject">OCR ID</h2>
+  <div class="surveysobject">
+  	調査項目のユニークなIDを入力（半角英数字）してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :ocr_name %>
+  </p>
+  <h2 class="surveysobject">集計レポート表示順序</h2>
+  <div class="surveysobject">
+  	集計レポートで項目を表示する順序を数字（半角数字）で入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :view_order %>
+  </p>
+  <h2 class="surveysobject">OCRデータタイプ</h2>
+  <div class="surveysobject">
+  	OCR読み込みで使用するデータタイプを選択してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.select(:data_type, SurveyProperty::DATA_TYPE) %>
+  </p>
+  <p>
+    <%= f.submit '保存' %>
+  </p>
+<% end %>

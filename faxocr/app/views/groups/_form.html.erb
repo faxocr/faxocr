@@ -1,0 +1,13 @@
+<% form_for(@group) do |f| %>
+  <%= f.error_messages %>
+  <h2 class="surveysobject">名称</h2>
+  <div class="surveysobject">
+  	自治体/機関名を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :group_name %>
+  </p>
+  <p class="surveysobject">
+    <%= f.submit '保存' %>
+  </p>
+<% end %>

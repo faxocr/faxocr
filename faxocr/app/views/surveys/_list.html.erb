@@ -1,0 +1,37 @@
+<div class="surveysobject_new">
+<% if params[:controller] == "surveys" %>
+<% if @current_user.has_survey_role(@group.id) %>
+<%= link_to 'サーベイの新規作成', new_group_survey_path(@group) %>
+<% end %>
+<% end %>
+</div>
+<table class="surveysobject">
+  <tr class="surveysobject">
+    <th class="surveysobject">ステータス</th>
+    <th class="surveysobject">名称</th>
+    <th class="surveysobject">受信調査シート</th>
+	<% if params[:controller] == "surveys" %>
+    <th class="surveysobject">操作</th>
+	<% end %>
+  </tr>
+  <% count = 0 %>
+  <% @surveys.each do |survey| %>
+  <% count = (count + 1) & 1 %>
+  <% if count == 0 %>
+  <tr class="surveysobject">
+  <% else %>
+  <tr class="surveysobject_dark">
+  <% end %>
+   	<td class="surveysobject"><%=h Survey::STATUS[survey.status][0] %></td>
+   	<td class="surveysobject"><%= link_to survey.survey_name, group_survey_path(@group, survey) %></td>
+   	<td class="surveysobject"><%= link_to '表示', group_survey_answer_sheets_path(@group, survey) %></td>
+	<% if params[:controller] == "surveys" %>
+    <% if @current_user.has_survey_role(@group.id) %>
+    <td class="surveysobject_manage"><%= link_to '削除', group_survey_path(@group, survey), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+    <% else %>
+    <td class="surveysobject_manage">操作できません</td>
+    <% end %>
+    <% end %>
+  </tr>
+<% end %>
+</table>

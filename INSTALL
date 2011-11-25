@@ -1,0 +1,32 @@
+1. Install package of ubuntu.
+sudo apt-get install autoconf
+sudo apt-get install g++
+sudo apt-get install libx11-dev
+sudo apt-get install libfreetype6-dev
+sudo apt-get install libxml2-dev
+sudo apt-get install libmysqlclient-dev
+sudo apt-get install libssl-dev
+sudo apt-get install netpbm
+sudo apt-get install wkhtmltopdf
+sudo apt-get install ttf-vlgothic ttf-kochi-gothic
+
+2. Download sources from OSS.
+Cluscore
+http://cluscore.googlecode.com
+OpenCV 1.1pre1
+http://sourceforge.net/projects/opencvlibrary
+
+3. Install OSS softwares.
+svn checkout http://cluscore.googlecode.com/svn/trunk/ cluscore
+cd cluscore
+./configure
+make
+sudo make install
+cd ..
+
+4. Set the crontab.
+$crontab -e
+# m h  dom mon dow   command
+0-59/10 * * * * sh ./procfax.sh >> Faxsystem/Log/cron_procfax.log
+0-59/15 * * * * sh ./procreport.sh >> Faxsystem/Log/cron_procreport.log
+

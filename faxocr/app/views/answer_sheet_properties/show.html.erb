@@ -1,0 +1,23 @@
+<p>
+  <b>Answer sheet:</b>
+  <%=h @answer_sheet_property.answer_sheet_id %>
+</p>
+
+<p>
+  <b>Ocr name:</b>
+  <%=h @answer_sheet_property.ocr_name %>
+</p>
+
+<p>
+  <b>Ocr value:</b>
+  <%=h @answer_sheet_property.ocr_value %>
+</p>
+
+<p>
+  <b>Ocr image:</b>
+  <%=h @answer_sheet_property.ocr_image %>
+</p>
+
+
+<%= link_to 'Edit', edit_answer_sheet_property_path(@answer_sheet_property) %> |
+<%= link_to 'Back', answer_sheet_properties_path %>

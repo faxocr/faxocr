@@ -1,0 +1,24 @@
+<% form_for([@group,@survey,@survey_candidate]) do |f| %>
+  <%= f.error_messages %>
+  <%= f.hidden_field :survey_id %>
+  <h2 class="surveysobject">調査対象</h2>
+  <div class="surveysobject">
+  	サーベイの調査対象を選択してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.collection_select :candidate_id, @group.candidates.find(:all), :id, :candidate_name %>
+  </p>
+  <h2 class="surveysobject">役割</h2>
+  <div class="surveysobject">
+  	役割を設定してください。
+  </div>
+  <%
+  SurveyCandidate::ROLES.each do |r|
+    checked = @survey_candidate.role_by_array.include?(r[1]) ? true : false
+  %>
+    <%= check_box_tag "survey_candidate[role_by_array][]", r[1], checked %><%= r[0] %><br />
+  <% end %>
+  <p class="surveysobject">
+    <%= f.submit '保存' %>
+  </p>
+<% end %>

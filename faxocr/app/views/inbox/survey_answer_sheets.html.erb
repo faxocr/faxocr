@@ -1,0 +1,31 @@
+<table>
+  <tr>
+    <th>Date</th>
+    <th colspan="2">Candidate</th>
+    <th>Sender number</th>
+    <th>Receiver number</th>
+    <th>Sheet</th>
+    <th>Full image</th>
+    <th>Show</th>
+  </tr>
+
+<%
+  @answer_sheets.each do |a|
+    #candidate = Candidate.find_by_candidate_code(a.candidate_code)
+    #candidate_name = candidate != nil ? candidate.candidate_name : ''
+%>
+  <tr>
+    <td><%=h a.date.strftime("%m/%d %H:%M") %></td>
+    <td><%=h a.candidate.candidate_code %></td>
+    <td><%=h a.candidate.candidate_name %></td>
+    <td><%=h a.sender_number %></td>
+    <td><%=h a.receiver_number %></td>
+    <td><%=h a.sheet.sheet_code %></td>
+    <td><a href="/images/ocr/<%= a.sheet_image %>" rel="lightbox"><img src="/icons/16x16/search.png"/></a></td>
+    <td><%= link_to 'Show', :controller => 'inbox', :action => 'answer_sheet_properties', :survey_id => @authorized_survey.id, :answer_sheet_id => a.id %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+<%= link_to 'Back', request.request_uri.sub(/\/[0-9]+$/, '') %>

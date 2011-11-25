@@ -1,0 +1,40 @@
+<div class="surveysobject_new">
+<% if params[:controller] == "survey_properties" %>
+<% if @current_user.has_survey_role(@group.id) %>
+<%= link_to 'サーベイに調査項目を追加', new_group_survey_survey_property_path(@group, @survey) %>
+<% end %>
+<% end %>
+</div>
+<table class="surveysobject">
+  <tr class="surveysobject">
+    <th class="surveysobject">名称</th>
+    <th class="surveysobject">OCR ID</th>
+    <th class="surveysobject">集計レポート表示順序</th>
+    <th class="surveysobject">OCRデータタイプ</th>
+	<% if params[:controller] == "survey_properties" %>
+    <th class="surveysobject">操作</th>
+	<% end %>
+  </tr>
+  <% count = 0 %>
+  <% @survey_properties.each do |survey_property| %>
+  <% count = (count + 1) & 1 %>
+  <% if count == 0 %>
+  <tr class="surveysobject">
+  <% else %>
+  <tr class="surveysobject_dark">
+  <% end %>
+   	<td class="surveysobject"><%= link_to survey_property.ocr_name_full, group_survey_survey_property_path(@group, @survey, survey_property) %></td>
+   	<td class="surveysobject"><%=h survey_property.ocr_name %></td>
+   	<td class="surveysobject"><%=h survey_property.view_order %></td>
+   	<td class="surveysobject"><%=h survey_property.printable_data_type %></td>
+	<% if params[:controller] == "survey_properties" %>
+    <% if @current_user.has_survey_role(@group.id) %>
+    <td class="surveysobject_manage"><%= link_to '削除', group_survey_survey_property_path(@group, @survey, survey_property), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+    <% else %>
+    <td class="surveysobject_manage">操作できません</td>
+    <% end %>
+    <% end %>
+  </tr>
+<% end %>
+</table>
+

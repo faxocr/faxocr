@@ -1,0 +1,46 @@
+<h1>ユーザ編集</h1>
+
+<% form_for :user, :url => {:action => :update_self} do |f| %>
+  <%= f.error_messages %>
+
+    <h2 class="surveysobject">ログイン名</h2>
+    <p class="surveysobject">
+    <%= @user.login_name %>
+    </p>
+    <h2 class="surveysobject">担当者名</h2>
+    <p class="surveysobject">
+    <%= @user.full_name %>
+    </p>
+    <h2 class="surveysobject">ログインパスワード</h2>
+    <p class="surveysobject">
+    <%= f.password_field :password %>
+    </p>
+    <h2 class="surveysobject">ログインパスワード（確認）</h2>
+    <p class="surveysobject">
+    <%= f.password_field :password_confirmation %>
+    </p>
+    <h2 class="surveysobject">管轄自治体名</h2>
+    <p class="surveysobject">
+    <%= @user.organization %>
+    </p>
+    <h2 class="surveysobject">組織名</h2>
+    <p class="surveysobject">
+    <%= @user.section %>
+    </p>
+    <h2 class="surveysobject">TEL番号</h2>
+    <p class="surveysobject">
+    <%= @user.tel_number %>
+    </p>
+    <h2 class="surveysobject">FAX番号</h2>
+    <p class="surveysobject">
+    <%= @user.fax_number %>
+    </p>
+    <h2 class="surveysobject">メールアドレス</h2>
+    <p class="surveysobject">
+    <%= @user.email %>
+    </p>
+
+  <p>
+    <%= f.submit '保存' %>
+  </p>
+<% end %>

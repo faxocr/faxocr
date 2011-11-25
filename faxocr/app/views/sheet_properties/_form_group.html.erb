@@ -1,0 +1,35 @@
+<% form_for([@group, @survey, @sheet, @sheet_property]) do |f| %>
+  <%= f.error_messages %>
+  <%= f.hidden_field :sheet_id %>
+  <h2 class="surveysobject">調査項目名</h2>
+  <div class="surveysobject">
+  	シートで使用する調査項目を選択してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.collection_select :survey_property_id, @survey.survey_properties, :id, :ocr_name_full %>
+  </p>
+  <h2 class="surveysobject">横の場所</h2>
+  <div class="surveysobject">
+  	シート内ブロックの横位置を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :position_x %>
+  </p>
+  <h2 class="surveysobject">縦の場所</h2>
+  <div class="surveysobject">
+  	シート内ブロックの縦位置を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :position_y %>
+  </p>
+  <h2 class="surveysobject">文字数</h2>
+  <div class="surveysobject">
+  	読み取りブロック数を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :colspan %>
+  </p>
+  <p>
+    <%= f.submit '保存' %>
+  </p>
+<% end %>

@@ -1,0 +1,2 @@
+module SurveyPropertiesHelper
+end

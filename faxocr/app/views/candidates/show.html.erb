@@ -1,0 +1,24 @@
+<h1 class="surveysobject"><%= @candidate.candidate_name %>の調査対象情報</h1> 
+<table><tr><td>
+<h2 class="surveysobject_title">基本情報</h2>
+</td><td>
+<% if @current_user.has_candidate_role(@current_group.id) %>
+<%= link_to '編集', edit_group_candidate_path(@group, @candidate) %>
+<% end %>
+</td></tr></table>
+<div>
+  <h3>名称</h3>
+  <%=h @candidate.candidate_name %>
+</div>
+<div>
+  <h3>調査対象コード</h3>
+  <%=h @candidate.candidate_code %>
+</div>
+<div>
+  <h3>TEL番号</h3>
+  <%=h @candidate.tel_number %>
+</div>
+<div>
+  <h3>FAX番号</h3>
+  <%=h @candidate.fax_number %>
+</div>

@@ -1,0 +1,35 @@
+<h1>New answer_sheet</h1>
+
+<% form_for(@answer_sheet) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :date %><br />
+    <%= f.datetime_select :date %>
+  </p>
+  <p>
+    <%= f.label :sender_number %><br />
+    <%= f.text_field :sender_number %>
+  </p>
+  <p>
+    <%= f.label :receiver_number %><br />
+    <%= f.text_field :receiver_number %>
+  </p>
+  <p>
+    <%= f.label :sheet_id %><br />
+    <%= f.text_field :sheet_id %>
+  </p>
+  <p>
+    <%= f.label :candidate_id %><br />
+    <%= f.text_field :candidate_id %>
+  </p>
+  <p>
+    <%= f.label :sheet_image %><br />
+    <%= f.text_field :sheet_image %>
+  </p>
+  <p>
+    <%= f.submit 'Create' %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', answer_sheets_path %>

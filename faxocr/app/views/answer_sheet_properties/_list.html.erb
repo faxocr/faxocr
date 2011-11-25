@@ -1,0 +1,34 @@
+<div class="surveysobject_new">
+</div>
+<table class="surveysobject">
+  <tr class="surveysobject">
+    <th class="surveysobject">OCR ID</th>
+    <th class="surveysobject">画像</th>
+    <th class="surveysobject">データ</th>
+	<% if params[:controller] == "answer_sheet_properties" %>
+    <th class="surveysobject">操作</th>
+	<% end %>
+  </tr>
+  <% count = 0 %>
+<% @answer_sheet_properties.each do |answer_sheet_property| %>
+  <% count = (count + 1) & 1 %>
+  <% if count == 0 %>
+  <tr class="surveysobject">
+  <% else %>
+  <tr class="surveysobject_dark">
+  <% end %>
+    <td class="surveysobject"><%=h answer_sheet_property.ocr_name %></td>
+    <td class="surveysobject">
+  		<%= image_tag(image_group_survey_answer_sheet_answer_sheet_property_path(@group, @survey, @answer_sheet, answer_sheet_property), :height => '30') %>
+	</td>
+    <td class="surveysobject"><%=h answer_sheet_property.ocr_value %></td>
+	<% if params[:controller] == "answer_sheet_properties" %>
+    <% if @current_user.has_survey_role(@group.id) %>
+    <td><%= link_to '編集', edit_group_survey_answer_sheet_answer_sheet_property_path(@group, @survey, @answer_sheet, answer_sheet_property) %></td>
+    <% else %>
+    <td class="surveysobject_manage">操作できません</td>
+    <% end %>
+    <% end %>
+  </tr>
+<% end %>
+</table>

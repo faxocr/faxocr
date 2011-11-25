@@ -1,0 +1,5 @@
+<h1><%=h @group.group_name %> の調査対象の作成</h1>
+
+<%= render :partial => "form_group" %>
+
+<%= link_to 'キャンセル', group_candidates_path(@group) %>

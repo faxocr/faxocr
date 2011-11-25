@@ -1,0 +1,55 @@
+<div class="surveysobject_new">
+<% if params[:controller] == "users" %>
+<% if @current_user.has_user_role(@group.id) %>
+<%= link_to 'ユーザの新規作成', new_group_user_path(@group) %>
+<% end %>
+<% end %>
+</div>
+<table class="surveysobject">
+  <tr class="surveysobject">
+    <th class="surveysobject">ログイン名</th>
+    <th class="surveysobject">担当者名</th>
+    <th class="surveysobject">管轄自治体名</th>
+    <th class="surveysobject">組織名</th>
+    <th class="surveysobject">TEL番号</th>
+    <th class="surveysobject">FAX番号</th>
+    <th class="surveysobject">メールアドレス</th>
+    <th class="surveysobject">役割</th>
+	<% if params[:controller] == "users" %>
+    <th class="surveysobject">操作</th>
+	<% end %>
+  </tr>
+  <% count = 0 %>
+  <% @users.each do |user| %>
+  <% role_mapping = RoleMapping.find_by_group_id_and_user_id(@group.id, user.id) %>
+  <% count = (count + 1) & 1 %>
+  <% if count == 0 %>
+  <tr class="surveysobject">
+  <% else %>
+  <tr class="surveysobject_dark">
+  <% end %>
+    <td class="surveysobject"><%=h user.login_name %></td>
+    <td class="surveysobject"><%=h user.full_name %></td>
+    <td class="surveysobject"><%=h user.organization %></td>
+    <td class="surveysobject"><%=h user.section %></td>
+    <td class="surveysobject"><%=h user.tel_number %></td>
+    <td class="surveysobject"><%=h user.fax_number %></td>
+    <td class="surveysobject"><%=h user.email %></td>
+    <td class="surveysobject"><%=h role_mapping ? role_mapping.printable_role : "&nbsp;" %></td>
+	<% if params[:controller] == "users" %>
+    <% if @current_user.has_user_role(@group.id) %>
+	    <td><%= link_to '編集', edit_group_user_path(@group, user) %>
+	    <%= link_to '削除', group_user_path(@group, user), :confirm => '削除してもよろしいですか？', :method => :delete %>
+		<% if @current_user.has_masquerade_role(@group.id) %>
+			<% if @masqueradable && user.id != @current_user.id %>
+				<%= link_to '代理ログイン', :controller => 'faxocr', :action => 'direct_masquerade', :group_id => @group.id, :id => user.id %>
+			<% end %>
+		<% end %>
+		</td>
+    <% else %>
+	    <td class="surveysobject_manage">操作できません</td>
+	<% end %>
+	<% end %>
+  </tr>
+<% end %>
+</table>

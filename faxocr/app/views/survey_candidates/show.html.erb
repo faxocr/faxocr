@@ -1,0 +1,13 @@
+<p>
+  <b>Survey Name:</b>
+  <%=h Survey.find(@survey_candidate.survey_id).survey_name %>
+</p>
+
+<p>
+  <b>Candidate Name:</b>
+  <%=h Candidate.find(@survey_candidate.candidate_id).candidate_name %>
+</p>
+
+
+<%= link_to 'Edit', edit_group_survey_survey_candidate_path(@group, @survey, @survey_candidate) %> |
+<%= link_to 'Back', group_survey_survey_candidates_path(@group, @survey) %>

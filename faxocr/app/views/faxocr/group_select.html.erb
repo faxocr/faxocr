@@ -1,0 +1,10 @@
+<% form_tag :action => :group_select do %>
+<fieldset>
+  <div>
+    <%= select_tag(:gid, options_from_collection_for_select(@current_user.groups, :id, :group_name)) %>
+  </div>
+  <div>
+    <%= submit_tag "OK" %>
+  </div>
+</fieldset>
+<% end %>

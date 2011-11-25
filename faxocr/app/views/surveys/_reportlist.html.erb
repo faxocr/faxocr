@@ -1,0 +1,39 @@
+<table class="surveysobject">
+  <tr class="surveysobject">
+    <th class="surveysobject">ステータス</th>
+    <th class="surveysobject">名称</th>
+    <th class="surveysobject">サマリレポート</th>
+    <th class="surveysobject">月単位CSV</th>
+    <th class="surveysobject">年単位CSV</th>
+  </tr>
+  <% count = 0 %>
+  <% @surveys.each do |survey| %>
+    <% count = (count + 1) & 1 %>
+    <% if count == 0 %>
+      <tr class="surveysobject">
+    <% else %>
+      <tr class="surveysobject_dark">
+    <% end %>
+   	<td class="surveysobject"><%=h Survey::STATUS[survey.status][0] %></td>
+   	<td class="surveysobject"><%=h survey.survey_name %></td>
+    <td class="surveysobject">[
+    <% @repdays.each do |repday| %>
+	  <%= link_to "#{repday[0]} ", :controller => 'report', :action => 'daily', :group_id => @group.id, :survey_id => survey.id, :year => repday[1], :month => repday[2], :day => repday[3] %>
+	  -
+    <% end %>
+	]日</td>
+    <td class="surveysobject">[
+    <% @repmonths.each do |repmonth| %>
+   	  <%= link_to "#{repmonth[0]} ", :controller => 'export', :action => 'csv', :group_id => @group.id, :survey_id => survey.id, :year => repmonth[1], :month => repmonth[2] %>
+	  -
+    <% end %>
+    ]月</td>
+    <td class="surveysobject">[
+    <% @repyears.each do |repyear| %>
+      <%= link_to "#{repyear[0]} ", :controller => 'export', :action => 'csv', :group_id => @group.id, :survey_id => survey.id, :year => repyear[1] %>
+	  -
+    <% end %>
+    ]年</td>
+  </tr>
+<% end %>
+</table>

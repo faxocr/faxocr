@@ -1,0 +1,44 @@
+<% form_for([@group, @survey, @sheet]) do |f| %>
+  <%= f.error_messages %>
+  <%= f.hidden_field :survey_id %>
+  <h2 class="surveysobject">名称</h2>
+  <div class="surveysobject">
+  	シートの名称を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :sheet_name %>
+  </p>
+  <h2 class="surveysobject">ステータス</h2>
+  <div class="surveysobject">
+  	シートのステータスを選択してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.select(:status, Sheet::STATUS) %>
+  </p>
+  <h2 class="surveysobject">シートコード</h2>
+  <div class="surveysobject">
+  	シートコードを入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :sheet_code %>
+  </p>
+
+  <h2 class="surveysobject">横ブロック数</h2>
+  <div class="surveysobject">
+  	シートの横ブロック数を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :block_width %>
+  </p>
+
+  <h2 class="surveysobject">縦ブロック数</h2>
+  <div class="surveysobject">
+  	シートの縦ブロック数を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :block_height %>
+  </p>
+  <p>
+    <%= f.submit '保存' %>
+  </p>
+<% end %>

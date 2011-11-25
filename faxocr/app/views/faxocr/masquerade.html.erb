@@ -1,0 +1,10 @@
+<% form_tag :action => :masquerade do %>
+<fieldset>
+  <div>
+    <%= select_tag(:id, options_from_collection_for_select(@users, :id, :full_name)) %>
+  </div>
+  <div>
+    <%= submit_tag "OK" %>
+  </div>
+</fieldset>
+<% end %>

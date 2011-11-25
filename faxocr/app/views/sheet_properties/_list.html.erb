@@ -1,0 +1,40 @@
+<div class="surveysobject_new">
+<% if params[:controller] == "sheet_properties" %>
+<% if @current_user.has_survey_role(@group.id) %>
+<%= link_to 'シートに調査項目を追加', new_group_survey_sheet_sheet_property_path(@group, @survey, @sheet) %>
+<% end %>
+<% end %>
+</div>
+<table class="surveysobject">
+  <tr class="surveysobject">
+    <th class="surveysobject">調査項目名</th>
+    <th class="surveysobject">横の場所</th>
+    <th class="surveysobject">縦の場所</th>
+    <th class="surveysobject">文字数</th>
+	<% if params[:controller] == "sheet_properties" %>
+    <th class="surveysobject">操作</th>
+	<% end %>
+  </tr>
+  <% count = 0 %>
+  <% @sheet_properties.each do |sheet_property| %>
+  <% count = (count + 1) & 1 %>
+  <% if count == 0 %>
+  <tr class="surveysobject">
+  <% else %>
+  <tr class="surveysobject_dark">
+  <% end %>
+    <td class="surveysobject"><%= link_to sheet_property.survey_property.ocr_name_full, group_survey_sheet_sheet_property_path(@group, @survey, @sheet, sheet_property) %></td>
+    <td class="surveysobject"><%=h sheet_property.position_x %></td>
+    <td class="surveysobject"><%=h sheet_property.position_y %></td>
+    <td class="surveysobject"><%=h sheet_property.colspan %></td>
+	<% if params[:controller] == "sheet_properties" %>
+    <% if @current_user.has_survey_role(@group.id) %>
+    <td class="surveysobject_manage"><%= link_to '削除', group_survey_sheet_sheet_property_path(@group, @survey, @sheet, sheet_property), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+    <% else %>
+    <td class="surveysobject_manage">操作できません</td>
+    <% end %>
+    <% end %>
+  </tr>
+<% end %>
+</table>
+

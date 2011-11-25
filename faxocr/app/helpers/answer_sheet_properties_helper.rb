@@ -1,0 +1,2 @@
+module AnswerSheetPropertiesHelper
+end

@@ -1,0 +1,24 @@
+<h1>Listing role_mappings</h1>
+
+<table>
+  <tr>
+    <th>Group</th>
+    <th>User</th>
+    <th>Role</th>
+  </tr>
+
+<% @role_mappings.each do |role_mapping| %>
+  <tr>
+    <td><%=h role_mapping.group.group_name %></td>
+    <td><%=h role_mapping.user.full_name %></td>
+    <td><%=h role_mapping.role %></td>
+    <td><%= link_to 'Show', role_mapping %></td>
+    <td><%= link_to 'Edit', edit_role_mapping_path(role_mapping) %></td>
+    <td><%= link_to 'Destroy', role_mapping, :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New role_mapping', new_role_mapping_path %>

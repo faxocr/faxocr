@@ -1,0 +1,2 @@
+module SurveyCandidatesHelper
+end

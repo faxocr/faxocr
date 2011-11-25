@@ -1,0 +1,55 @@
+<sheetreader>
+	<outFormat>
+		<rails>
+			<code>
+				<![CDATA[
+				#!/usr/bin/ruby
+				require "rubygems"
+				require "active_record"
+				require "yaml"
+				rails_prefix = ARGV[0] || "./"
+				image_prefix = ARGV[1] || "./"
+				echo_prefix = ARGV[2] || "./"
+				config_db = rails_prefix + "/config/database.yml"
+				db_env = "development"
+				ActiveRecord::Base.configurations = YAML.load_file(config_db)
+				ActiveRecord::Base.establish_connection(db_env)
+				Dir.glob(rails_prefix + '/app/models/*.rb').each do |model|
+				  load model
+				end
+				answer_sheet = AnswerSheet.new
+				answer_sheet.date = "#DATE#"
+				answer_sheet.srerror = "#RESULT#"
+				sheet_object = Sheet.find_by_sheet_code("#SHEET#")
+				answer_sheet.sheet_id = sheet_object ? sheet_object.id : 1
+				candidate_object = Candidate.find_by_candidate_code("#CANDIDATE#")
+				answer_sheet.candidate_id = candidate_object ? candidate_object.id : 1
+				answer_sheet.analyzed_sheet_code = "#SHEET#"
+				answer_sheet.analyzed_candidate_code = "#CANDIDATE#"
+				answer_sheet.sender_number = "#SENDER#"
+				answer_sheet.receiver_number = "#RECEIVER#"
+				answer_sheet.sheet_image = '#SHEETIMAGE#'
+				answer_sheet.need_check = #NEEDCHECK#
+				props = []
+				#PROPERTIES#
+				props.each do |prop|
+				  if prop[0] != "echo_request_and_send_analyzed_data"
+				    answer_sheet_property = AnswerSheetProperty.new
+				    answer_sheet_property.ocr_name = prop[0]
+				    answer_sheet_property.ocr_value = prop[1]
+				    answer_sheet_property.ocr_image = prop[2]
+				    answer_sheet.answer_sheet_properties << answer_sheet_property
+				  end
+				end
+				answer_sheet.save
+				exit(0)
+				]]>
+			</code>
+			<propertyCode>
+				<![CDATA[
+				props << ['#OCRNAME#','#OCRVALUE#','#OCRIMAGE#']
+				]]>
+			</propertyCode>
+		</rails>
+	</outFormat>
+</sheetreader>

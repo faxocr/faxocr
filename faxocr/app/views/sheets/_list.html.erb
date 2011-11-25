@@ -1,0 +1,41 @@
+<div class="surveysobject_new">
+<% if params[:controller] == "sheets" %>
+<% if @current_user.has_survey_role(@group.id) %>
+<%= link_to 'シートの新規作成', new_group_survey_sheet_path(@group, @survey) %>
+<% end %>
+<% end %>
+</div>
+<table class="surveysobject">
+  <tr class="surveysobject">
+    <th class="surveysobject">ステータス</th>
+    <th class="surveysobject">シートコード</th>
+    <th class="surveysobject">名称</th>
+    <th class="surveysobject">横ブロック数</th>
+    <th class="surveysobject">縦ブロック数</th>
+	<% if params[:controller] == "sheets" %>
+    <th class="surveysobject">操作</th>
+	<% end %>
+  </tr>
+  <% count = 0 %>
+  <% @sheets.each do |sheet| %>
+  <% count = (count + 1) & 1 %>
+  <% if count == 0 %>
+  <tr class="surveysobject">
+  <% else %>
+  <tr class="surveysobject_dark">
+  <% end %>
+   	<td class="surveysobject"><%=h Sheet::STATUS[sheet.status][0] %></td>
+	<td class="surveysobject"><%=h sheet.sheet_code %></td>
+   	<td class="surveysobject"><%= link_to sheet.sheet_name, group_survey_sheet_path(@group, @survey, sheet) %></td>
+	<td class="surveysobject"><%=h sheet.block_width %></td>
+	<td class="surveysobject"><%=h sheet.block_height %></td>
+	<% if params[:controller] == "sheets" %>
+    <% if @current_user.has_survey_role(@group.id) %>
+    <td class="surveysobject_manage"><%= link_to '削除', group_survey_sheet_path(@group, @survey, sheet), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+    <% else %>
+    <td class="surveysobject_manage">操作できません</td>
+    <% end %>
+    <% end %>
+  </tr>
+<% end %>
+</table>

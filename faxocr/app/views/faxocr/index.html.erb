@@ -1,0 +1,4 @@
+<h1>Faxocr#index</h1>
+Welcome, "<%= @current_user.full_name %>"@[<%= @current_group.group_name %>]
+<% masq_from = session[:masq_from] %>
+<%= masq_from ? '(' + masq_from.full_name + ')' : '' %>.<br />

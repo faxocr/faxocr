@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  position_x: 1
+  position_y: 
+  colspan: 1
+  sheet: 
+  survey_property: 
+
+two:
+  position_x: 1
+  position_y: 
+  colspan: 1
+  sheet: 
+  survey_property: 

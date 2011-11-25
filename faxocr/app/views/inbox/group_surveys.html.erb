@@ -1,0 +1,35 @@
+<table>
+  <tr>
+    <th>Survey Name</th>
+    <th>Inbox (Check needed)</th>
+  </tr>
+
+<%
+@surveys.each do |survey|
+  survey_response_count = 0
+  survey_need_check_count = 0
+
+  sheets = survey.sheets
+  sheet_ids = []
+  sheets.each {|sheet| sheet_ids << sheet.id}
+  answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids)
+  need_checks = AnswerSheet.count :conditions => ["sheet_id IN (?) AND need_check = true", sheet_ids]
+
+%>
+  <tr>
+    <td><%=h survey.survey_name %></td>
+    <td><%= answer_sheets.length %>
+      (
+      <% if need_checks > 0 %>
+        <strong><%= need_checks %></strong>
+      <% else %>
+        <%= need_checks %>
+      <% end %>
+      )
+    </td>
+    <td><%= link_to 'Show', :controller => 'inbox', :action => 'survey_answer_sheets', :survey_id => survey.id %></td>
+  </tr>
+<%
+end
+%>
+</table>

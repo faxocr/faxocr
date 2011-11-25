@@ -1,0 +1,136 @@
+class GroupsController < ApplicationController
+  before_filter :verify_group_authority
+  def verify_group_authority
+    super(:group_id => params[:id])
+  end
+  # GET /groups
+  # GET /groups.xml
+  def index
+    if @current_user.has_administrator_group
+      @groups = Group.all
+    else
+      @groups = []
+      @groups << @current_group
+    end
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @groups }
+    end
+  end
+
+  # GET /groups/1
+  # GET /groups/1.xml
+  def show
+    @group = Group.find(params[:id])
+    @surveys = @group.surveys
+    @candidates = @group.candidates
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml => @group }
+    end
+  end
+
+  # GET /groups/new
+  # GET /groups/new.xml
+  def new
+    @group = Group.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @group }
+    end
+  end
+
+  # GET /groups/1/edit
+  def edit
+    @group = Group.find(params[:id])
+  end
+
+  # POST /groups
+  # POST /groups.xml
+  def create
+    @group = Group.new(params[:group])
+
+    respond_to do |format|
+      if @group.save
+        flash[:notice] = 'Group was successfully created.'
+        format.html { redirect_to(@group) }
+        format.xml  { render :xml => @group, :status => :created, :location => @group }
+      else
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @group.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  # PUT /groups/1
+  # PUT /groups/1.xml
+  def update
+    @group = Group.find(params[:id])
+
+    respond_to do |format|
+      if @group.update_attributes(params[:group])
+        flash[:notice] = 'Group was successfully updated.'
+        format.html { redirect_to(@group) }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml => @group.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  # DELETE /groups/1
+  # DELETE /groups/1.xml
+  def destroy
+    @group = Group.find(params[:id])
+    candidate = Candidate.find_by_group_id(params[:id])
+    role_mapping = RoleMapping.find_by_group_id(params[:id])
+    survey = Survey.find_by_group_id(params[:id])
+    if candidate != nil || role_mapping != nil || survey != nil
+      flash[:notice] = "このグループは使用されているため削除できません"
+    else
+      @group.destroy
+    end
+    respond_to do |format|
+      format.html { redirect_to(groups_url) }
+      format.xml  { head :ok }
+    end
+  end
+
+  def report
+    @group = Group.find(params[:id])
+    @surveys = @group.surveys
+    datetime = DateTime.now
+    @repyears = []
+    i = 2
+    while i >= 0 do      
+      tmpdatetime = datetime - (365 * i)
+      repyear = [tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%Y")]
+      @repyears << repyear
+      i -= 1
+    end
+    @repmonths = []
+    datetime = DateTime.now
+    i = 6
+    while i >= 0 do      
+      tmpdatetime = datetime - (31 * i)
+      repmonth = [tmpdatetime.strftime("%m"), tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%m")]
+      i -= 1
+      @repmonths << repmonth
+    end
+    @repdays = []
+    datetime = DateTime.now
+    i = 6
+    while i >= 0 do      
+      tmpdatetime = datetime - i
+      repday = [tmpdatetime.strftime("%d"), tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%m"), tmpdatetime.strftime("%d")]
+      i -= 1
+      @repdays << repday
+    end
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml => @group }
+    end
+  end
+end

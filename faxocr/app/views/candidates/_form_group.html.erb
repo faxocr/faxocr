@@ -1,0 +1,39 @@
+<% form_for([@group, @candidate]) do |f| %>
+  <%= f.error_messages %>
+  <%= f.hidden_field :group_id %>
+
+  <h2 class="surveysobject">名称</h2>
+  <div class="surveysobject">
+  	調査対象の名称を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :candidate_name %>
+  </p>
+
+  <h2 class="surveysobject">調査対象コード</h2>
+  <div class="surveysobject">
+  	調査対象コードを入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :candidate_code %>
+  </p>
+
+  <h2 class="surveysobject">TEL番号</h2>
+  <div class="surveysobject">
+  	TEL番号を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :tel_number %>
+  </p>
+
+  <h2 class="surveysobject">FAX番号</h2>
+  <div class="surveysobject">
+  	FAX番号を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :fax_number %>
+  </p>
+  <p>
+    <%= f.submit '保存' %>
+  </p>
+<% end %>

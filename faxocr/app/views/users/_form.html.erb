@@ -1,0 +1,82 @@
+<% form_for([@group,@user]) do |f| %>
+  <%= f.error_messages %>
+
+  <h2 class="surveysobject">ログイン名</h2>
+  <div class="surveysobject">
+  	本Webシステムへのログイン名を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :login_name %>
+  </p>
+  <h2 class="surveysobject">ログインパスワード</h2>
+  <div class="surveysobject">
+  	本Webシステムへログインパスワードを入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.password_field :password %>
+  </p>
+  <h2 class="surveysobject">ログインパスワード（確認）</h2>
+  <div class="surveysobject">
+  	確認のため、もう一度本Webシステムへログインパスワードを入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.password_field :password_confirmation %>
+  </p>
+  <h2 class="surveysobject">担当者名</h2>
+  <div class="surveysobject">
+  	担当者名を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :full_name %>
+  </p>
+  <h2 class="surveysobject">管轄自治体名</h2>
+  <div class="surveysobject">
+  	管轄自治体名を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :organization %>
+  </p>
+  <h2 class="surveysobject">組織名</h2>
+  <div class="surveysobject">
+  	組織名を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :section %>
+  </p>
+  <h2 class="surveysobject">TEL番号</h2>
+  <div class="surveysobject">
+  	TEL番号を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :tel_number %>
+  </p>
+  <h2 class="surveysobject">FAX番号</h2>
+  <div class="surveysobject">
+  	FAX番号を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :fax_number %>
+  </p>
+  <h2 class="surveysobject">メールアドレス</h2>
+  <div class="surveysobject">
+  	メールアドレスを入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_field :email %>
+  </p>
+  <h2 class="surveysobject">役割</h2>
+  <div class="surveysobject">
+  	役割を入力してください。
+  </div>
+  <p class="surveysobject">
+    <%
+      RoleMapping::ROLES.each do |r|
+      checked = @role_mapping.role_by_array.include?(r[1]) ? true : false
+    %>
+    <%= check_box_tag "role_by_array[]", r[1], checked %><%= r[0] %><br />
+    <% end %>
+  </p>
+  <p>
+    <%= f.submit '保存' %>
+  </p>
+<% end %>

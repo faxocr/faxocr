@@ -1,0 +1,40 @@
+<h1 class="surveysobject"><%= @sheet.sheet_name %> のシート情報</h1> 
+<table><tr><td>
+<h2 class="surveysobject_title">基本情報</h2>
+</td><td>
+<% if @current_user.has_survey_role(@current_group.id) %>
+<%= link_to '編集', edit_group_survey_sheet_path(@group, @survey, @sheet) %>
+<% end %>
+</td></tr></table>
+<div>
+  <h3>名称</h3>
+  <%=h @sheet.sheet_name %>
+</div>
+<div>
+  <h3>シートコード</h3>
+  <%=h @sheet.sheet_code %>
+</div>
+<div>
+  <h3>ステータス</h3>
+  <%=h Sheet::STATUS[@sheet.status][0] %>
+</div>
+<div>
+  <h3>横ブロック数</h3>
+  <%=h @sheet.block_width %>
+</div>
+<div>
+  <h3>縦ブロック数</h3>
+  <%=h @sheet.block_height %>
+</div>
+
+<p>
+<table><tr><td>
+<h2 class="surveysobject_title">使用する調査項目</h2>
+</td><td>
+<% if @current_user.has_survey_role(@current_group.id) %>
+<%= link_to '編集', group_survey_sheet_sheet_properties_path(@group, @survey, @sheet) %>
+<% end %>
+</td></tr></table>
+<%= render :partial => "sheet_properties/list" %>
+<br/>
+</p>

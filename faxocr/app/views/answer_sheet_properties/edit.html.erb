@@ -1,0 +1,22 @@
+<h1>受信調査項目修正</h1>
+
+<% form_for([@group,@survey,@answer_sheet,@answer_sheet_property]) do |f| %>
+  <%= f.error_messages %>
+  <p>
+    <%= f.label :ocr_name %><br />
+    <%= f.text_field :ocr_name %>
+  </p>
+  <p>
+    <%= f.label :ocr_image %><br />
+  	<%= image_tag(image_group_survey_answer_sheet_answer_sheet_property_path(@group, @survey, @answer_sheet, @answer_sheet_property)) %>
+  </p>
+  <p>
+    <%= f.label :ocr_value %><br />
+    <%= f.text_field :ocr_value %>
+  </p>
+  <p>
+    <%= f.submit '保存' %>
+  </p>
+<% end %>
+
+<%= link_to 'キャンセル', group_survey_answer_sheet_answer_sheet_properties_path(@group, @survey, @answer_sheet) %>

@@ -1,0 +1,18 @@
+<p>
+  <b>Group:</b>
+  <%=h @role_mapping.group_id %>
+</p>
+
+<p>
+  <b>User:</b>
+  <%=h @role_mapping.user_id %>
+</p>
+
+<p>
+  <b>Role:</b>
+  <%=h @role_mapping.role %>
+</p>
+
+
+<%= link_to 'Edit', edit_role_mapping_path(@role_mapping) %> |
+<%= link_to 'Back', role_mappings_path %>

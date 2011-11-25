@@ -1,0 +1,61 @@
+<div class="breadcrumb">
+場所: <%= link_to '自治体/機関', groups_path %>
+
+<% if /^(groups|surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties|report|candidates|users)$/ =~ params[:controller] %>
+	<% if !(/^(groups)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	  (<%= link_to @group.group_name, group_path(@group) %>)
+	<% end %>
+	<% if /^(surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties|report)$/ =~ params[:controller] %>
+	  &nbsp;&gt;&nbsp;<%= link_to 'サーベイ', group_surveys_path(@group) %>
+	  <% if !(/^(surveys)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action]) %>
+	    (<%= link_to @survey.survey_name, group_survey_path(@group, @survey) %>)
+	  <% end %>
+	  <% if /^(sheets|sheet_properties)$/ =~ params[:controller] %>
+		&nbsp;&gt;&nbsp;<%= link_to 'シート', group_survey_sheets_path(@group, @survey) %>
+	    <% if !(/^(sheets)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	      (<%= link_to @sheet.sheet_name, group_survey_sheet_path(@group, @survey, @sheet) %>)
+	    <% end %>
+	    <% if /^(sheet_properties)$/ =~ params[:controller] %>
+		  &nbsp;&gt;&nbsp;<%= link_to 'シートの調査項目', group_survey_sheet_sheet_properties_path(@group, @survey, @sheet) %>
+	      <% if !(/^(sheet_properties)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	        (<%= link_to @sheet_property.id, group_survey_sheet_sheet_properties_path(@group, @survey, @sheet, @sheet_property) %>)
+	      <% end %>
+	    <% end %>
+	  <% elsif /^(survey_properties)$/ =~ params[:controller] %>
+	    &nbsp;&gt;&nbsp;<%= link_to '調査項目', group_survey_survey_properties_path(@group, @survey) %>
+	    <% if !(/^(survey_properties)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	      (<%= link_to @survey_property.ocr_name, group_survey_survey_property_path(@group, @survey, @survey_property) %>)
+	    <% end %>
+	  <% elsif /^(survey_candidates)$/ =~ params[:controller] %>
+	    &nbsp;&gt;&nbsp;<%= link_to '調査対象', group_survey_survey_candidates_path(@group, @survey) %>
+	    <% if !(/^(survey_candidates)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	      (<%= link_to @survey_candidate.candidate_id, group_survey_survey_candidate_path(@group, @survey, @survey_candidate) %>)
+	    <% end %>
+	  <% elsif /^(answer_sheets|answer_sheet_properties)$/ =~ params[:controller] %>
+	    &nbsp;&gt;&nbsp;<%= link_to 'FAX受信調査シート', group_survey_answer_sheets_path(@group, @survey) %>
+	    <% if !(/^(answer_sheets)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	      (<%= link_to @answer_sheet.date.to_s(:datetime_jp), group_survey_answer_sheet_path(@group, @survey, @answer_sheet) %>)
+	    <% end %>
+	    <% if /^(answer_sheet_properties)$/ =~ params[:controller] %>
+	      &nbsp;&gt;&nbsp;<%= link_to '調査項目', group_survey_answer_sheet_answer_sheet_properties_path(@group, @survey, @answer_sheet) %>
+	      <% if !(/^(answer_sheet_properties)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	        (<%= @answer_sheet_property.ocr_name %>)
+	      <% end %>
+	    <% end %>
+	  <% end %>
+	<% elsif /^(candidates)$/ =~ params[:controller] %>
+	  &nbsp;&gt;&nbsp;<%= link_to '調査対象', group_candidates_path(@group) %>
+	  <% if !(/^(candidates)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	    (<%= link_to @candidate.candidate_name, group_candidate_path(@group, @candidate) %>)
+	  <% end %>
+	<% elsif /^(users)$/ =~ params[:controller] %>
+	  &nbsp;&gt;&nbsp;<%= link_to 'ユーザ', group_users_path(@group) %>
+	  <% if !(/^(users)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	    (<%= @user.full_name %>)
+	  <% end %>
+	<% end %>
+	<% if /^(groups)$/ =~ params[:controller] && /^(report)$/ =~ params[:action] %>
+	  &nbsp;&gt;&nbsp;<%= link_to 'サマリレポート', report_group_path(@group) %>
+	<% end %>
+<% end %>
+</div>

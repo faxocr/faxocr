@@ -1,0 +1,13 @@
+<p>
+  <b>Survey Name:</b>
+  <%=h @survey_user.survey.survey_name %>
+</p>
+
+<p>
+  <b>User Name:</b>
+  <%=h @survey_user.user.full_name %>
+</p>
+
+
+<%= link_to 'Edit', edit_survey_user_path(@survey_user) %> |
+<%= link_to 'Back', survey_users_path %>

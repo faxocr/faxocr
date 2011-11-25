@@ -1,0 +1,24 @@
+<h1 class="surveysobject"><%=h @survey_property.ocr_name_full %> の調査項目情報</h1>
+<table><tr><td>
+<h2 class="surveysobject_title">基本情報</h2>
+</td><td>
+<% if @current_user.has_survey_role(@current_group.id) %>
+<%= link_to '編集', edit_group_survey_survey_property_path(@group, @survey, @survey_property) %>
+<% end %>
+</td></tr></table>
+<div>
+  <h3>名称</h3>
+  <%=h @survey_property.ocr_name_full %>
+</div>
+<div>
+  <h3>OCR ID</h3>
+  <%=h @survey_property.ocr_name %>
+</div>
+<div>
+  <h3>集計レポート表示順序</h3>
+  <%=h @survey_property.view_order %>
+</div>
+<div>
+  <h3>OCRデータタイプ</h3>
+  <%=h @survey_property.printable_data_type %>
+</div>
