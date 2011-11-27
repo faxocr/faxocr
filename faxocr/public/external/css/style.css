@@ -53,24 +53,24 @@ form{margin:0;padding:0;}
 /* -------------------------------------------- */
 #header{
 	width:940px;
-	margin:0 auto 1.2em;
-	padding:23px 0 0;
+	margin:0 auto 1px;
+	padding:6px 0 0 0;
 }
 
 #header dl{
 	margin:0;
-	padding:0;
+	padding:0 0 0 0;
 }
 
 #header dt{
 	float:left;
 	margin:0;
-	padding:0;
+	padding:0 0 0 0;
 }
 
 #header dd{
-	margin:0 0 0 195px;
-	padding:1em 0 0;
+	margin:0 0 0 95px;
+	padding:1em 0 0 0;
 }
 
 /* nav */
@@ -260,21 +260,20 @@ form{margin:0;padding:0;}
 #footer{
 	margin:0;
 	padding:0;
-	background:url('../image/back_footer.gif') repeat-x 0 0;
 }
 
 #footer #pagetop{
 	width:930px;
-	margin:0 auto 19px;
+	margin:0 auto 1px;
 	padding:0;
 	text-align:right;
 }
 
 #footer .inner{
-	width:948px;
-	margin:0 auto;
+	height:110px;
+	margin:0 0;
 	padding:0;
-	background:url('../image/back_footerinner.gif') no-repeat 0 0;
+	background:url('../image/back_footer_short.gif') repeat-x 0 0;
 }
 
 #footer .top-area{
