@@ -66,10 +66,12 @@ a:hover { color: #fff; background-color:#000; }
 
 .welcome {
 	border-collapse:collapse;
-	background: #006600;
+/* XXX */
+	background: #666688;
+/*	background: #006600;
 	background-image: url(/images/menu_bg.png);
 	background-position: left bottom;
-	background-repeat: repeat-x;
+	background-repeat: repeat-x;*/
 	width: 100%;
 }
 
@@ -139,9 +141,10 @@ a:hover.welcome_logout {
 .menu_tab {
 	text-align: center;
 	background: #eeeeee;
-	background-image: url(/images/menu_bg.png);
+/* XXX */
+/*	background-image: url(/images/menu_bg.png);
 	background-position: left bottom;
-	background-repeat: repeat-x;
+	background-repeat: repeat-x;*/
 	color: #000000;
 	font-weight: bold;
 	border-top-width: 1px;
@@ -207,9 +210,10 @@ a:hover.welcome_logout {
 	font-weight: bold;
 	border-top-width: 0px;
 	border-bottom-width: 0px;
-	background-image: url(/images/menu_bg.png);
+/* XXX */
+/*	background-image: url(/images/menu_bg.png);
 	background-position: left bottom;
-	background-repeat: repeat-x;
+	background-repeat: repeat-x;*/
 	padding-top: 10px;
 	padding-right: 10px;
 	padding-left: 10px;

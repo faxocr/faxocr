@@ -1,4 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
+
   map.resources :role_mappings
 
   map.resources :groups, :member => { :report => :get } do |group|
@@ -37,6 +38,20 @@ ActionController::Routing::Routes.draw do |map|
   # Sample of regular route:
   #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'
   # Keep in mind you can assign values other than :controller and :action
+
+  # PHP driver
+  map.connect 'external/register/:group_id',
+    :controller => 'external',
+    :action => 'register'
+
+  # PHP driver
+  map.connect 'external/form/:group_id/:survey_id',
+    :controller => 'external',
+    :action => 'form'
+
+  # PHP driver
+  map.connect 'external/:action',
+    :controller => 'external'
 
   map.connect 'faxocr/direct_masquerade/:group_id/:id',
     :controller => 'faxocr',
@@ -81,7 +96,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect "util/sheet/:survey_code/srml",
     :controller => "util",
     :action => "srml"
- 
+
   # Sample of named route:
   #   map.purchase 'products/:id/purchase', :controller => 'catalog', :action => 'purchase'
   # This route can be invoked with purchase_url(:id => product.id)

@@ -1,4 +1,34 @@
+#
+# Sheet-reader for Shinsai FaxOCR
+#
+# Copyright (C) 2009-2011 National Institute of Public Health, Japan.
+# All rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+# note
+
+ディレクトリは、下記に展開すること。(faxocr/faxocrがファックス画像等に
+アクセスする際、ディレクトリがハードコードされている。)
+
+/home/faxocr/
+
+##################################################################
+
 1. Install package of ubuntu.
+
 sudo apt-get install autoconf
 sudo apt-get install g++
 sudo apt-get install libx11-dev

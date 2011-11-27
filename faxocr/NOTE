@@ -1,0 +1,32 @@
+
+ * アカウント
+
+user: admin
+pass: admin
+
+ * PHP関連ディレクトリ / ファイル
+
+/faxocr/faxocr/app/controllers/external_controller.rb	PHP driver
+/faxocr/faxocr/app/external/	for PHP files (dynamic: .php)
+/faxocr/faxocr/public/external/	for HTML files (static: css, image, js)
+/faxocr/ext-files/		for UI related files (conf, xls, etc)
+
+ * メモ
+
+ - conrig/route.rbに、route設定を行う。単なるPHP呼び出し(test_php)、
+   パラメータ渡し(test_gid)等、例を設けた
+ - app/controllers/external_controller.rbに、踏み台メソッドを記載
+ - script/serverを実行
+
+ * externl class作成ログ
+
+debian-faxocr:~/google/faxocr/faxocr> script/generate controller external
+      exists  app/controllers/
+      exists  app/helpers/
+      create  app/views/external
+      exists  test/functional/
+      exists  test/unit/helpers/
+      create  app/controllers/external_controller.rb
+      create  test/functional/external_controller_test.rb
+      create  app/helpers/external_helper.rb
+      create  test/unit/helpers/external_helper_test.rb
