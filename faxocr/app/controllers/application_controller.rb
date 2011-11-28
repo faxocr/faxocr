@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
@@ -22,7 +23,7 @@ protected
       # It is going to set a user to a session in the 
       # login of faxocr.
       session[:return_uri] = request.request_uri
-      flash[:notice] = "Please login."
+      flash[:notice] = "ログインして下さい"
       redirect_to :controller => 'faxocr', :action => 'login'
       return
     end
@@ -44,7 +45,7 @@ protected
       elsif @authorized_groups.length > 1
         session[:wait_group_selection] = true
         #session[:return_uri] = request.request_uri
-        flash[:notice] = "#{@current_user.full_name} belong to two or more groups. Please select group."
+        flash[:notice] = "ユーザー #{@current_user.full_name} は、複数のグループに属しています。一つを選択して下さい。"
         redirect_to :controller => 'faxocr', :action => 'group_select'
         return
       else

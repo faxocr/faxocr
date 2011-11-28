@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class RoleMappingsController < ApplicationController
   before_filter :administrator_only
   # GET /role_mappings
@@ -45,7 +46,7 @@ class RoleMappingsController < ApplicationController
     @role_mapping.role = ""
     respond_to do |format|
       if @role_mapping.save
-        flash[:notice] = 'RoleMapping was successfully created.'
+        flash[:notice] = '役割の設定を行いました'
         format.html { redirect_to(@role_mapping) }
         format.xml  { render :xml => @role_mapping, :status => :created, :location => @role_mapping }
       else
@@ -63,7 +64,7 @@ class RoleMappingsController < ApplicationController
 
     respond_to do |format|
       if @role_mapping.update_attributes(params[:role_mapping])
-        flash[:notice] = 'RoleMapping was successfully updated.'
+        flash[:notice] = '役割の更新を行いました'
         format.html { redirect_to(@role_mapping) }
         format.xml  { head :ok }
       else

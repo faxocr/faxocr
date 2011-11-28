@@ -1,25 +1,52 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
-  <title>SurveyCandidates: <%= controller.action_name %></title>
-  <%= stylesheet_link_tag 'faxocr' %>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+  <title>Shinsai FaxOCR</title>
+  <%= stylesheet_link_tag 'style' %>
 </head>
+
 <body>
 
-<div class="container">
+<!-- header STR -->
 <%= render :partial => "layouts/welcome" %>
-<div class="faxocrcontainer">
+<!-- header END -->
+<!-- nav STR -->
 <%= render :partial => "layouts/menu" %>
+<!-- nav END -->
 <%= render :partial => "layouts/breadcrumb" %>
+
+<!-- container STR -->
+<div id="container" class="clearfix">
 <p style="color: green"><%= flash[:notice] %></p>
-<div class="content">
+
+	<!-- contents STR -->
+	<div id="contents_1c">
+
 <%= yield %>
+
+	</div>
+	<!-- contents END -->
+<!-- container END -->
 </div>
+
+<!-- footer STR -->
+<div id="footer">
+	<p id="pagetop">
+	  <a href="#">
+	    <img src="/image/pagetop.gif" alt="このページの先頭へ" />
+	</a>
+	</p>
+	<div class="inner">
+	</div>
 </div>
-</div>
+<!-- footer END -->
 
 </body>
 </html>

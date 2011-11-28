@@ -1,3 +1,4 @@
+# -*- coding: undecided -*-
 class AnswerSheetsController < ApplicationController
   before_filter :verify_group_authority
   # GET /answer_sheets
@@ -99,7 +100,7 @@ class AnswerSheetsController < ApplicationController
 
     respond_to do |format|
       if @answer_sheet.save
-        flash[:notice] = 'AnswerSheet was successfully created.'
+        flash[:notice] = '受信FAXを作成しました'
         format.html { redirect_to(@answer_sheet) }
         format.xml  { render :xml => @answer_sheet, :status => :created, :location => @answer_sheet }
       else

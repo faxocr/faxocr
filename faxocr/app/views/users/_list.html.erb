@@ -1,7 +1,29 @@
+<% if params[:controller] == "users" %>
+<% if @current_group.is_administrator? && !session[:masq_from_user] %>
+
+<h3>組織基本情報</h3>
+<table class="surveysobject">
+  <tr class="surveysobject">
+    <th class="surveysobject" align="left">組織名</th>
+    <th class="surveysobject" align="left">操作</th>
+  </tr>
+  <tr class="surveysobject">
+    <td class="surveysobject">
+      <%=h @group.group_name %>
+    </td>
+    <td class="surveysobject">
+      <%= link_to '[編集]', edit_group_path(@group) %>
+    </td>
+  </tr>
+</table>
+<% end %>
+<% end %>
+
+<h3>ユーザーアカウント一覧</h3>
 <div class="surveysobject_new">
 <% if params[:controller] == "users" %>
 <% if @current_user.has_user_role(@group.id) %>
-<%= link_to 'ユーザの新規作成', new_group_user_path(@group) %>
+<%= link_to '[アカウントの新規作成]', new_group_user_path(@group) %>
 <% end %>
 <% end %>
 </div>
@@ -9,8 +31,8 @@
   <tr class="surveysobject">
     <th class="surveysobject">ログイン名</th>
     <th class="surveysobject">担当者名</th>
-    <th class="surveysobject">管轄自治体名</th>
     <th class="surveysobject">組織名</th>
+    <th class="surveysobject">部署名</th>
     <th class="surveysobject">TEL番号</th>
     <th class="surveysobject">FAX番号</th>
     <th class="surveysobject">メールアドレス</th>
@@ -53,3 +75,4 @@
   </tr>
 <% end %>
 </table>
+

@@ -1,4 +1,4 @@
-<h1 class="surveysobject"><%= @survey.survey_name %> のサーベイ情報</h1> 
+<h1 class="surveysobject"><%= @survey.survey_name %></h1> 
 
 <table><tr><td>
 <h2 class="surveysobject_title">基本情報</h2>
@@ -35,7 +35,7 @@
 </div>
 <p>
 <table><tr><td>
-<h2 class="surveysobject_title">24時間以内に受信された調査シート</h2>
+<h2 class="surveysobject_title">24時間以内に受信したFAX</h2>
 </td><td>
 <%= link_to '全て表示', group_survey_answer_sheets_path(@group, @survey) %>
 </td></tr></table>

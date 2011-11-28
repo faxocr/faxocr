@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class GroupsController < ApplicationController
   before_filter :verify_group_authority
   def verify_group_authority
@@ -53,7 +54,7 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       if @group.save
-        flash[:notice] = 'Group was successfully created.'
+        flash[:notice] = 'グループを作成しました'
         format.html { redirect_to(@group) }
         format.xml  { render :xml => @group, :status => :created, :location => @group }
       else
@@ -70,7 +71,7 @@ class GroupsController < ApplicationController
 
     respond_to do |format|
       if @group.update_attributes(params[:group])
-        flash[:notice] = 'Group was successfully updated.'
+        flash[:notice] = 'グループを更新しました'
         format.html { redirect_to(@group) }
         format.xml  { head :ok }
       else

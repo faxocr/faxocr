@@ -1,8 +1,9 @@
 <div class="surveysobject_new">
 <% if params[:controller] == "candidates" %>
 <% if @current_user.has_candidate_role(@group.id) %>
-<%= link_to '調査対象の新規作成', new_group_candidate_path(@group) %>
+<%= link_to '[調査対象の新規作成]', new_group_candidate_path(@group) %>
 <% end %>
+<a href=<%="\"/external/register/" + @group.id.to_s + "\""%> >[一括取込]</a>
 <% end %>
 </div>
 <table class="surveysobject">

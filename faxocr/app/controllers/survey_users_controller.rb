@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class SurveyUsersController < ApplicationController
   # GET /survey_users
   # GET /survey_users.xml
@@ -44,7 +45,7 @@ class SurveyUsersController < ApplicationController
 
     respond_to do |format|
       if @survey_user.save
-        flash[:notice] = 'SurveyUser was successfully created.'
+        flash[:notice] = 'SurveyUser を作成しました'
         format.html { redirect_to(@survey_user) }
         format.xml  { render :xml => @survey_user, :status => :created, :location => @survey_user }
       else
@@ -61,7 +62,7 @@ class SurveyUsersController < ApplicationController
 
     respond_to do |format|
       if @survey_user.update_attributes(params[:survey_user])
-        flash[:notice] = 'SurveyUser was successfully updated.'
+        flash[:notice] = 'SurveyUser を更新しました'
         format.html { redirect_to(@survey_user) }
         format.xml  { head :ok }
       else

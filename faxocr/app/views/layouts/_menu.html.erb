@@ -1,45 +1,16 @@
 <% @selected_group = @authorized_group || @current_group %>
-	<table class="menu">
-		<tr>
-		<td class="menu_empty" width="10" rowspan="2">&nbsp;</td>
-		<%
-		 controller = params[:controller]
-		 action = params[:action]
-		 if /(groups|surveys|survey_properties|candidates|sheets|sheet_properties)/ =~ controller && !(/(report)/ =~ action)
-		%>
-			<td class="menu_tab_selected" rowspan="2">
-		<% else %>
-			<td class="menu_tab" rowspan="2">
-		<% end %>
-			<%= link_to "自治体/機関設定", group_path(@authorized_group ? @authorized_group.id : @current_group.id)%>
-		</td>
-		<td class="menu_group" colspan="2"><%=h @selected_group.group_name %></td>
-		<td class="menu_empty" rowspan="2">&nbsp;</td>
-		</tr>
-		<tr>
-		<%
-		 controller = params[:controller]
-		 if /(groups)/ =~ controller && /(report)/ =~ action
-		%>
-			<td class="menu_tab_selected">
-		<% else %>
-			<td class="menu_tab">
-		<% end %>
-			<%= link_to "調査結果", report_group_path(@selected_group) %>
-		</td>
-		<%
-		 controller = params[:controller]
-		 if /(users)/ =~ controller
-		%>
-			<td class="menu_tab_selected">
-		<% else %>
-			<td class="menu_tab">
-		<% end %>
+<div id="nav">
+	<ul class="clearfix">
+		<li><%= link_to "調査対象", group_candidates_path(@selected_group.id)%></li>
+
+		<li><%= link_to "サーベイ", group_surveys_path(@group) %></li>
+		<li><%= link_to "ダウンロード", report_group_path(@selected_group) %></li>
 		<% if @current_user.has_administrator_group %>
-			<%= link_to "ユーザ管理", group_users_path(@selected_group)%>
+		<li><%= link_to "ユーザ設定", group_users_path(@selected_group)%></li>
 		<% else %>
-			<%= link_to "ユーザ管理", group_users_path(@authorized_group || @current_group)%>
+		<li><%= link_to "ユーザ設定", group_users_path(@authorized_group || @current_group)%></li>
 		<% end %>
-		</td>
-		</tr>
-	</table>
+		<li>　　　　　　　　　　　　　　　　　　　　　　　　</li>
+		<li><%= link_to 'ログアウト', {:action=>"logout", :controller=>"faxocr"}, :class => "welcome_logout" %>
+	</ul>
+</div>

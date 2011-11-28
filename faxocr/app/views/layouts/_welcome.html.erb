@@ -1,25 +1,33 @@
-	<table class="welcome">
-		<tr>
-		<td class="welcome_user">
+<table id="header">
+  <tr>
+    <td width="50px" rowspan="2"><img src="/image/logo.png" alt="Shinsai FaxOCR System" /></td>
+    <td>Shinsai FaxOCRシステム</td>
+    <td>
+    </td>
+  </tr>
+  <tr>
+    <td class="welcome_user">
+      <font size="-1">
 	<% if @current_user != nil %>
-		 ようこそ <%= @current_group ? @current_group.group_name + ' の ': nil %><%=h @current_user.full_name %> さん。
+	ようこそ <%= @current_group ? @current_group.group_name + ' の ': nil %><%=h @current_user.full_name %> さん。
 	<% else %>
-		ようこそ ゲスト さん。
+	ようこそ ゲスト さん。
 	<% end %>
 	<% if @masq_from_user != nil %>
-		 <br/>(<%=h @masq_from_user.full_name %> さんから、代理ログイン中)
+	<font color="red">
+	(<%=h @masq_from_user.full_name %> さんから、代理ログイン中)
+	</font>
 	<% end %>
-		</td>
-		<td class="welcome_logout">
-			<% if @current_group != nil %>
-				<% if @masq_from_user == nil %>
-				<% if @current_user.has_masquerade_role(@current_group.id) %>
-			    	[<%= link_to '代理', {:action=>"masquerade", :controller=>"faxocr"}, :class => "welcome_logout" %>]
-				<% end %>
-				<% end %>
-	    		[<%= link_to 'ログアウト', {:action=>"logout", :controller=>"faxocr"}, :class => "welcome_logout" %>]
-			<% end %>
-		</td>
-		</tr>
-	</table>
-</div>
+      </font>
+    </td>
+    <td class="welcome_logout" align="right">
+      <% if @current_group != nil %>
+      <% if @masq_from_user == nil %>
+      <% if @current_user.has_masquerade_role(@current_group.id) %>
+      [<%= link_to '代理ログイン', {:action=>"masquerade", :controller=>"faxocr"}, :class => "welcome_logout" %>]
+      <% end %>
+      <% end %>
+      <% end %>
+    </td>
+  </tr>
+</table>

@@ -1,3 +1,4 @@
+# -*- coding: undecided -*-
 class AnswerSheetPropertiesController < ApplicationController
   before_filter :verify_group_authority
   # GET /answer_sheet_properties
@@ -84,7 +85,7 @@ class AnswerSheetPropertiesController < ApplicationController
 
     respond_to do |format|
       if @answer_sheet_property.save
-        flash[:notice] = 'AnswerSheetProperty was successfully created.'
+        flash[:notice] = 'FAX調査項目を作成しました'
         format.html { redirect_to(@answer_sheet_property) }
         format.xml  { render :xml => @answer_sheet_property, :status => :created, :location => @answer_sheet_property }
       else

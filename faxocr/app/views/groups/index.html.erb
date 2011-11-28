@@ -1,12 +1,9 @@
-<h1 class="surveysobject">自治体/機関リスト</h1>
-<div class="surveysobject_new">
-<% if @current_user.has_administrator_group %>
-<%= link_to '自治体/機関の新規作成', new_group_path %>
-<% end %>
-</div>
+<h1 class="surveysobject">グループ一覧</h1>
+<br>
+
 <table class="surveysobject">
   <tr class="surveysobject">
-    <th class="surveysobject">自治体/機関</th>
+    <th class="surveysobject">組織</th>
     <th class="surveysobject">操作</th>
   </tr>
 
@@ -27,3 +24,8 @@
   </tr>
 <% end %>
 </table>
+<div class="surveysobject_new">
+<% if @current_user.has_administrator_group %>
+<%= link_to '[新規作成]', new_group_path %>
+<% end %>
+</div>

@@ -1,32 +1,28 @@
-<h1 class="surveysobject"><%=h @group.group_name %> の自治体/機関情報</h1>
-<table><tr><td>
-<h2 class="surveysobject_title">基本情報</h2>
-</td><td>
-<%= link_to '編集', edit_group_path(@group) %>
-</td></tr></table>
-<div>
-  <h3>名称</h3>
-  <%=h @group.group_name %>
-</div>
+<h1 class="surveysobject"><%=h @group.group_name %> の実施中サーベイ一覧</h1>
+
+<!-- <%= link_to '[サーベイ一覧]', group_surveys_path(@group) %>-->
+
 <p>
-<table><tr><td>
-<h2 class="surveysobject_title">調査対象</h2>
-</td><td>
-<% if @current_user.has_candidate_role(@current_group.id) %>
-<%= link_to '編集', group_candidates_path(@group) %>
-<% end %>
-</td></tr></table>
-<%= render :partial => "candidates/list" %>
-<br/>
-</p>
-<p>
-<table><tr><td>
-<h2 class="surveysobject_title">サーベイ</h2>
-</td><td>
-<% if @current_user.has_survey_role(@current_group.id) %>
-<%= link_to '編集', group_surveys_path(@group) %>
-<% end %>
-</td></tr></table>
+<!-- <h2 class="surveysobject_title">実施中サーベイ一覧</h2> -->
 <%= render :partial => "surveys/list" %>
+<div align="right">
+<% if @current_user.has_survey_role(@current_group.id) %>
+<a href=<%="\"/external/form/" + @group.id.to_s + "/000\""%> >[新規サーベイ]</a>
+<% end %>
+</div>
 <br/>
 </p>
+
+<!-- 
+<p>
+<h2 class="surveysobject_title">調査対象</h2>
+<%= render :partial => "candidates/list" %>
+<div align="right">
+<% if @current_user.has_candidate_role(@current_group.id) %>
+<%= link_to '[編集]', group_candidates_path(@group) %>
+<% end %>
+</div>
+<br/>
+</p>
+-->
+
