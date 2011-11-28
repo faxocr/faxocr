@@ -7,6 +7,7 @@ class FaxocrController < ApplicationController
   end
 
   def login
+    flash[:notice] = "ログインしました"
     if request.post?
       authn_user = User.authenticate(params[:login_name], params[:password])
       if authn_user
