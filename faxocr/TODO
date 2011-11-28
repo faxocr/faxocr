@@ -1,0 +1,47 @@
+
+ - PHP連携
+   - app/externalのテンプレート、css、imageを、rails側に合わせる
+
+ - ホーム画面
+   - 「24時間以内に受信したFAX」を追加
+   - 「新規サーベイ」PHPリンクを修正
+
+ - 調査対象画面
+   - 「一括取り込み」PHP機能を修正
+
+ - サーベイ基本画面
+   - 「ステータス編集画面」と「集計レポート編集画面」を分離したい
+   - PDFダウンロードリンクを修正
+   - 目視確認画面へのUIを修正
+
+ - 目視確認画面
+   - ファックス画像を回転
+   - 高機能化
+
+ - survey_userって不要？
+
+*** *** ***
+
+ x inbox.html.erb
+ x role_mappings.html.erb
+ x answer_sheets.html.erb
+ x answer_sheet_properties.html.erb
+ x survey_candidates.html.erb
+ x survey_properties.html.erb
+ x sheets.html.erb
+ x sheet_properties.html.erb
+ x survey_users.html.erb
+ x group_users.html.erb
+
+ x logged out等のメッセージを日本語化
+ x 「リスト」 → 「一覧」
+ x 「自治体/機関設定」を外す
+
+views/groups/new.html.erb:<h1 class="surveysobject">自治体/機関の新規作成</h1>
+views/groups/edit.html.erb:<h1 class="surveysobject">自治体/機関の基本情報編集</h1>
+views/groups/_form.html.erb:    自治体/機関名を入力してください。
+views/users/edit_self.html.erb:    <h2 class="surveysobject">管轄自治体名</h2>
+views/users/_list.html.erb:    <th class="surveysobject">管轄自治体名</th>
+views/users/_form.html.erb:  <h2 class="surveysobject">管轄自治体名</h2>
+views/users/_form.html.erb:     管轄自治体名を入力してください。
+

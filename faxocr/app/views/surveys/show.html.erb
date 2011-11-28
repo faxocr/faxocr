@@ -1,78 +1,92 @@
-<h1 class="surveysobject"><%= @survey.survey_name %></h1> 
+<h1 class="surveysobject"><%= @survey.survey_name %>
+(<%=h Survey::STATUS[@survey.status][0] %>)</h1> 
 
-<table><tr><td>
-<h2 class="surveysobject_title">基本情報</h2>
-</td><td>
+<div align="right">
 <% if @current_user.has_survey_role(@current_group.id) %>
-<%= link_to '編集', edit_group_survey_path(@group, @survey) %>
+<%= link_to '[設定]', edit_group_survey_path(@group, @survey) %>
 <% end %>
-</td></tr></table>
-<div>
-  <h3>名称</h3>
-  <%=h @survey.survey_name %>
 </div>
-<div>
-  <h3>ステータス</h3>
-  <%=h Survey::STATUS[@survey.status][0] %>
-</div>
-<div>
-  <h3>集計レポート配信時間</h3>
-  <% if @survey.report_time != nil %>
-  <%=h @survey.report_time.to_s(:time_jp) %>
-  <% end %>
-</div>
-<div>
-  <h3>集計レポート配信曜日</h3>
-  <%=h @survey.printable_report_wday %>
-</div>
-<div>
-  <h3>集計レポートHTMLヘッダー</h3>
-  <%=h @survey.report_header %>
-</div>
-<div>
-  <h3>集計レポートHTMLフッター</h3>
-  <%=h @survey.report_footer %>
-</div>
+
 <p>
-<table><tr><td>
 <h2 class="surveysobject_title">24時間以内に受信したFAX</h2>
-</td><td>
-<%= link_to '全て表示', group_survey_answer_sheets_path(@group, @survey) %>
-</td></tr></table>
 <%= render :partial => "answer_sheets/list" %>
-<br/>
+<div align="right">
+<%= link_to '[全件管理]', group_survey_answer_sheets_path(@group, @survey) %>
+</div>
 </p>
-<table><tr><td>
+
+<p>
 <h2 class="surveysobject_title">調査対象</h2>
-</td><td>
-<% if @current_user.has_survey_role(@current_group.id) %>
-<%= link_to '編集', group_survey_survey_candidates_path(@group, @survey) %>
-<% end %>
-</td></tr></table>
 <%= render :partial => "survey_candidates/list" %>
-<br/>
-</p>
-
-<p>
-<table><tr><td>
-<h2 class="surveysobject_title">調査項目</h2>
-</td><td>
+<div align="right">
 <% if @current_user.has_survey_role(@current_group.id) %>
-<%= link_to '編集', group_survey_survey_properties_path(@group, @survey) %>
+<%= link_to '[一覧管理]', group_survey_survey_candidates_path(@group, @survey) %>
 <% end %>
-</td></tr></table>
-<%= render :partial => "survey_properties/list" %>
-<br/>
+</div>
 </p>
 
 <p>
-<table><tr><td>
 <h2 class="surveysobject_title">シート</h2>
-</td><td>
-<% if @current_user.has_survey_role(@current_group.id) %>
-<%= link_to '編集', group_survey_sheets_path(@group, @survey) %>
-<% end %>
-</td></tr></table>
 <%= render :partial => "sheets/list" %>
-<br/>
+<div align="right">
+<% if @current_user.has_survey_role(@current_group.id) %>
+<%= link_to '[一覧管理]', group_survey_sheets_path(@group, @survey) %>
+<% end %>
+</div>
+</p>
+
+<p>
+<h2 class="surveysobject_title">調査項目</h2>
+<div align="right">
+<%= render :partial => "survey_properties/list" %>
+<% if @current_user.has_survey_role(@current_group.id) %>
+<%= link_to '[一覧管理]', group_survey_survey_properties_path(@group, @survey) %>
+<% end %>
+</div>
+</p>
+
+<p>
+<h2 class="surveysobject_title">集計レポート</h2>
+
+<table class="surveysobject">
+  <tr class="surveysobject">
+    <th class="surveysobject" align="left">　配信曜日</th>
+    <th class="surveysobject" align="left">　配信時間</th>
+  </tr>
+  <tr class="surveysobject">
+    <td align="left">
+      　<%=h @survey.printable_report_wday %>
+    </td>
+    <td align="left">
+      <% if @survey.report_time != nil %>
+      　<%=h @survey.report_time.to_s(:time_jp) %>
+      <% end %>
+    </td>
+  </tr>
+
+  <tr class="surveysobject">
+    <th class="surveysobject" align="left" colspan="2">　HTMLヘッダー</th>
+  </tr>
+  <tr class="surveysobject">
+    <td class="surveysobject" align="left" colspan="2">
+      <%=h @survey.report_header %>
+    </td>
+  </tr>
+
+  <tr class="surveysobject">
+    <th class="surveysobject" align="left" colspan="2">　HTMLフッター</th>
+  </tr>
+  <tr class="surveysobject">
+    <td class="surveysobject" align="left" colspan="2">
+      <%=h @survey.report_footer %>
+    </td>
+  </tr>
+
+</table>
+
+<div align="right">
+<% if @current_user.has_survey_role(@current_group.id) %>
+<%= link_to '[編集]', edit_group_survey_path(@group, @survey) %>
+<% end %>
+</div>
 </p>

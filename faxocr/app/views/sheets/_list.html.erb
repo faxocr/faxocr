@@ -1,7 +1,7 @@
 <div class="surveysobject_new">
 <% if params[:controller] == "sheets" %>
 <% if @current_user.has_survey_role(@group.id) %>
-<%= link_to 'シートの新規作成', new_group_survey_sheet_path(@group, @survey) %>
+<%= link_to '[シートの新規作成]', new_group_survey_sheet_path(@group, @survey) %>
 <% end %>
 <% end %>
 </div>
@@ -12,9 +12,11 @@
     <th class="surveysobject">名称</th>
     <th class="surveysobject">横ブロック数</th>
     <th class="surveysobject">縦ブロック数</th>
-	<% if params[:controller] == "sheets" %>
+    <% if params[:controller] == "sheets" %>
     <th class="surveysobject">操作</th>
-	<% end %>
+    <% else %>
+    <th class="surveysobject">ダウンロード</th>
+    <% end %>
   </tr>
   <% count = 0 %>
   <% @sheets.each do |sheet| %>
@@ -31,10 +33,17 @@
 	<td class="surveysobject"><%=h sheet.block_height %></td>
 	<% if params[:controller] == "sheets" %>
     <% if @current_user.has_survey_role(@group.id) %>
-    <td class="surveysobject_manage"><%= link_to '削除', group_survey_sheet_path(@group, @survey, sheet), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+    <td class="surveysobject_manage">
+<a href=<%="\"/pdf/" + sheet.id.to_s + ".pdf\""%> >[PDF]</a>
+<%= link_to '[編集]', group_survey_sheet_path(@group, @survey, sheet) %>
+<%= link_to '[削除]', group_survey_sheet_path(@group, @survey, sheet), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
     <% else %>
     <td class="surveysobject_manage">操作できません</td>
     <% end %>
+    <% else %>
+    <td class="surveysobject_manage">
+      <a href=<%="\"/pdf/" + sheet.id.to_s + ".pdf\""%> >[PDF]</a>
+    </td>
     <% end %>
   </tr>
 <% end %>

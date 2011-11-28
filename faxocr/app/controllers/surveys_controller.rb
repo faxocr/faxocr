@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class SurveysController < ApplicationController
   before_filter :verify_group_authority
   before_filter :verify_survey_authority

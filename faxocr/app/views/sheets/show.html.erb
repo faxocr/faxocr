@@ -28,13 +28,11 @@
 </div>
 
 <p>
-<table><tr><td>
 <h2 class="surveysobject_title">使用する調査項目</h2>
-</td><td>
-<% if @current_user.has_survey_role(@current_group.id) %>
-<%= link_to '編集', group_survey_sheet_sheet_properties_path(@group, @survey, @sheet) %>
-<% end %>
-</td></tr></table>
 <%= render :partial => "sheet_properties/list" %>
-<br/>
+<div align="right">
+<% if @current_user.has_survey_role(@current_group.id) %>
+<%= link_to '[一覧]', group_survey_sheet_sheet_properties_path(@group, @survey, @sheet) %>
+<% end %>
+</div>
 </p>
