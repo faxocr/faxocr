@@ -3,7 +3,11 @@ class FaxocrController < ApplicationController
   before_filter :verify_group_authority, :only => :direct_masquerade
 
   def index
-     redirect_to group_url(@authorized_group ? @authorized_group.id : @current_group.id)
+     if (@current_group.is_administrator?)
+       redirect_to :controller => 'groups', :action => 'index'
+     else
+       redirect_to group_url(@authorized_group ? @authorized_group.id : @current_group.id)
+     end
   end
 
   def login
