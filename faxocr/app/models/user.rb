@@ -1,3 +1,4 @@
+# -*- coding: undecided -*-
 require "digest/sha1"
 class User < ActiveRecord::Base
   has_many  :role_mappings
@@ -116,7 +117,7 @@ class User < ActiveRecord::Base
 
   private
   def password_non_blank
-    errors.add(:password, "Password required.") if hashed_password.blank?
+    errors.add(:password, "パスワードを入力して下さい") if hashed_password.blank?
   end
 
   def create_new_salt
