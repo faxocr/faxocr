@@ -7,16 +7,16 @@ class FaxocrController < ApplicationController
   end
 
   def login
-    flash[:notice] = "ログインしました"
     if request.post?
       authn_user = User.authenticate(params[:login_name], params[:password])
       if authn_user
         session[:current_user] = authn_user
         return_uri = session[:return_uri]
         #session[:return_uri] = nil
+        flash[:notice] = "ログインしました"
         redirect_to(return_uri || {:action => 'index'})
       else
-        flash.now[:notice] = "ユーザー名、あるいは、パスワードが違います"
+        flash[:notice] = "ユーザー名、あるいは、パスワードが違います"
       end
     end
 
