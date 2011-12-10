@@ -20,6 +20,7 @@ class AnswerSheetsController < ApplicationController
   def show
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:survey_id])
+
     begin
     @answer_sheet = AnswerSheet.find(params[:id])
     @answer_sheet_properties = @answer_sheet.answer_sheet_properties
@@ -28,6 +29,59 @@ class AnswerSheetsController < ApplicationController
     rescue
       sheet = nil
     end
+
+    #
+    # Finds prev and next
+    #
+    @answer_sheets = AnswerSheet.find_all_by_sheet_id(@survey.sheet_ids,
+						      :order => 'date desc')
+    nsheets = @answer_sheets.length
+    case nsheets
+    when 0
+      @s_prev = nil
+      @s_next = nil
+    when 1
+      @s_prev = nil
+      @s_next = nil
+    when 2
+      if @answer_sheets.first == sheet
+        @s_prev = @answer_sheets.last
+	@s_next = nil
+      else
+        @s_prev = nil
+	@s_next = @answer_sheets.first
+      end
+    else
+      flag = nil
+      @s_prev = nil
+      @s_next = nil
+      @answer_sheets.each do |s|
+        if flag == true
+	  @s_prev = s
+	  break
+	end
+	if s == @answer_sheet
+          flag = true
+	else
+          @s_next = s
+	end
+      end
+    end
+
+#   flash[:notice] = n.to_s
+
+#    begin
+#    @s_prev = AnswerSheet.find(params[:id] - 1)
+#    rescue
+#    @s_prev = @answer_sheet
+#    end
+#
+#    begin
+#    @s_next = AnswerSheet.find(params[:id] + 1)
+#    rescue
+#    @s_next = @answer_sheet
+#    end
+
     if sheet == nil
       redirect_to(group_survey_answer_sheets_url(@group, @survey))
     else
@@ -74,6 +128,7 @@ class AnswerSheetsController < ApplicationController
     @survey = @group.surveys.find(params[:survey_id])
     sheets = @survey.sheets
     sheet = sheets.find(@answer_sheet.sheet_id)
+
     if sheet == nil
       redirect_to(group_survey_answer_sheets_url(@group, @survey))
     end
@@ -116,11 +171,26 @@ class AnswerSheetsController < ApplicationController
     @answer_sheet = AnswerSheet.find(params[:id])
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:survey_id])
+
+    # XXX: Added for quick updating of answer_sheet (dec 11, 2011)
+    @answer_sheet.answer_sheet_properties.each do |p|
+      pid = "property_" + p.id.to_s
+      if !params[pid].nil?
+	p.ocr_value = params[pid]
+	p.save
+      end
+    end
+
     if @answer_sheet.update_attributes(params[:answer_sheet])
       redirect_to group_survey_answer_sheet_url(@group, @survey, @answer_sheet)
     else
       render :action => "edit"
     end
+  end
+
+  # XXX
+  def update_audit
+    redirect_to group_survey_answer_sheet_url(@group, @survey, @answer_sheet)
   end
 
   def update_recognize

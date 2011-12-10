@@ -1,0 +1,62 @@
+<div class="surveysobject_new">
+</div>
+
+<center>
+
+<% form_for([@group,@survey,@answer_sheet], :action => 'update_audit') do |f| %>
+
+<table width="85%">
+<tr>
+  <td valign="middle" align="right">
+    <% if !@s_prev.nil? %>
+    <%= link_to image_tag('/images/prev.gif'), group_survey_answer_sheet_path(@group, @survey, @s_prev) %>
+    <% end %>
+  </td>
+  <td align="center">
+<table class="surveysobject" style="width:100%;">
+  <tr class="surveysobject">
+    <th class="surveysobject">OCR ID</th>
+    <th class="surveysobject">画像</th>
+    <th class="surveysobject">データ</th>
+  </tr>
+  <% count = 0 %>
+
+<% @answer_sheet_properties.each do |answer_sheet_property| %>
+  <% count = (count + 1) & 1 %>
+  <% if count == 0 %>
+  <tr class="surveysobject">
+  <% else %>
+  <tr class="surveysobject_dark">
+  <% end %>
+    <td class="surveysobject"><%=h answer_sheet_property.ocr_name %></td>
+    <td class="surveysobject" style="text-align:right;">
+  		<%= image_tag(image_group_survey_answer_sheet_answer_sheet_property_path(@group, @survey, @answer_sheet, answer_sheet_property), :height => '30') %>
+	</td>
+    <% if @current_user.has_survey_role(@group.id) %>
+    <td class="surveysobject" style="text-align:right;">
+      <%= text_field_tag "property_" + answer_sheet_property.id.to_s, answer_sheet_property.ocr_value, :size => 8, :style => "border:0;font-size:18px;"%>
+    </td>
+    <% else %>
+    <td class="surveysobject" style="text-align:right;">
+      <%=h answer_sheet_property.ocr_value %>
+    </td>
+    <% end %>
+  </tr>
+<% end %>
+  <tr>
+    <td colspan="3" align="center">
+      <%= f.submit '更新' %>
+    </td>
+  </tr>
+</table>
+  </td>
+  <td valign="middle" align="left">
+    <% if !@s_next.nil? %>
+    <%= link_to image_tag('/images/next.gif'), group_survey_answer_sheet_path(@group, @survey, @s_next) %>
+    <% end %>
+  </td>
+</tr>
+</table>
+<% end %>
+
+</center>

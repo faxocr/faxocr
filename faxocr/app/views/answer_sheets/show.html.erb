@@ -32,10 +32,13 @@
 <td>
 <div>
   <h3>調査シート</h3>
+<p style="-webkit-transform: rotate(-90deg); -webkit-transform-origin:250px 250px;">
   <%= image_tag(image_group_survey_answer_sheet_path(@group, @survey, @answer_sheet), :width => '500') %>
+</p>
 </div>
 </td>
 </tr></table>
+
 <table><tr><td>
 <h2 class="surveysobject_title">調査項目</h2>
 </td><td>
@@ -43,6 +46,7 @@
 <%= link_to '編集', group_survey_answer_sheet_answer_sheet_properties_path(@group, @survey, @answer_sheet) %>
 <% end %>
 </td></tr></table>
-<%= render :partial => "answer_sheet_properties/list" %>
+<%= render :partial => "answer_sheet_properties/audit" %>
+
 <br/>
 </p>
