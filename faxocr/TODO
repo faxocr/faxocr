@@ -1,7 +1,4 @@
 
- - PHP連携
-   - app/externalのテンプレート、css、imageを、rails側に合わせる
-
  - ホーム画面 / 利便向上
    - 「24時間以内に受信したFAX」を追加
    - 「新規サーベイ」PHPリンクを修正
@@ -17,6 +14,9 @@
  x 目視確認画面
    x ファックス画像を回転
    x 高機能化
+
+ x PHP連携
+   x app/externalのテンプレート、css、imageを、rails側に合わせる
 
 *** *** ***
 

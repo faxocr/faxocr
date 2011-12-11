@@ -37,34 +37,35 @@
 
 <h1>調査対象 一括取込</h1>
 
-<BR>
+<br>
 <form action="<%= @action %>" method="post" enctype="multipart/form-data" name="upfm">
-<CENTER>
+<center>
 <%= hidden_field_tag(:gid, @gid) %>
 <table width="700px" border="0" cellpadding="3" cellspacing="0" class="srcTable1">
 	<tbody><tr> 
-		<th><div align="center"><B>ファイル登録</B></div></th> 
-		<td> <BR><BR>
+		<th><div align="center"><b>ファイル登録</b></div></th> 
+		<td> <br><br>
 <center><%= file_field "file", "upfile", "size" => "60" %></center>
-<BR>
+<br>
 <div align="left">
-<UL><LI> 対応ファイル: 　.xls</LI>
-	<LI> アップロード可能なファイルサイズは、<B><%= @limit %></B>バイトまでです。<BR>
-	<LI> 本システムは、Office 2003以前のExcel(.xls)専用で、.xlsxには未対応です。<BR>
-<BR>
-</UL>
+<ul>
+  <li> 調査対象ファイルのテンプレートは、<a href="../target.xls">こちら</a>です。</li>
+  <li> 本システムは、Office 2003以前のExcel(.xls)専用で、.xlsxには未対応です。</li>
+  <li> アップロード可能なファイルサイズは、<b><%= @limit %></b>バイトまでです。</li>
+<br>
+</ul>
 </div>
 		</td> 
 	</tr> 
 	<tr>
-		<td colspan="2"><CENTER><BR>
+		<td colspan="2"><center><br>
 <a href="#" onclick="document.upfm.submit()"><img src="/image/submit.gif" alt="アップロード" border="0"></a>
-<BR><BR>
+<br><br>
 </center>
 		</td> 
 	</tr> 
 </tbody></table> 
-</CENTER>
+</center>
 </form>
 
 	</div>
