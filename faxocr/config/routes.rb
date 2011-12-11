@@ -39,10 +39,24 @@ ActionController::Routing::Routes.draw do |map|
   #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'
   # Keep in mind you can assign values other than :controller and :action
 
-  # PHP driver
+  #
+  # Target registration
+  #
+
+  # Entry point
   map.connect 'external/register/:group_id',
     :controller => 'external',
     :action => 'register'
+
+  # PHP driver
+  map.connect 'external/reg_upload',
+    :controller => 'external',
+    :action => 'reg_upload'
+
+  # PHP driver
+  map.connect 'external/reg_exec',
+    :controller => 'external',
+    :action => 'reg_exec'
 
   # PHP driver
   map.connect 'external/form/:group_id/:survey_id',

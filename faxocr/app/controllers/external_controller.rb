@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 class ExternalController < ApplicationController
 
+  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec]
+
+  # file size limit
+  # @@size_limit = 60000
+  @@size_limit = 128 * 1024
+
   # コメント：
   #
   # - もっとよいpath指定の方法がありそうだが...
@@ -29,11 +35,61 @@ class ExternalController < ApplicationController
     render :dummy
   end
 
+  #
   # http://server_addr:3000/external/register/1234
+  #
   def register
-    @gid = params[:group_id]
-    @html = "GID: " + @gid + "\n<BR>"
-    render :dummy
+    # XXX
+    # @html = "GID: " + @gid + "\n<BR>"
+    # @action = "/external/register/" + @gid + "?status=list"
+    # @action = "/external/test/" + @gid
+
+    @limit = (@@size_limit / 1024).to_s + "K"
+    # @limit = "128K"
+
+    @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
+    @action = "/external/reg_upload/"
+  end
+
+  def reg_upload
+
+    @gid = params[:gid]
+    if params[:file].nil? then
+      redirect_to :controller => 'external', :action => 'register', :id => @gid
+      return
+    else
+      @filename = params[:file]['upfile'].original_filename
+      @size = params[:file]['upfile'].size
+      @tname = @gid + "-" + Time.now().strftime("%Y%m%d%H%M")
+    end
+
+    if 0 < @size && @size <= @@size_limit && /\.xls$/ =~ @filename then
+      File.open("#{RAILS_ROOT}/files/#{@tname}" + ".lst", "wb") {
+        |f| f.write(params[:file]['upfile'].read)
+      }
+      # @html = "GID: " + @gid + "\n<BR>" +
+      #  "Filename: " + @filename + " (" + @size.to_s + ")\n<BR>" +
+      #  "Temp file: " + @tname
+      # @html = `cd ./app/external; php reg_upload.php`
+      # @html = `echo php reg_upload.php file=\"#{@tname}\"`
+      @html = `cd ./app/external; php reg_upload.php gid=\"#{@gid}\" file=\"#{@tname}\"`
+      render :dummy
+    else
+      # @html = "GID: " + @gid + "\n<BR>"
+      flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
+      redirect_to :controller => 'faxocr'
+    end
+  end
+
+  def reg_exec
+
+    @file = params[:file]
+    @gid = params[:gid]
+    @group = Group.find(params[:gid])
+    @result = `ruby #{RAILS_ROOT}/files/#{@file}.rb #{RAILS_ROOT} #{@gid}`
+
+    flash[:notice] = "調査対象を一括登録しました"
+    redirect_to group_candidates_url(@group)
   end
 
   # http://server_addr:3000/external/form/1234/5678

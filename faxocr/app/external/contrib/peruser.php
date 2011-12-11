@@ -1402,10 +1402,10 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 				$desc=($this->__get2($cell['dat'],0)==0)?'FALSE':'TRUE';
 				break;
 			case Type_BLANK:
-				$desc=' ';
+				$desc=''; // XXX $desc = ' '; 
 				break;
 			default:
-				$desc=' ';
+				$desc=''; // XXX $desc = ' '; 
 		}
 	  } else $desc='';
 	  return $desc;

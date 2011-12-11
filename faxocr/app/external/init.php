@@ -23,15 +23,43 @@
 // Encoding setting
 mb_internal_encoding($charset);
 
-//
 // Initialization
-//
 $header_opt = "";
 $body_opt = "";
 $errmsg = "";
 $xls = null;
 
-if (isset($_REQUEST['file']))
-	$file_id = $_REQUEST['file'];
+//
+// For PHP command line interface (CLI)
+//
+if ($argc > 0) {
+	foreach($argv as $strArg) {
+		if (($arrTmp = explode('=', $strArg)) && count($arrTmp) > 1) {
+			$_REQUEST[$arrTmp[0]] = $arrTmp[1];
+		}
+	}
+}
+
+//
+// Environment Variable
+//
+
+if ($_SERVER["HTTPS"]) {
+	$url_base = "https://${_SERVER['HTTP_HOST']}";
+} else {
+	$url_base = "http://${_SERVER['HTTP_HOST']}";
+}
+
+if (isset($_REQUEST["file"])) {
+	$file_id = $_REQUEST["file"];
+}
+
+if (isset($_REQUEST["gid"])) {
+	$group_id = $_REQUEST["gid"];
+}
+
+if (isset($_REQUEST["msg"])) {
+	$errmsg = $_REQUEST["msg"];
+}
 
 ?>

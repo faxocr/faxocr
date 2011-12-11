@@ -20,39 +20,135 @@
  *
  */
 
-// 最大ファイルサイズ
+// 文字エンコーディング
+//
+// utf-8以外を使用する場合は、以下を変更してください。
+// 文字コードによっては機種依存文字が化ける場合があります。
+//
+$charset = "utf-8";
+
+// 最大登録ファイルサイズ
 $max_upload_size = 1024 * 128;
 
-// utf-8以外の文字エンコーディングを使用する場合は、
-// 以下のutf-8を変更してください。文字コードによっては
-// 機種依存文字が化ける場合があります
-$charset='utf-8';
+// パスワード義務化 (1: yes, 0: no)
+$password_required = 0;
 
-// Dst Dir Name
-define("DST_DIR", dirname(__FILE__) . "/../../ext-files/");
+// ファイル同一性閾値
+//
+// formモードでファイルをアップロードする際、正統なテンプレートを
+// 利用していると見なす閾値
+//
+$proximity_threshold = 0.025;
 
-// Tmp Dir Name
+// 任意リンクURL
+//
+// 画面下部に、フィードバックページなど、任意のリンクを挿入するこ
+// とが出来ます。
+//
+$link_url = "";
+
+// 任意リンクラベル
+//
+$link_label = "";
+
+// マーカー色指定 (マーカーモード用)
+define("COLOR_FILL", 22);
+
+///////////////////////////////////////////////////////
+// ディレクトリ設定
+//
+
+// 登録ファイル保存ディレクトリ
+define("DST_DIR", dirname(__FILE__) . "/../../files/");
+
+// アップロードXLS保存ディレクトリ
+define("XLS_DIR", dirname(__FILE__) . "/../orig/");
+
+// 一時ファイル保存ディレクトリ
 define("TMP_DIR", "/tmp/");
 
-// Obj Data Ext
-define("DATA_EXT", ".dat");
+// HTMLスキンディレクトリ
+define("TMP_HTML_DIR", dirname(__FILE__) . "/skin/");
 
-// Obj Data Ext
-define("ORIG_EXT", ".orig");
-
-// Lockfile
-define("LOCK_FILE", TMP_DIR . "excel_lock_");
-
-// Tmp HTML Dir Name
-define("TMP_HTML_DIR", dirname(__FILE__) . "/html-template/");
-
-// Template XLS Dir Name
+// XLSテンプレートディレクトリ
 define("TMP_XLS_DIR", "./xls-template/");
 
-// Template XLS Path Name
+///////////////////////////////////////////////////////
+// 拡張子・ロックファイル設定
+//
+
+// ターゲットXLSデータ用拡張子 (システムが修正しうる)
+define("DATA_EXT", ".dat");
+
+// オリジナルXLSデータ用拡張子 (システムは修正しない)
+define("ORIG_EXT", ".orig");
+
+// 設定ファイル用拡張子
+define("CONF_EXT", ".conf");
+
+// 配列型設定ファイル用拡張子 (XXX: 将来的にCONF_EXTと統合)
+define("ARRAY_CONF_EXT", ".acnf");
+
+// ログファイル用拡張子
+define("LOG_EXT", ".log");
+
+// 報告対象リスト用拡張子
+define("LIST_EXT", ".lst");
+
+// 報告対象セレクタ用拡張子
+define("SELECT_EXT", ".html");
+
+// 書き込みロックファイル
+define("LOCK_FILE", TMP_DIR . "excel_lock_");
+
+///////////////////////////////////////////////////////
+// XLSテンプレート
+//
+
+// XLS出力用テンプレート
+//
+// reviser.phpは、xlsファイルの生成に際して種となるxlsファイルを要します
 define("TMP_XLS", TMP_XLS_DIR . "template.xls");
 
-// for maker view
-define("COLOR_FILL", 22);
+// 報告対象テンプレート：都道府県
+define("LIST_PREF_XLS", TMP_XLS_DIR . "list-pref.xls");
+
+// 報告対象テンプレート：政令指定都市 (H22版?)
+define("LIST_CITIES_XLS", TMP_XLS_DIR . "list-cities.xls");
+
+// 報告対象テンプレート：保健所 (H22版?)
+define("LIST_PHC_XLS", TMP_XLS_DIR . "list-phc.xls");
+
+///////////////////////////////////////////////////////
+// XLSファイル毎設定
+//
+
+// 設定保存形式 {file, filedb}
+define("FILE_CONF_STORAGE_DEVICE", "file");
+
+// 対象ファイルディレクトリ
+define("FILEDB_DIR", "../files/");
+
+// ファイルデータベースファイル
+define("FILEDB_PATH", "../files/file.db");
+
+// ファイル逆引きデータベースファイル
+define("FILE_REVERSE_DB_PATH", "../files/file_reverse.db");
+
+///////////////////////////////////////////////////////
+// MySQL接続情報
+//
+
+// MySQLサーバ
+define("MYSQL_DB_SERVER_NAME", "localhost");
+
+// データベース名
+define("MYSQL_DB_NAME", "ezcloud");
+
+// アクセスユーザー名
+define("MYSQL_DB_USER_NAME", "cloud");
+
+// アクセスパスワード
+define("MYSQL_DB_USER_PASS", "cloudpass");
 
 ?>
