@@ -30,7 +30,12 @@ class ExternalController < ApplicationController
 
     # PHP CLI SAPIだが、スクリプトがHTMLタグを生成
     # ただし、各種imgやcssはpublic/external側にも用意
-    @html = `cd ./app/external; php form-overlay.php`
+
+    @html = "<PRE>\n"
+    # @html += "RAILS_ENV=#{fetch(:rails_env)}"
+    # @html = `cd ./app/external; php form-overlay.php`
+    @html += "RAILS_ENV=#{RAILS_ENV}"
+    @html += "<PRE>\n"
 
     render :dummy
   end
@@ -72,7 +77,7 @@ class ExternalController < ApplicationController
       #  "Temp file: " + @tname
       # @html = `cd ./app/external; php reg_upload.php`
       # @html = `echo php reg_upload.php file=\"#{@tname}\"`
-      @html = `cd ./app/external; php reg_upload.php gid=\"#{@gid}\" file=\"#{@tname}\"`
+      @html = `cd ./app/external; php reg_upload.php gid=\"#{@gid}\" file=\"#{@tname}\" rails_env=\"#{RAILS_ENV}\"`
       render :dummy
     else
       # @html = "GID: " + @gid + "\n<BR>"

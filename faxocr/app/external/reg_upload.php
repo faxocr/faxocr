@@ -65,7 +65,7 @@ if ($xls) {
 		#
 		# ruby script
 		#
-		$tgt_script = <<< STR
+		$tgt_script = <<< "STR"
 #!/usr/bin/ruby
 # -*- coding: utf-8 -*-
 
@@ -77,7 +77,7 @@ rails_prefix = ARGV[0] || "./"
 group = ARGV[1] || exit(0)
 
 config_db = rails_prefix + "/config/database.yml"
-db_env = "development"
+db_env = "{$rails_env}"
 
 ActiveRecord::Base.configurations = YAML.load_file(config_db)
 ActiveRecord::Base.establish_connection(db_env)
@@ -87,7 +87,7 @@ end
 
 props = []
 
-STR;
+"STR";
 		for ($r = 0; $r <= $nrows; $r++) {
 			$item_name = trim(strconv($xls->dispcell(0, $r, 0)));
 			$item_id = trim(strconv($xls->dispcell(0, $r, 1)));

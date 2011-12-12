@@ -62,6 +62,10 @@ if (isset($_REQUEST["sid"])) {
 	$sheet_id = $_REQUEST["gid"];
 }
 
+if (isset($_REQUEST["rails_env"])) {
+	$rails_env = $_REQUEST["rails_env"];
+}
+
 if (isset($_REQUEST["msg"])) {
 	$errmsg = $_REQUEST["msg"];
 }
