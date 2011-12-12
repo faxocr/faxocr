@@ -60,12 +60,35 @@ if ($xls) {
 	if (isset($xls->boundsheets))
 		$nsheets = count($xls->boundsheets);
 
+	$tgt_script = "";
 	if ($ncolumn >= 3 && $nsheets == 1) {
+
+
+		# target
+		$tgt_items = "";
+		for ($r = 0; $r <= $nrows; $r++) {
+			$item_name = trim(strconv($xls->dispcell(0, $r, 0)));
+			$item_id = trim(strconv($xls->dispcell(0, $r, 1)));
+
+			$item_tel = strconv($xls->dispcell(0, $r, 2));
+			$item_tel = ereg_replace("[^0-9]", "", $item_tel);
+			$item_tel = trim($item_tel);
+
+			$item_fax = strconv($xls->dispcell(0, $r, 3));
+			$item_fax = ereg_replace("[^0-9]", "", $item_fax);
+			$item_fax = trim($item_fax);
+
+			if ($item_name && $item_id && $item_tel && $item_fax) {
+				$tgt_items .= "props << ['${item_name}', '${item_id}'," .
+					       "'${item_tel}', '${item_fax}']\n";
+			}
+		}
 
 		#
 		# ruby script
 		#
 		$tgt_script = <<< "STR"
+
 #!/usr/bin/ruby
 # -*- coding: utf-8 -*-
 
@@ -87,26 +110,8 @@ end
 
 props = []
 
-"STR";
-		for ($r = 0; $r <= $nrows; $r++) {
-			$item_name = trim(strconv($xls->dispcell(0, $r, 0)));
-			$item_id = trim(strconv($xls->dispcell(0, $r, 1)));
+{$tgt_items}
 
-			$item_tel = strconv($xls->dispcell(0, $r, 2));
-			$item_tel = ereg_replace("[^0-9]", "", $item_tel);
-			$item_tel = trim($item_tel);
-
-			$item_fax = strconv($xls->dispcell(0, $r, 3));
-			$item_fax = ereg_replace("[^0-9]", "", $item_fax);
-			$item_fax = trim($item_fax);
-
-			if ($item_name && $item_id && $item_tel && $item_fax) {
-				$tgt_script .= "props << ['${item_name}', '${item_id}'," .
-					       "'${item_tel}', '${item_fax}']\n";
-			}
-		}
-
-		$tgt_script .= <<< STR
 props.each do |prop|
 
   # preprocess
@@ -128,10 +133,10 @@ props.each do |prop|
   end
 end
 exit(0)
+
 STR;
 
 	} else {
-		$tgt_script = "";
 		$xls = null;
 
 		if ($nsheets != 1)
