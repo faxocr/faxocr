@@ -1,4 +1,38 @@
 
+ * アカウント
+
+user: admin
+pass: admin
+
+ * PHP関連ディレクトリ / ファイル
+
+/faxocr/faxocr/app/controllers/external_controller.rb	PHP driver
+/faxocr/faxocr/app/external/	for PHP files (dynamic: .php)
+/faxocr/faxocr/public/external/	for HTML files (static: css, image, js)
+/faxocr/ext-files/		for UI related files (conf, xls, etc)
+
+ * メモ
+
+ - conrig/route.rbに、route設定を行う。単なるPHP呼び出し(test_php)、
+   パラメータ渡し(test_gid)等、例を設けた
+ - app/controllers/external_controller.rbに、踏み台メソッドを記載
+ - script/serverを実行
+
+ * externl class作成ログ
+
+debian-faxocr:~/google/faxocr/faxocr> script/generate controller external
+      exists  app/controllers/
+      exists  app/helpers/
+      create  app/views/external
+      exists  test/functional/
+      exists  test/unit/helpers/
+      create  app/controllers/external_controller.rb
+      create  test/functional/external_controller_test.rb
+      create  app/helpers/external_helper.rb
+      create  test/unit/helpers/external_helper_test.rb
+
+ * TODO
+
  - ホーム画面 / 利便向上
    - 「24時間以内に受信したFAX」を追加
    - 「新規サーベイ」PHPリンクを修正
@@ -7,6 +41,9 @@
    - 「ステータス編集画面」と「集計レポート編集画面」を分離したい
    - PDFダウンロードリンクを修正
    - 目視確認画面へのUIを修正
+
+
+*** *** ***
 
  x 調査対象画面
    x 「一括取り込み」PHP機能を修正
@@ -17,8 +54,6 @@
 
  x PHP連携
    x app/externalのテンプレート、css、imageを、rails側に合わせる
-
-*** *** ***
 
  x inbox.html.erb
  x role_mappings.html.erb

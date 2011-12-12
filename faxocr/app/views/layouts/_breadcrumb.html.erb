@@ -2,11 +2,23 @@
 <div class="breadcrumb">
 　場所:
 <% if /^(groups|surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties|report|candidates|users)$/ =~ params[:controller] %>
-	<% if !(/^(groups)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
-	  <%= link_to 'ホーム', group_path(@group) %>
+
+	<% if @current_group.is_administrator? %>
+	  <%= link_to '管理ホーム', groups_url %>
+
+	  <% if !(/^(groups)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	  &gt;
+	    <%= link_to @group.group_name, group_path(@group) %>
+	  <% end %>
+
 	<% else %>
-	  <%= link_to 'ホーム', @current_group %>
+	  <% if !(/^(groups)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	    <%= link_to 'ホーム', group_path(@group) %>
+	  <% else %>
+	    <%= link_to 'ホーム', @current_group %>
+	  <% end %>
 	<% end %>
+
 	<% if /^(surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties|report)$/ =~ params[:controller] %>
 	  &gt;&nbsp;<%= link_to 'サーベイ一覧', group_surveys_path(@group) %>
 	  <% if !(/^(surveys)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action]) %>

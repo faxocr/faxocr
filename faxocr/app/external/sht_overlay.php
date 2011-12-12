@@ -25,22 +25,24 @@ require_once 'init.php';
 require_once 'lib/common.php';
 require_once 'contrib/peruser.php';
 
-// makeptn関数(セルのパターン塗りつぶし画像生成)を使う場合は必ず先頭で処理
-if (isset($_GET['ptn']))
-	makeptn($_GET['ptn'], $_GET['fc']);
-
-if (This_Class_Name != "Excel_Peruser")
-	$errmsg = "Excel_Peruserが正しく読み込まれていません";
-
-if (Peruser_Ver != 0.110)
-	$errmsg = "Excel_Peruserのバージョンが異なります";
-
 // ファイルハンドリング
-if (isset($file_id)) {
-	$tgt_file = DST_DIR . $file_id . DATA_EXT;
+if (isset($file_id) && $file_id) {
+	$tgt_file = DST_DIR . $file_id . ".xls";
 } else {
-	$errmsg = "ファイルが読み込めません";
+	// XXX: $errmsg = "ファイルが読み込めません";
+	put_err_page("不正なアクセスです");
+	die;
 }
+
+//
+// ヘッダ処理
+//
+$header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/jqDnR.css\" type=\"text/css\">\n";
+$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.4.1.min.js\"></script>\n";
+$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetedit.js\"></script>\n";
+$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jqDnR.js\"></script>\n";
+include( TMP_HTML_DIR . "tpl.header.html" );
+
 
 // Excelファイル読み込み処理
 if ($tgt_file && $errmsg === "") {
@@ -52,30 +54,9 @@ if ($tgt_file && $errmsg === "") {
 
 	if ($xls->isError($result)) {
 		$errmsg = $result->getMessage();
-		if (strpos($errmsg, $_FILES['userfile']['tmp_name']) !== false) {
-			$errmsg = str_replace('Template file', 'Uploaded file',
-					      $errmsg);
-		}
 		$xls = null;
 	}
 }
-
-if (isset($_GET["msg"])) {
-	$errmsg = $_GET["msg"];
-}
-
-//
-// ヘッダ処理
-//
-$header_opt .= "<link rel=\"stylesheet\" href=\"./css/simpletabs.css\" type=\"text/css\" />\n";
-$header_opt .= "<link rel=\"stylesheet\" href=\"./css/jqdialog.css\" type=\"text/css\" />\n";
-$header_opt .= "<link rel=\"stylesheet\" href=\"./css/jqDnR.css\" type=\"text/css\">\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"./js/jquery-1.4.1.min.js\"></script>\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"./js/sheetedit.js\"></script>\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"./js/simpletabs_1.3.js\"></script>\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"./js/jqdialog.js\"></script>\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"./js/jqDnR.js\"></script>\n";
-include( TMP_HTML_DIR . "tpl.header.html" );
 
 //
 // エラーメッセージ処理
@@ -117,25 +98,7 @@ if ($xls) {
 	print "<input type=\"hidden\" name=\"password\" id=\"passwd\" />";
 	print "</form>";
 	print "<br>";
-
-	print "<div align=\"right\"><a href=\"./\">[戻る]</a></div>";
-
-} else {
-	print "<H1>かんたんクラウド</H1>";
-
-	//
-	// エラーメッセージ処理
-	//
-	if ($errmsg) {
-		print "<blockquote><font color=\"red\"><STRONG>";
-		print strconv($errmsg);
-		print "</STRONG></font></blockquote>";
-	}
-
-	print "<div align=\"right\"><a href=\"./\">[戻る]</a></div>";
 }
-
-print "<BR><a href=\"https://i-crisis.niph.go.jp/open_qhm/index.php?go=5ReYrp\">[御感想]</a><br>";
 
 //
 // フッタ読み込み
@@ -233,9 +196,9 @@ function insn_rotate() {
 <div id="ex3" class="jqDnR" style="opacity:0.8; position: absolute; top:100px; left:50px;display:none">
 <div class="jqDrag" style="height:100%">
 
-<img src="./image/mark.gif" class="mark-img" style="top: 0;left: 0">
-<img src="./image/mark.gif" class="mark-img" style="top: 0;right: 0">
-<img src="./image/mark.gif" class="mark-img" style="bottom: 0;left: 0">
+<img src="/image/mark.gif" class="mark-img" style="top: 0;left: 0">
+<img src="/image/mark.gif" class="mark-img" style="top: 0;right: 0">
+<img src="/image/mark.gif" class="mark-img" style="bottom: 0;left: 0">
 
 <BR><BR>
 <center>
@@ -248,17 +211,17 @@ function insn_rotate() {
 
 <h3>用紙方向</h3>
 
-<img valign="bottom" src="./image/direc-01.gif"><input type="radio" name="drctn" onclick="change_drctn(false);" checked>横
-<img valign="bottom" src="./image/direc-02.gif"><input type="radio" name="drctn" onclick="change_drctn(true);">縦<BR>
+<img valign="bottom" src="/image/direc-01.gif"><input type="radio" name="drctn" onclick="change_drctn(false);" checked>横
+<img valign="bottom" src="/image/direc-02.gif"><input type="radio" name="drctn" onclick="change_drctn(true);">縦<BR>
 
 
 <h3>見本位置</h3>
 
 <table style="position:relative; z-index:10;">
-<tr><td></td><td><img src="./image/arrow-u.gif" onmousedown="insn_move('d');" ></td><td></td><td></td></tr>
-<tr><td><img src="./image/arrow-l.gif" onmousedown="insn_move('l');" ></td><td></td><td><img src="./image/arrow-r.gif" onmousedown="insn_move('r');" >
-</td><td>　　<img src="./image/rotate.gif" onclick="insn_rotate();" ></td></tr>
-<tr><td></td><td><img src="./image/arrow-d.gif" onmousedown="insn_move('u');" >
+<tr><td></td><td><img src="/image/arrow-u.gif" onmousedown="insn_move('d');" ></td><td></td><td></td></tr>
+<tr><td><img src="/image/arrow-l.gif" onmousedown="insn_move('l');" ></td><td></td><td><img src="/image/arrow-r.gif" onmousedown="insn_move('r');" >
+</td><td>　　<img src="/image/rotate.gif" onclick="insn_rotate();" ></td></tr>
+<tr><td></td><td><img src="/image/arrow-d.gif" onmousedown="insn_move('u');" >
 </td><td></td><td></td></tr>
 </table>
 
@@ -266,7 +229,7 @@ function insn_rotate() {
 <button onclick="hide_marker();" style="position:relative; z-index:10;">PDF作成</button><BR><BR>
 </center>
 
-<img id="instrctn" valign="bottom" src="./image/insn-01.gif" style="position:relative; top:-100px; left:10px; z-index:0; width:200px;">
+<img id="instrctn" valign="bottom" src="/image/insn-01.gif" style="position:relative; top:-100px; left:10px; z-index:0; width:200px;">
 
 </div>
 <div class="jqResize"></div>

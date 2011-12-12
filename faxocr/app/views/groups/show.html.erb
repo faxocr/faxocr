@@ -7,7 +7,7 @@
 <%= render :partial => "surveys/list" %>
 <div align="right">
 <% if @current_user.has_survey_role(@current_group.id) %>
-<a href=<%="\"/external/form/" + @group.id.to_s + "/000\""%> >[新規サーベイ]</a>
+<a href=<%="\"/external/sheet/" + @group.id.to_s + "/000\""%> >[調査シート登録]</a>
 <% end %>
 </div>
 <br/>

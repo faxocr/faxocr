@@ -53,10 +53,14 @@ if ($tgt_file && $errmsg === "") {
 if ($xls) {
 	if (isset($xls->maxcell[0]))
 		$ncolumn = $xls->maxcell[0];
+
 	if (isset($xls->maxrow[0]))
 		$nrows = $xls->maxrow[0];
 
-	if ($ncolumn >= 3) {
+	if (isset($xls->boundsheets))
+		$nsheets = count($xls->boundsheets);
+
+	if ($ncolumn >= 3 && $nsheets == 1) {
 
 		#
 		# ruby script
@@ -129,7 +133,11 @@ STR;
 	} else {
 		$tgt_script = "";
 		$xls = null;
-		$errmsg .= "ファイルに列が足りません (" . ($ncolumn + 1) . "列)";
+
+		if ($nsheets != 1)
+			$errmsg .= "ファイルにシートが多すぎます (" . $nsheets . "シート)";
+		else
+			$errmsg .= "ファイルに列が足りません (" . ($ncolumn + 1) . "列)";
 	}
 
 	// ファイル生成
@@ -139,11 +147,11 @@ STR;
 //
 // ヘッダ処理
 //
-$header_opt .= "<link rel=\"stylesheet\" href=\"/css/simpletabs.css\" type=\"text/css\" />\n";
-$header_opt .= "<link rel=\"stylesheet\" href=\"/css/jqdialog.css\" type=\"text/css\" />\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"/js/jquery-1.4.1.min.js\"></script>\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"/js/simpletabs_1.3.js\"></script>\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"/js/jqdialog.js\"></script>\n";
+// $header_opt .= "<link rel=\"stylesheet\" href=\"/css/simpletabs.css\" type=\"text/css\" />\n";
+// $header_opt .= "<link rel=\"stylesheet\" href=\"/css/jqdialog.css\" type=\"text/css\" />\n";
+$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.4.1.min.js\"></script>\n";
+// $header_opt .= "<script type=\"text/javascript\" src=\"/js/simpletabs_1.3.js\"></script>\n";
+// $header_opt .= "<script type=\"text/javascript\" src=\"/js/jqdialog.js\"></script>\n";
 include( TMP_HTML_DIR . "tpl.header.html" );
 
 // エラーメッセージ処理

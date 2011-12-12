@@ -1,0 +1,11 @@
+
+ x sht_setup: simpletabを排除
+ x simpletabs.js, simpletabs.cssを削除
+
+ - sht_setup
+	x enterで動かない
+	- chrome的jsエラーを潰していく
+	- 色付きセルの登録ロジックを確認、追加
+	- ctrl+sのロジックを修正
+
+ - sht_overlay

@@ -58,6 +58,10 @@ if (isset($_REQUEST["gid"])) {
 	$group_id = $_REQUEST["gid"];
 }
 
+if (isset($_REQUEST["sid"])) {
+	$sheet_id = $_REQUEST["gid"];
+}
+
 if (isset($_REQUEST["msg"])) {
 	$errmsg = $_REQUEST["msg"];
 }

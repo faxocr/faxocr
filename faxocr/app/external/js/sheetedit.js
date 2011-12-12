@@ -469,11 +469,13 @@ SHEET = {
 		if (keycode === 13) {
 			e.preventDefault();
 
+		    /*
 			if (modal) {
 				// password modal
 				$('#jqDialog_ok').click();
 				return false;
 			}
+		    */
 
 			if (target) {
 				cell_id = target.parent().attr('id');

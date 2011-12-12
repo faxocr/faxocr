@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 class ExternalController < ApplicationController
 
-  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec]
+  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec,:sht_setup,:sht_overlay]
 
   # file size limit
   # @@size_limit = 60000
@@ -92,14 +92,61 @@ class ExternalController < ApplicationController
     redirect_to group_candidates_url(@group)
   end
 
-  # http://server_addr:3000/external/form/1234/5678
-  def form
+  # http://server_addr:3000/external/sheet/1234/5678
+  def sheet
 
     # 生成したpdfは、public/external/pdfに入れる方針で
-    @gid = params[:group_id]
+    # @gid = params[:group_id]
+    @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
     @sid = params[:survey_id]
-    @html = "GID: " + @gid + "\n<BR>"
-    @html += "SID: " + @sid + "\n<BR>"
+
+    @limit = (@@size_limit / 1024).to_s + "K"
+
+    @action = "/external/sht_setup/"
+
+    # @html = "GID: " + @gid + "\n<BR>"
+    # @html += "SID: " + @sid + "\n<BR>"
+    # render :dummy
+  end
+
+  def sht_setup
+
+    @gid = params[:gid]
+    @sid = params[:sid]
+    if params[:file].nil? then
+      redirect_to :controller => 'external', :action => 'sheet', :group_id => @gid, :survey_id => @sid
+      return
+    else
+      @filename = params[:file]['upfile'].original_filename
+      @size = params[:file]['upfile'].size
+      @tname = @gid + "-" + Time.now().strftime("%Y%m%d%H%M")
+    end
+
+    if 0 < @size && @size <= @@size_limit && /\.xls$/ =~ @filename then
+      File.open("#{RAILS_ROOT}/files/#{@tname}" + ".xls", "wb") {
+        |f| f.write(params[:file]['upfile'].read)
+      }
+      # @html = "GID: " + @gid + "\n<BR>" +
+      #  "Filename: " + @filename + " (" + @size.to_s + ")\n<BR>" +
+      #  "Temp file: " + @tname
+      # @html = `cd ./app/external; php reg_upload.php`
+      # @html = `echo php reg_upload.php file=\"#{@tname}\"`
+      @html = `cd ./app/external; php sht_setup.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\"`
+      render :dummy
+    else
+      flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
+      redirect_to :controller => 'faxocr'
+    end
+  end
+
+  def sht_overlay
+
+    @gid = params[:gid]
+    @sid = params[:sid]
+    @file = params[:file]
+    # @group = Group.find(params[:gid])
+
+    @html = `cd ./app/external; php sht_overlay.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\"`
     render :dummy
   end
 

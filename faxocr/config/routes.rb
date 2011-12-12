@@ -59,9 +59,24 @@ ActionController::Routing::Routes.draw do |map|
     :action => 'reg_exec'
 
   # PHP driver
-  map.connect 'external/form/:group_id/:survey_id',
+  map.connect 'external/sheet/:group_id/:survey_id',
     :controller => 'external',
-    :action => 'form'
+    :action => 'sheet'
+
+  # PHP driver
+  map.connect 'external/sht_setup',
+    :controller => 'external',
+    :action => 'sht_setup'
+
+  # PHP driver
+  map.connect 'external/sht_commit',
+    :controller => 'external',
+    :action => 'sht_commit'
+
+  # PHP driver
+  map.connect 'external/sht_overlay',
+    :controller => 'external',
+    :action => 'sht_overlay'
 
   # PHP driver
   map.connect 'external/:action',
