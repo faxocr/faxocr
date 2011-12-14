@@ -179,4 +179,22 @@ class ExternalController < ApplicationController
     redirect_to group_url(@group)
   end
 
+  def download
+
+    @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
+    @sid = params[:survey_id]
+
+    send_file("#{RAILS_ROOT}/files/simple.zip",
+              {:filename => "simple.zip",
+                :type => "application/zip"})
+
+    # send_file("#{RAILS_ROOT}/files/simple.pdf",
+    #           {:filename => "simple.pdf",
+    #             :type => "application/pdf"})
+
+    # send_file("#{RAILS_ROOT}/files/#{@file}.xls",
+    #           {:filename => @folder.filename,
+    #            :type => @folder.content_type})
+  end
+
 end

@@ -45,15 +45,11 @@ if (isset($file_id) && $file_id) {
 //
 // ヘッダ処理
 //
-//$header_opt .= "<link rel=\"stylesheet\" href=\"/css/simpletabs.css\" type=\"text/css\" />\n";
 $header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/jqcontextmenu.css\" type=\"text/css\" />\n";
 $header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/flexigrid.css\" type=\"text/css\" />\n";
-//$header_opt .= "<link rel=\"stylesheet\" href=\"/css/jqdialog.css\" type=\"text/css\" />\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.4.1.min.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jqcontextmenu.js\"></script>\n";
-//$header_opt .= "<script type=\"text/javascript\" src=\"/js/simpletabs_1.3.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/flexigrid.js\"></script>\n";
-// $header_opt .= "<script type=\"text/javascript\" src=\"/js/jqdialog.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetlist.js\"></script>\n";
 $body_opt .= "<ul id=\"contextmenu\" class=\"jqcontextmenu\">\n";
 $body_opt .= "<li>　フィールド名 <input id=\"field\" size=10 value=\"\"></li>\n";
@@ -95,7 +91,21 @@ if ($errmsg) {
 
 {
 	// ステータス表示
-	print "<table width=\"100%\"><tr><td></td>\n";
+	print "<table width=\"100%\">\n";
+	print "<tr>\n";
+
+	print "<td>\n";
+	print "<form enctype=\"multipart/form-data\" method=\"POST\" " .
+	  "action=\"/external/sht_field/\">\n";
+	print "対象ファイル： <input id=\"file_upfile\" type=\"file\" name=\"file[upfile]\" size=\"60\" />\n";
+	print "<input id=\"gid\" name=\"gid\" type=\"hidden\" value=\"" . 
+	      $group_id . "\" />\n";
+	print "<input id=\"sid\" name=\"sid\" type=\"hidden\" value=\"" . 
+	      $sheet_id . "\" />\n";
+	print "<input type=\"submit\" value=\"再読み込み\">\n";
+	print "</form>\n";
+	print "</td>\n";
+
 	print "<td align=\"right\"\"  width=\"450px\">\n";
 	put_status();
 	print "</td>\n";

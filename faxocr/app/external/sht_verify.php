@@ -59,8 +59,7 @@ if ($errmsg) {
 {
 	// ステータス表示
 	print "<table width=\"100%\">\n";
-	print "<td>「シート登録」で、このシートを登録します</td>\n";
-
+	print "<td align=\"right\">「シート登録」で、このシートを登録します→</td>\n";
 	print "<td align=\"right\"\"  width=\"450px\">";
 	put_status();
 	print "</td>\n";

@@ -7,22 +7,8 @@
 <%= render :partial => "surveys/list" %>
 <div align="right">
 <% if @current_user.has_survey_role(@current_group.id) %>
-<a href=<%="\"/external/sheet/" + @group.id.to_s + "/000\""%> >[調査シート登録]</a>
+<a href=<%="\"/external/sheet/" + @group.id.to_s + "/" + @sht_id.to_s + "\""%> >[調査シート登録]</a>
 <% end %>
 </div>
 <br/>
 </p>
-
-<!-- 
-<p>
-<h2 class="surveysobject_title">調査対象</h2>
-<%= render :partial => "candidates/list" %>
-<div align="right">
-<% if @current_user.has_candidate_role(@current_group.id) %>
-<%= link_to '[編集]', group_candidates_path(@group) %>
-<% end %>
-</div>
-<br/>
-</p>
--->
-

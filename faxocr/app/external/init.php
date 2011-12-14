@@ -59,7 +59,7 @@ if (isset($_REQUEST["gid"])) {
 }
 
 if (isset($_REQUEST["sid"])) {
-	$sheet_id = $_REQUEST["gid"];
+	$sheet_id = $_REQUEST["sid"];
 }
 
 if (isset($_REQUEST["rails_env"])) {

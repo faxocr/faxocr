@@ -1,24 +1,27 @@
 
+*** *** ***
+
  - sht_field
 	x enterで動かない
 	x chrome的jsエラーを潰していく
 	x 右上にstatusフィールドを追加
-	- 調査シート再登録フィールド
-	- 保存 / ctrl+sのロジックを修正
+	x 調査シート再登録フィールド
 	- 色付きセルの登録ロジックを確認、追加
+	- 保存 / ctrl+sのロジックを修正
 
  - sht_script / 未作成 ★
 	- xlsファイル保存機能
 	- railsスクリプト作成機能
+	- .confファイル作成機能
 	- 隣接同一名フィールドは連結する
 
 *** *** ***
 
  - sht_marker
 	x 右上にstatusフィールドを追加
+	- 対象が不特定多数か、特定対象かの指定radiobutton
 	- マーカー位置指定UI修正
 	- 保存 / ctrl+sのロジックを修正
-	- 対象が不特定多数か、特定対象かの指定radiobutton
 
  - sht_config / 未作成 ★
 	- srml作成機能
@@ -33,16 +36,25 @@
 	x route.rb修正
 	x 右上にstatusフィールドを追加
 	- controler修正
-	- 作成したJPGを表示
+		- 作成したJPGを表示
 
  - sht_commit
 	x route.rb修正
-	- controler
-	- PDF作成
-	- zip作成
-	- railsスクリプトの実行
+	- controler修正
+		- PDF作成
+		- zip作成
+		- railsスクリプトの実行
+
+*** *** ***
+
+ - pdfダウンロード
+	x .pdf、.zip、の確認ロジックを追加
+	x route.rbにpdf downloadの追加を確認
+	x views/sheets/_list.html.erb
+	- external_controller.rb:downloadに、zip/pdf切り替えロジックを追加
 
 *** *** ***
 
  x sht_setup: simpletabを排除
  x simpletabs.js, simpletabs.cssを削除
+ x views/groups/show.html.erbにあるsheet_id = "000"のhardcodeを修正

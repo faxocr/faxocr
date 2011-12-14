@@ -87,6 +87,10 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'external/:action',
     :controller => 'external'
 
+  map.connect 'external/download/:group_id/:survey_id',
+    :controller => 'external',
+    :action => 'download'
+
   map.connect 'faxocr/direct_masquerade/:group_id/:id',
     :controller => 'faxocr',
     :action => 'direct_masquerade'

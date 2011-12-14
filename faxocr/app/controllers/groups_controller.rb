@@ -24,7 +24,9 @@ class GroupsController < ApplicationController
   def show
     @group = Group.find(params[:id])
     @surveys = @group.surveys
-    @candidates = @group.candidates
+    # @candidates = @group.candidates
+    @sht_id = AnswerSheet.last.nil? ? 1 : AnswerSheet.last.id + 1
+
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @group }
