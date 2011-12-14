@@ -64,19 +64,24 @@ ActionController::Routing::Routes.draw do |map|
     :action => 'sheet'
 
   # PHP driver
-  map.connect 'external/sht_setup',
+  map.connect 'external/sht_field',
     :controller => 'external',
-    :action => 'sht_setup'
+    :action => 'sht_field'
+
+  # PHP driver
+  map.connect 'external/sht_marker',
+    :controller => 'external',
+    :action => 'sht_marker'
+
+  # PHP driver
+  map.connect 'external/sht_verify',
+    :controller => 'external',
+    :action => 'sht_verify'
 
   # PHP driver
   map.connect 'external/sht_commit',
     :controller => 'external',
     :action => 'sht_commit'
-
-  # PHP driver
-  map.connect 'external/sht_overlay',
-    :controller => 'external',
-    :action => 'sht_overlay'
 
   # PHP driver
   map.connect 'external/:action',

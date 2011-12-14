@@ -67,6 +67,18 @@ if ($errmsg) {
 	print "</STRONG></font></blockquote>";
 }
 
+{
+	// ステータス表示
+	print "<table width=\"100%\">\n";
+	print "<tr>\n";
+	print "<td><button onclick=\"show_marker();\" style=\"z-index:10;\">マーカー</button></td>\n";
+	print "<td align=\"right\"\"  width=\"450px\">";
+	put_status();
+	print "</td>\n";
+	print "</tr></table>\n";
+	print "<br />\n";
+}
+
 //
 // Excelファイル表示処理
 //
@@ -74,18 +86,11 @@ if ($xls) {
 
 	put_css($xls);
 
-	// ファイル名表示
-	print "<table width=\"100%\"><tr><td align=\"left\" valign=\"top\">";
-	print strconv($file_name);
-	print "<button onclick=\"show_marker();\" style=\"z-index:10;\">表示</button>";
-	print "</td>\n";
-
-	print "</tr></table>";
-
 	// シート表示
 	print "<center>";
 	put_excel_form($xls);
 	print "</center>";
+	print "<br>";
 
 	// フッタ表示
 	print "<form action=\"commit.php?ret\" method=\"POST\" id=\"form-commit\">";
@@ -93,11 +98,11 @@ if ($xls) {
 	print "<input id=\"sbmt\" type=\"submit\" value=\"保存\" disabled/>";
 	print "</form>";
 
+	// XXX
 	print "<form action=\"setting.php\" method=\"POST\" id=\"form-setting\">";
 	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />";
 	print "<input type=\"hidden\" name=\"password\" id=\"passwd\" />";
 	print "</form>";
-	print "<br>";
 }
 
 //
@@ -226,7 +231,7 @@ function insn_rotate() {
 </table>
 
 <BR><BR><BR>
-<button onclick="hide_marker();" style="position:relative; z-index:10;">PDF作成</button><BR><BR>
+<button onclick="hide_marker();" style="position:relative; z-index:10;">確定</button><BR><BR>
 </center>
 
 <img id="instrctn" valign="bottom" src="/image/insn-01.gif" style="position:relative; top:-100px; left:10px; z-index:0; width:200px;">
@@ -242,8 +247,11 @@ die;
 function put_excel_form($xls) {
 
 	// シート表示
-	for ($sn = 0; $sn < 1; $sn++) {
-		$fnum = 0;
+	// for ($sn = 0; $sn < 1; $sn++) {
+
+	$sn = 0; 
+	{
+		// $fnum = 0;
 
 		$w = 32;
 		if (!isset($xls->maxcell[$sn]))
@@ -251,10 +259,8 @@ function put_excel_form($xls) {
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 			$w += $xls->getColWidth($sn, $i);
 		}
-
-		// シート毎ヘッダ表示
-		$hd = $xls->getHEADER($sn);
-		$ft = $xls->getFOOTER($sn);
+// XXX
+$w = $w / 2;
 
 		// シートテーブル表示
 		print "<table class=\"sheet\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
@@ -263,11 +269,13 @@ function put_excel_form($xls) {
 		if (!isset($xls->maxrow[$sn]))
 			$xls->maxrow[$sn] = 0;
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
-			print "  <tr height=\"" .
-			  $xls->getRowHeight($sn, $r) . "\">" . "\n";
+			// XXX
+			$trheight = $xls->getRowHeight($sn, $r) * 0.8;
+			print "  <tr height=\"" . $trheight . "\">" . "\n";
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
-				$tdwidth = $xls->getColWidth($sn, $i);
+// XXX
+				$tdwidth = $xls->getColWidth($sn, $i) / 2;
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
 				if (isset($xls->hlink[$sn][$r][$i])){
@@ -333,6 +341,38 @@ function put_excel_form($xls) {
 
 		// シート終了
 	}
+}
+
+//
+// ステータス操作エリア表示
+//
+function put_status()
+{
+	global $file_id;
+	global $group_id;
+	global $sheet_id;
+
+	$style = array();
+	$style["normal"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffffff;padding:1px;color:gray\"";
+	$style["gray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#bbbbbb;padding:1px\"";
+	$style["lgray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#dddddd;padding:1px\"";
+	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
+
+	// XXX
+	print "<form action=\"/external\sht_verify/\" method=\"POST\" id=\"form-commit\">\n";
+	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
+
+	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
+	print "<div ${style["gray"]}><span>フィールド指定</span></div>\n";
+
+	print "<div ${style["pink"]}><span>マーカー指定</span></div>\n";
+	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"this.form.submit();\">シート確認</button></div>\n";
+	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
+	print "</div>\n";
+
+	print "</form>\n";
 }
 
 ?>

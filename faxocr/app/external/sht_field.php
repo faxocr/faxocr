@@ -93,6 +93,16 @@ if ($errmsg) {
 	print "</strong></font></blockquote>";
 }
 
+{
+	// ステータス表示
+	print "<table width=\"100%\"><tr><td></td>\n";
+	print "<td align=\"right\"\"  width=\"450px\">\n";
+	put_status();
+	print "</td>\n";
+	print "</tr></table>\n";
+	print "<br />\n";
+}
+
 // Excelファイル表示処理
 if ($xls) {
 
@@ -100,20 +110,11 @@ if ($xls) {
 	put_excel($xls);
 	put_fields();
 
-	// XXX
-	/*
+	// XXX : sht_script行きへと変更
 	print "<form action=\"form-commit.php?ret\" method=\"POST\" id=\"form-commit\">";
 	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />";
 	print "<input type=\"hidden\" name=\"password\" id=\"passwd\" />";
 	print "<button id=\"sbmt\" onclick=\"pack_fields();\" disabled/>保存</button>";
-	print "</form>";
-	*/
-
-	print "<form action=\"/external\sht_overlay/\" method=\"POST\" id=\"form-commit\">\n";
-	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />\n";
-	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
-	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
-	print "<button id=\"sbmt\" onclick=\"pack_fields();\" disabled/>進む</button>\n";
 	print "</form>";
 }
 
@@ -132,22 +133,6 @@ function put_excel($xls)
 	global $field_list;
 	global $field_width;
 
-	// プロパティ表示
-	if (isset($_POST["selprop"]) && $_POST["selprop"] == "on") {
-		$prp = $xls->getPropJP();
-		if (count($prp) > 1) {
-			print "<table border=\"0\" cellpadding=\"0\" cellspacing=\"1\" bgcolor=\"#CCCCCC\"><tr bgcolor=\"#F8FFFF\"><td bgcolor=\"#E0E0E0\">プロパティ</td><td bgcolor=\"#E0E0E0\">値</td></tr>\n";
-			foreach ($prp as $propid => $val) {
-				$val = mb_eregi_replace ("&lt;br */?&gt;", "<br />", strconv($val));
-				print "	<tr bgcolor=\"#F8FFFF\"><td bgcolor=\"#E0E0E0\"><font size=2>".strconv($propid)."</font></td>";
-				print "<td bgcolor=\"#F8FFFF\"><font size=2>${val}</font></td></tr>\n";
-			}
-			print "</table><p></p>\n";
-		} else {
-			print "\n<small>有効なプロパティを取得できませんでした。</small><br><br>\n";
-		}
-	}
-
 	// タブコントロール表示
 	// print "<div class=\"simpleTabs\">";
 	// print "<ul class=\"simpleTabsNavigation\">";
@@ -156,6 +141,8 @@ function put_excel($xls)
 	//	  strconv($xls->sheetname[$sn]) . "</a></li>";
 	// }
 	// print "</ul>";
+
+	print "<center>";
 
 	// シート表示
 	// for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
@@ -169,26 +156,8 @@ function put_excel($xls)
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 			$w += $xls->getColWidth($sn, $i);
 		}
-
-		// シート毎ヘッダ表示
-		$hd = $xls->getHEADER($sn);
-		$ft = $xls->getFOOTER($sn);
-		if ($hd !== null) {
-			$hd["left"] = (isset($hd["left"])) ? strconv($hd["left"]) : "";
-			$hd["center"] = (isset($hd["center"])) ? strconv($hd["center"]) : "";
-			$hd["right"] = (isset($hd["right"])) ? strconv($hd["right"]) : "";
-
-			print <<< STR
-
-<table width="${w}" border="0" cellpadding="0" cellspacing="1" bordercolor="#CCCCCC" bgcolor="#CCCCCC">
-<tr>
-    <td width="30" nowrap><font size="1">ヘッダ</font></td>
-    <td bgcolor="#FFFFFF"><div align="left"> ${hd["left"]} </div></td>
-    <td bgcolor="#FFFFFF"><div align="center"> ${hd["center"]} </div></td>
-    <td bgcolor="#FFFFFF"><div align="right"> ${hd["right"]} </div></td>
-</tr></table>
-STR;
-		}
+// XXX
+$w = $w / 2;
 
 		// シートテーブル表示
 		print <<< STR
@@ -197,11 +166,13 @@ STR;
 		if (!isset($xls->maxrow[$sn]))
 			$xls->maxrow[$sn] = 0;
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
-			print "  <tr height=\"" .
-			  $xls->getRowHeight($sn, $r) . "\">" . "\n";
+			// XXX
+			$trheight = $xls->getRowHeight($sn, $r) * 0.8;
+			print "  <tr height=\"" . $trheight . "\">" . "\n";
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
-				$tdwidth = $xls->getColWidth($sn, $i);
+// XXX
+				$tdwidth = $xls->getColWidth($sn, $i) / 2;
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
 				$dispval = htmlspecialchars($dispval);
@@ -295,26 +266,10 @@ STR;
 			print "</tr>\n";
 		}
 		print "</table>\n"; // シートテーブル終了
-
-		// フッタ表示
-		if ($ft !== null) {
-			$ft["left"] = (isset($ft["left"])) ? strconv($ft["left"]) : "";
-			$ft["center"] = (isset($ft["center"])) ? strconv($ft["center"]) : "";
-			$ft["right"] = (isset($ft["right"])) ? strconv($ft["right"]) : "";
-
-			print <<< STR
-<table width="${w}" border="0" cellpadding="0" cellspacing="1" bordercolor="#CCCCCC" bgcolor="#CCCCCC"><tr>
-    <td width="30" nowrap><font size="1">フッタ</font></td>
-    <td bgcolor="#FFFFFF"><div align="left">${ft['left']} </div></td>
-    <td bgcolor="#FFFFFF"><div align="center">${ft['center']}</div></td>
-    <td bgcolor="#FFFFFF"><div align="right">${ft['right']}</div></td>
-</tr></table>
-STR;
-		}
 		// print "</div>\n"; // シート終了 (simpleTabsContent)
-
 	}
 	// print "</div>\n"; // タブ全体終了 (simpleTabs)
+	print "</center><br>\n";
 }
 
 //
@@ -376,6 +331,39 @@ function put_fields()
 
 	print "</table>\n";
 	print "</div><br />\n";
+}
+
+//
+// ステータス操作エリア表示
+//
+function put_status()
+{
+	global $file_id;
+	global $group_id;
+	global $sheet_id;
+
+	$style = array();
+	$style["normal"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffffff;padding:1px;color:gray\"";
+	$style["gray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#bbbbbb;padding:1px\"";
+	$style["lgray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#dddddd;padding:1px\"";
+	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
+
+	// XXX
+	print "<form action=\"/external\sht_marker/\" method=\"POST\" id=\"form-commit\">\n";
+	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
+
+	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
+	print "<div ${style["pink"]}><span>フィールド指定</span></div>\n";
+
+	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"this.form.submit();\">マーカー指定</button></div>\n";
+
+	print "<div ${style["gray"]}><span>シート確認</span></div>\n";
+	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
+	print "</div>\n";
+
+	print "</form>\n";
 }
 
 ?>

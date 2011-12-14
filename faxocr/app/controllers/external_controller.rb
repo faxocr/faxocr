@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 class ExternalController < ApplicationController
 
-  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec,:sht_setup,:sht_overlay]
+  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec,:sht_field,:sht_marker,:sht_verify,:sht_commit]
 
   # file size limit
   # @@size_limit = 60000
@@ -33,7 +33,7 @@ class ExternalController < ApplicationController
 
     @html = "<PRE>\n"
     # @html += "RAILS_ENV=#{fetch(:rails_env)}"
-    # @html = `cd ./app/external; php form-overlay.php`
+    # @html = `cd ./app/external; php form-marker.php`
     @html += "RAILS_ENV=#{RAILS_ENV}"
     @html += "<PRE>\n"
 
@@ -107,14 +107,14 @@ class ExternalController < ApplicationController
 
     @limit = (@@size_limit / 1024).to_s + "K"
 
-    @action = "/external/sht_setup/"
+    @action = "/external/sht_field/"
 
     # @html = "GID: " + @gid + "\n<BR>"
     # @html += "SID: " + @sid + "\n<BR>"
     # render :dummy
   end
 
-  def sht_setup
+  def sht_field
 
     @gid = params[:gid]
     @sid = params[:sid]
@@ -136,7 +136,7 @@ class ExternalController < ApplicationController
       #  "Temp file: " + @tname
       # @html = `cd ./app/external; php reg_upload.php`
       # @html = `echo php reg_upload.php file=\"#{@tname}\"`
-      @html = `cd ./app/external; php sht_setup.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\"`
+      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\"`
       render :dummy
     else
       flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
@@ -144,15 +144,39 @@ class ExternalController < ApplicationController
     end
   end
 
-  def sht_overlay
+  def sht_marker
 
     @gid = params[:gid]
     @sid = params[:sid]
     @file = params[:file]
     # @group = Group.find(params[:gid])
 
-    @html = `cd ./app/external; php sht_overlay.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\"`
+    @html = `cd ./app/external; php sht_marker.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\"`
     render :dummy
+  end
+
+  def sht_verify
+
+    @gid = params[:gid]
+    @sid = params[:sid]
+    @file = params[:file]
+    # @group = Group.find(params[:gid])
+
+    @html = `cd ./app/external; php sht_verify.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\"`
+    render :dummy
+  end
+
+  def sht_commit
+
+    @gid = params[:gid]
+    @sid = params[:sid]
+    @file = params[:file]
+    @group = Group.find(params[:gid])
+
+    # @result = `ruby #{RAILS_ROOT}/files/#{@file}.rb #{RAILS_ROOT} #{@gid}`
+
+    flash[:notice] = "シートを登録しました"
+    redirect_to group_url(@group)
   end
 
 end

@@ -1,4 +1,20 @@
 
+ * NOTE
+
+ - candidateのIDが、system wideにuniqueとなっている。これは不便なので、
+   group毎にuniqueとしたい。しかし、そのためには、dbをmigrateしなければ
+   ならず、旧バージョンとの互換性が犠牲となるため、断念する。正常化する
+   ためには、以下の作業が必要
+
+   - model/candidate.rbにて、validates_uniqueness_ofに:scope => :group_idを
+     付ける
+   - db/migrate/のcandidateにて、add_index :candidates, :candidate_codeとして、
+     :unique => trueを取る
+   - mysqlのテーブル定義を捨てて、作り直す
+
+ - 以上を行うと、旧システムとの互換性が無くなるので、断念...(本当は、
+   migrationでどうにかできなくはないのだが...)
+
  * アカウント
 
 user: admin
@@ -41,7 +57,6 @@ debian-faxocr:~/google/faxocr/faxocr> script/generate controller external
    - 「ステータス編集画面」と「集計レポート編集画面」を分離したい
    - PDFダウンロードリンクを修正
    - 目視確認画面へのUIを修正
-
 
 *** *** ***
 

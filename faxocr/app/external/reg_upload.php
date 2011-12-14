@@ -168,6 +168,7 @@ if ($errmsg) {
 
 {
 	// 対象ファイル再設定
+	print "<br />\n";
 	print "<form enctype=\"multipart/form-data\" method=\"POST\" " .
 	  "action=\"/external/reg_upload/\">\n";
 

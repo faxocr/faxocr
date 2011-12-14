@@ -1,11 +1,48 @@
 
+ - sht_field
+	x enterで動かない
+	x chrome的jsエラーを潰していく
+	x 右上にstatusフィールドを追加
+	- 調査シート再登録フィールド
+	- 保存 / ctrl+sのロジックを修正
+	- 色付きセルの登録ロジックを確認、追加
+
+ - sht_script / 未作成 ★
+	- xlsファイル保存機能
+	- railsスクリプト作成機能
+	- 隣接同一名フィールドは連結する
+
+*** *** ***
+
+ - sht_marker
+	x 右上にstatusフィールドを追加
+	- マーカー位置指定UI修正
+	- 保存 / ctrl+sのロジックを修正
+	- 対象が不特定多数か、特定対象かの指定radiobutton
+
+ - sht_config / 未作成 ★
+	- srml作成機能
+	- html作成機能
+	- PDFサンプル作成機能
+	- JPGサンプル作成機能
+
+*** *** ***
+
+ - sht_verify
+	x sht_veryfy.php作成
+	x route.rb修正
+	x 右上にstatusフィールドを追加
+	- controler修正
+	- 作成したJPGを表示
+
+ - sht_commit
+	x route.rb修正
+	- controler
+	- PDF作成
+	- zip作成
+	- railsスクリプトの実行
+
+*** *** ***
+
  x sht_setup: simpletabを排除
  x simpletabs.js, simpletabs.cssを削除
-
- - sht_setup
-	x enterで動かない
-	- chrome的jsエラーを潰していく
-	- 色付きセルの登録ロジックを確認、追加
-	- ctrl+sのロジックを修正
-
- - sht_overlay
