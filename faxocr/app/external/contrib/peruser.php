@@ -1168,6 +1168,12 @@ class Excel_Peruser
 	}
 
 	function getCssBR($val, $key=-1) {
+		// XXX
+		if (defined('border_sw')) {
+			$border_sw = 1;
+		} else {
+			$border_sw = 0;
+		}
 		$tmp='';
 
 		if (isset($val['Bstyle'])){
@@ -1189,9 +1195,16 @@ class Excel_Peruser
 
 		// XXX
 		if (!isset($val['Bstyle']) && !isset($val['Bcolor'])) {
-			$tmp .= "border-bottom-width: 1px;\n";
-			$tmp .= "border-bottom-style: dotted;\n";
-			$tmp .= "border-bottom-color: #000000;\n";
+
+			if ($border_sw) {
+				$tmp .= "border-bottom-width: 1px;\n";
+				$tmp .= "border-bottom-style: solid;\n";
+				$tmp .= "border-bottom-color: #ffffff;\n";
+			} else {
+				$tmp .= "border-bottom-width: 1px;\n";
+				$tmp .= "border-bottom-style: dotted;\n";
+				$tmp .= "border-bottom-color: #000000;\n";
+			}
 		}
 
 		if (isset($val['Rstyle'])){
@@ -1213,16 +1226,29 @@ class Excel_Peruser
 
 		// XXX
 		if (!isset($val['Rstyle']) && !isset($val['Rcolor'])) {
-			$tmp .= "border-right-width: 1px;\n";
-			$tmp .= "border-right-style: dotted;\n";
-			$tmp .= "border-right-color: #000000;\n";
+			if ($border_sw) {
+				$tmp .= "border-right-width: 1px;\n";
+				$tmp .= "border-right-style: solid;\n";
+				$tmp .= "border-right-color: #ffffff;\n";
+			} else {
+				$tmp .= "border-right-width: 1px;\n";
+				$tmp .= "border-right-style: dotted;\n";
+				$tmp .= "border-right-color: #000000;\n";
+			}
 		}
 
 		return $tmp;
 	}
 
 	function getCssTL($val,$key=-1){
+		// XXX
+		if (defined('border_sw')) {
+			$border_sw = 1;
+		} else {
+			$border_sw = 0;
+		}
 		$tmp='';
+
 		if (isset($val['Tstyle'])){
 			if ($val['Tstyle']!=0){
 				$tmp.='border-top-width: '. $this->getwidth($val['Tstyle']) . ";\n";
@@ -1243,9 +1269,15 @@ class Excel_Peruser
 
 		// XXX
 		if (!isset($val['Tstyle']) && !isset($val['Tcolor'])) {
-			$tmp .= "border-top-width: 1px;\n";
-			$tmp .= "border-top-style: dotted;\n";
-			$tmp .= "border-top-color: #000000;\n";
+			if ($border_sw) {
+				$tmp .= "border-top-width: 1px;\n";
+				$tmp .= "border-top-style: solid;\n";
+				$tmp .= "border-top-color: #ffffff;\n";
+			} else {
+				$tmp .= "border-top-width: 1px;\n";
+				$tmp .= "border-top-style: dotted;\n";
+				$tmp .= "border-top-color: #000000;\n";
+			}
 		}
 
 		if (isset($val['Lstyle'])){
@@ -1267,9 +1299,15 @@ class Excel_Peruser
 
 		// XXX
 		if (!isset($val['Lstyle']) && !isset($val['Lcolor'])) {
-			$tmp .= "border-left-width: 1px;\n";
-			$tmp .= "border-left-style: dotted;\n";
-			$tmp .= "border-left-color: #000000;\n";
+			if ($border_sw) {
+				$tmp .= "border-left-width: 1px;\n";
+				$tmp .= "border-left-style: solid;\n";
+				$tmp .= "border-left-color: #ffffff;\n";
+			} else {
+				$tmp .= "border-left-width: 1px;\n";
+				$tmp .= "border-left-style: dotted;\n";
+				$tmp .= "border-left-color: #000000;\n";
+			}
 		}
 
 		$ftmp='';

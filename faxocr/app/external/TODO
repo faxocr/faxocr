@@ -14,35 +14,36 @@
 	- sheetlist.jsのcleanup
 
  - sht_script
-	- xlsファイル保存機能
 	- railsスクリプト作成機能
 		- ダミー報告者作成
+	- xlsファイル保存機能
 	- confファイル作成機能
-	- 隣接同一名フィールドは連結する
+	- 隣接同一名フィールドを連結する内部処理
 
  * マーカー指定
 
  - sht_marker
 	x 右上にstatusフィールドを追加
 	x 保存 / ctrl+sのロジックを修正
-	- マーカー位置指定UI修正
+	- マーカー位置指定UI修正(整数倍サイズ、マーカーサイズ自由化)
 	- マーカー位置をhiddenで渡すロジック追加
 	- sheetedit.jsのcleanup
 
  - sht_config
-	- html作成機能
+	x html作成機能
+	x PDFサンプル作成機能
+	x JPGサンプル作成機能
+	x ImageMagickのconvert (convert a.pdf a.png)
 	- グループID、ユーザーID、流し込み機能
 	- srml作成機能
-	- PDFサンプル作成機能
-	- JPGサンプル作成機能
 
- * シート確認 / 登録
+ * シート確認 / 登録 / ダウンロード
 
- - sht_verify
+ x sht_verify
 	x sht_veryfy.php作成
 	x route.rb修正
 	x 右上にstatusフィールドを追加
-	- 作成したJPGを表示
+	x 作成したJPGを表示
 
  - sht_commit
 	x route.rb修正
@@ -50,25 +51,24 @@
 	- zip作成
 	- railsスクリプトの実行
 
+ - extern/download
+	x .pdf、.zip、の確認ロジックを追加
+	x route.rbにpdf downloadの追加を確認
+	x views/sheets/_list.html.erb
+	- external_controller.rb:downloadに、zip/pdf切り替えロジックを追加
+
 *** *** ***
 
- - pdf生成 / wkhtmltopdf
-	- cssを使ったoverlayも透過もちゃんと処理できる
-	- シートIDと機関IDを埋め込む
+ x pdf生成 / wkhtmltopdf
+	x cssを使ったoverlayも透過もちゃんと処理できる
+	x シートIDと機関IDを埋め込む
 
 ただし、apt-getでインストールしたwkhtmltopdfは、QTパッチが当たっておらず、
 X環境を必要とする。そこで、xvfbを用いて以下のように回避
 
    sudo apt-get install xvfb
    xvfb-run -a -s "-screen 0 640x480x16" wkhtmltopdf path_html path_pdf
-
-*** *** ***
-
- - extern/download (pdfダウンロード)
-	x .pdf、.zip、の確認ロジックを追加
-	x route.rbにpdf downloadの追加を確認
-	x views/sheets/_list.html.erb
-	- external_controller.rb:downloadに、zip/pdf切り替えロジックを追加
+   xvfb-run -a wkhtmltopdf --page-size A4 --orientation Landscape e.html e.pdf
 
 *** *** ***
 

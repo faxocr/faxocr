@@ -211,7 +211,15 @@ class ExternalController < ApplicationController
     # @html += @ret
     # render :dummy
 
-    redirect_to :controller => 'external', :action => 'sht_marker', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid}
+    @file_html = "#{RAILS_ROOT}/files/#{@file}.html"
+    @file_pdf = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.pdf"
+    @file_png = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.png"
+
+    # @ret = `cd #{RAILS_ROOT}; xvfb-run -a wkhtmltopdf --page-size A4 --orientation Landscape #{@file_html} #{@file_pdf}`
+    @ret = `cd #{RAILS_ROOT}; xvfb-run -a wkhtmltopdf --page-size A4 --orientation Landscape #{@file_html} #{@file_pdf}`
+    @ret = `convert #{@file_pdf} #{@file_png}`
+
+    redirect_to :controller => 'external', :action => 'sht_marker', :params => {:gid => @gid, :sid => @sid, :file_id => @file}
   end
 
   def sht_verify
@@ -242,18 +250,30 @@ class ExternalController < ApplicationController
 
     @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
     @sid = params[:survey_id]
+    @file_pdf = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.pdf"
 
-    send_file("#{RAILS_ROOT}/files/simple.zip",
-              {:filename => "simple.zip",
-                :type => "application/zip"})
+    # send_file("#{RAILS_ROOT}/files/simple.zip",
+    #          {:filename => "simple.zip",
+    #           :type => "application/zip"})
 
     # send_file("#{RAILS_ROOT}/files/simple.pdf",
     #           {:filename => "simple.pdf",
     #             :type => "application/pdf"})
 
-    # send_file("#{RAILS_ROOT}/files/#{@file}.xls",
-    #           {:filename => @folder.filename,
-    #            :type => @folder.content_type})
+    send_file(@file_pdf,
+              {:filename => "#{@gid}-#{@sid}.pdf",
+                :type => "application/pdf"})
+  end
+
+  def getimg
+
+    @gid = params[:group_id]
+    @sid = params[:survey_id]
+    @file_png = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.png"
+
+    send_file(@file_png,
+              {:filename => "#{@gid}-#{@sid}.png",
+                :type => "application/png"})
   end
 
 end

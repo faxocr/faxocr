@@ -25,6 +25,8 @@ require_once 'init.php';
 require_once 'lib/common.php';
 require_once 'contrib/peruser.php';
 
+// define('border_sw', true);
+
 // ファイルハンドリング
 if (isset($file_id) && $file_id) {
 	$tgt_file = DST_DIR . $file_id . ".xls";
@@ -97,7 +99,7 @@ if ($xls) {
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
-	print "<input id=\"sbmt\" type=\"submit\" value=\"保存\" disabled/>";
+	print "<input id=\"sbmt\" type=\"submit\" value=\"画像生成\" disabled/>";
 	print "</form>";
 }
 
@@ -256,10 +258,10 @@ function put_excel($xls) {
 		}
 
 		// XXX
-		$w = $w / 2;
+		// $w = $w / 2;
 
 		// シートテーブル表示
-		print "<table class=\"sheet\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
+		print "<table class=\"sheet_marker\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
 		print ${w} . " bgcolor=\"#FFFFFF\" style=\"border-collapse: collapse;\">";
 
 		if (!isset($xls->maxrow[$sn]))
@@ -270,8 +272,10 @@ function put_excel($xls) {
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
-				// XXX
-				$tdwidth = $xls->getColWidth($sn, $i) / 2;
+				$tdwidth = $xls->getColWidth($sn, $i);
+// XXX
+//				$tdwidth = $tdwidth / 2;
+
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
 				if (isset($xls->hlink[$sn][$r][$i])){

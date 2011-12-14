@@ -166,8 +166,9 @@ function put_excel($xls)
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 			$w += $xls->getColWidth($sn, $i);
 		}
+
 // XXX
-$w = $w / 2;
+//$w = $w / 2;
 
 		// シートテーブル表示
 		print <<< STR
@@ -181,8 +182,9 @@ STR;
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
+				$tdwidth = $xls->getColWidth($sn, $i);
 // XXX
-				$tdwidth = $xls->getColWidth($sn, $i) / 2;
+//				$tdwidth = $tdwidth / 2;
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
 				$dispval = htmlspecialchars($dispval);

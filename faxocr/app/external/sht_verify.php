@@ -59,7 +59,7 @@ if ($errmsg) {
 {
 	// ステータス表示
 	print "<table width=\"100%\">\n";
-	print "<td align=\"right\">「シート登録」で、このシートを登録します→</td>\n";
+	print "<td align=\"right\"></td>\n";
 	print "<td align=\"right\"\"  width=\"450px\">";
 	put_status();
 	print "</td>\n";
@@ -69,9 +69,16 @@ if ($errmsg) {
 
 // サンプルファイル表示処理
 {
-	print "<center>\n";
-	print "<img src=\"/external/skin/image/nowprinting.gif\">\n";
-	print "</center>\n";
+	print "<div align=\"center\" style=\"background-color: lightgray;\">\n";
+	print "<BR>\n";
+	//print "<img src=\"/external/skin/image/nowprinting.gif\">\n";
+	print "<img src=\"/external/getimg/" . $group_id . "/" . $sheet_id . 
+	         "\" width=\"500px\"><BR>\n";
+	print "<a href=\"/external/download/" . $group_id . "/" . $sheet_id . 
+	        "\">[Sample PDF]</a>\n";
+	print "</div>\n";
+	print "<div align=\"right\">\n";
+	print "</div>\n";
 }
 
 //

@@ -25,6 +25,8 @@ require_once 'init.php';
 require_once 'lib/common.php';
 require_once 'contrib/peruser.php';
 
+define('border_sw', true);
+
 //
 // ファイルハンドリング
 //
@@ -58,7 +60,6 @@ if ($xls) {
 	$html .= put_css($xls);
 	$html .= put_excel($xls);
 	$html .= put_footer();
-
 	file_put_contents(DST_DIR . $file_id . ".html", $html);
 }
 
@@ -74,9 +75,6 @@ function put_header()
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta http-equiv="Content-Script-Type" content="text/javascript" />
   <title>Shinsai FaxOCR</title>
-  <link rel="stylesheet" href="/external/css/jqDnR.css" type="text/css">
-  <script type="text/javascript" src="/external/js/jquery-1.4.1.min.js"></script>
-  <script type="text/javascript" src="/external/js/jqDnR.js"></script>
 </head>
 <body>
 
@@ -88,124 +86,18 @@ function put_footer()
 {
 	$html = <<< STR
 
-<script type="text/javascript">
-<!--
+<div id="ex3" class="jqDnR" style="opacity:0.8; top:10px; left:10px; z-index: 3; position: absolute; width: 800px; height:500px; font-size: 12px; ">
 
-var $ = jQuery;
-
-$().ready(function() {
-  $('#ex3').jqDrag('.jqDrag').jqResize('.jqResize');
-});
-
-var last_size = 32;
-
-function change_size(size) {
-
-	$(".mark-img").each( function () {
-		$(this).css("width", size);
-	});
-
-	var w = parseInt($("#instrctn").css("width"));
-	var h = parseInt($("#instrctn").css("height"));
-
-	$("#instrctn").css("height", h * size / last_size);
-	$("#instrctn").css("width", w * size / last_size);
-
-	last_size = size;
-}
-
-var last_time = 0;
-
-function insn_move(d) {
-	var new_time = +new Date();
-	var diff = new_time - last_time;
-	last_time = new_time;
-
-	var ofst = $("#instrctn").offset();
-	switch (d) {
-		case 'u':
-		ofst.top += Math.ceil(2000 / diff);
-		break;
-
-		case 'l':
-		ofst.left -= Math.ceil(2000 / diff);
-		break;
-
-		case 'r':
-		ofst.left += Math.ceil(2000 / diff);
-		break;
-
-		case 'd':
-		ofst.top -= Math.ceil(2000 / diff);
-		break;
-	}
-	$("#instrctn").offset(ofst);
-}
-
-var rot = Array(
-	'insn-01.gif',
-	'insn-02.gif',
-	'insn-03.gif',
-	'insn-04.gif'
-);
-
-var rotation = 0;
-var magnitude = 0.2;
-
-function insn_rotate() {
-	rotation = (rotation > 2) ? 0 : rotation + 1;
-	var w = $("#instrctn").css("width");
-	var h = $("#instrctn").css("height");
-
-	$("#instrctn").attr("src", "./image/" + rot[rotation]);
-	$("#instrctn").css("width", h);
-	$("#instrctn").css("height", w);
-}
-
--->
-</script>
-
-<div id="ex3" class="jqDnR" style="opacity:0.8; position: absolute; top:100px; left:50px;">
-<div class="jqDrag" style="height:100%">
-
-<img src="/image/mark.gif" class="mark-img" style="top: 0;left: 0">
-<img src="/image/mark.gif" class="mark-img" style="top: 0;right: 0">
-<img src="/image/mark.gif" class="mark-img" style="bottom: 0;left: 0">
-
-<BR><BR>
-<center>
-<h3>マーカーサイズ</h3>
-
-<input type="radio" name="size" onclick="change_size(64);">特大
-<input type="radio" name="size" onclick="change_size(48);">大
-<input type="radio" name="size" onclick="change_size(32);" checked>中
-<input type="radio" name="size" onclick="change_size(16);">小<BR>
-
-<h3>用紙方向</h3>
-
-<img valign="bottom" src="/image/direc-01.gif"><input type="radio" name="drctn" onclick="change_drctn(false);" checked>横
-<img valign="bottom" src="/image/direc-02.gif"><input type="radio" name="drctn" onclick="change_drctn(true);">縦<BR>
-
-
-<h3>見本位置</h3>
-
-<table style="position:relative; z-index:10;">
-<tr><td></td><td><img src="/image/arrow-u.gif" onmousedown="insn_move('d');" ></td><td></td><td></td></tr>
-<tr><td><img src="/image/arrow-l.gif" onmousedown="insn_move('l');" ></td><td></td><td><img src="/image/arrow-r.gif" onmousedown="insn_move('r');" >
-</td><td>　　<img src="/image/rotate.gif" onclick="insn_rotate();" ></td></tr>
-<tr><td></td><td><img src="/image/arrow-d.gif" onmousedown="insn_move('u');" >
-</td><td></td><td></td></tr>
-</table>
-
-<BR><BR><BR>
-<button onclick="hide_marker();" style="position:relative; z-index:10;">確定</button><BR><BR>
-</center>
-
-<img id="instrctn" valign="bottom" src="/image/insn-01.gif" style="position:relative; top:-100px; left:10px; z-index:0; width:200px;">
-
+<div class="jqDrag" style="height:100%; width: 100%;">
+<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; top: 0;left: 0; width: 32px;"><div style="position: absolute; left:40px; "><font style="font-size: 28pt; font-family: 'OCRB', sans-serif; ">00001</font></div>
+<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; top: 0;right: 0; width: 32px;">
+<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; bottom: 0;left: 0; width: 32px;"><div style="position: absolute; left:40px; bottom: 0"><font style="font-size: 28pt; font-family: 'OCRB', sans-serif; ">00001</font></div>
 </div>
 <div class="jqResize"></div>
 </div>
+
+</body>
+</html>
 
 STR;
 
@@ -229,7 +121,7 @@ function put_excel($xls)
 		}
 
 		// XXX
-		$w = $w / 2;
+		// $w = $w / 2;
 
 		// シートテーブル表示
 		$html .= "<table class=\"sheet\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
@@ -243,8 +135,9 @@ function put_excel($xls)
 			$html .= "  <tr height=\"" . $trheight . "\">" . "\n";
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
-				// XXX
-				$tdwidth = $xls->getColWidth($sn, $i) / 2;
+				$tdwidth = $xls->getColWidth($sn, $i);
+// XXX
+//				$tdwidth = $tdwidth / 2;
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
 				if (isset($xls->hlink[$sn][$r][$i])){
