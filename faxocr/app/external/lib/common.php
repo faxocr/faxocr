@@ -1,24 +1,24 @@
 <?php
 /*
-* Ez-Cloud (Kantan cloud)
-*
-* Copyright (C) 2011 National Institute of Public Health, Japan.
-* All rights Reserved.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-*/
+ * Shinsai FaxOCR
+ *
+ * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
+ * All rights Reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
 
 require_once "config.php";
 
@@ -258,7 +258,7 @@ function genCsvData($rows)
 function put_css($xls)
 {
 	$css = $xls->makecss();
-	print <<< _CSS
+	$css_str = <<< _CSS
 <style type="text/css">
 <!--
 body,td,th {
@@ -283,7 +283,11 @@ border-right-color: #444444;
 ${css}
 -->
 </style>
+
 _CSS;
+
+	print $css_str;
+	return $css_str;
 }
 
 //

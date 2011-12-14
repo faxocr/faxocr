@@ -6,24 +6,30 @@
 	x chrome的jsエラーを潰していく
 	x 右上にstatusフィールドを追加
 	x 調査シート再登録フィールド
-	- 色付きセルの登録ロジックを確認、追加
-	- 保存 / ctrl+sのロジックを修正
+	x 保存 / ctrl+sのロジックを修正
+	x 色付きセルの登録ロジックを確認、追加
+	- 色つきセルがある場合、saveのdisableがenable化
+	- confファイルがあれば、markerのbuttonをenable化
+	- sheetlist.jsのcleanup
 
- - sht_script / 未作成 ★
+ - sht_script
 	- xlsファイル保存機能
 	- railsスクリプト作成機能
-	- .confファイル作成機能
+		- ダミー報告者作成
+	- confファイル作成機能
 	- 隣接同一名フィールドは連結する
 
 *** *** ***
 
  - sht_marker
 	x 右上にstatusフィールドを追加
-	- 対象が不特定多数か、特定対象かの指定radiobutton
-	- マーカー位置指定UI修正
 	- 保存 / ctrl+sのロジックを修正
+	- マーカー位置指定UI修正
+	- マーカー位置をhiddenで渡すロジック追加
+	- 対象が不特定多数か、特定対象かの指定radiobutton追加
+	- sheetedit.jsのcleanup
 
- - sht_config / 未作成 ★
+ - sht_config
 	- srml作成機能
 	- html作成機能
 	- PDFサンプル作成機能
@@ -47,7 +53,19 @@
 
 *** *** ***
 
- - pdfダウンロード
+ - pdf生成 / wkhtmltopdf
+	- cssを使ったoverlayも透過もちゃんと処理できる
+	- シートIDと機関IDを埋め込む
+
+ただし、apt-getでインストールしたwkhtmltopdfは、QTパッチが当たっておらず、
+X環境を必要とする。そこで、xvfbを用いて以下のように回避
+
+   sudo apt-get install xvfb
+   xvfb-run -a -s "-screen 0 640x480x16" wkhtmltopdf path_html path_pdf
+
+*** *** ***
+
+ - extern/download (pdfダウンロード)
 	x .pdf、.zip、の確認ロジックを追加
 	x route.rbにpdf downloadの追加を確認
 	x views/sheets/_list.html.erb

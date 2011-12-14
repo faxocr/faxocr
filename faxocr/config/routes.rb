@@ -40,45 +40,47 @@ ActionController::Routing::Routes.draw do |map|
   # Keep in mind you can assign values other than :controller and :action
 
   #
-  # Target registration
+  # PHP driver (Target registration)
   #
-
-  # Entry point
   map.connect 'external/register/:group_id',
     :controller => 'external',
     :action => 'register'
 
-  # PHP driver
   map.connect 'external/reg_upload',
     :controller => 'external',
     :action => 'reg_upload'
 
-  # PHP driver
   map.connect 'external/reg_exec',
     :controller => 'external',
     :action => 'reg_exec'
 
-  # PHP driver
+  #
+  # PHP driver (Sheet registration)
+  #
   map.connect 'external/sheet/:group_id/:survey_id',
     :controller => 'external',
     :action => 'sheet'
 
-  # PHP driver
   map.connect 'external/sht_field',
     :controller => 'external',
     :action => 'sht_field'
 
-  # PHP driver
+  map.connect 'external/sht_script',
+    :controller => 'external',
+    :action => 'sht_script'
+
   map.connect 'external/sht_marker',
     :controller => 'external',
     :action => 'sht_marker'
 
-  # PHP driver
+  map.connect 'external/sht_config',
+    :controller => 'external',
+    :action => 'sht_config'
+
   map.connect 'external/sht_verify',
     :controller => 'external',
     :action => 'sht_verify'
 
-  # PHP driver
   map.connect 'external/sht_commit',
     :controller => 'external',
     :action => 'sht_commit'

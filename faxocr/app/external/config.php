@@ -1,8 +1,8 @@
 <?php
 /*
- * Ez-Cloud (Kantan cloud)
+ * Shinsai FaxOCR
  *
- * Copyright (C) 2011 National Institute of Public Health, Japan.
+ * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
  * All rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify

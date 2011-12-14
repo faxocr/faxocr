@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 class ExternalController < ApplicationController
 
-  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec,:sht_field,:sht_marker,:sht_verify,:sht_commit]
+  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec, :sht_field, :sht_script, :sht_marker, :sht_config, :sht_verify, :sht_commit]
 
   # file size limit
   # @@size_limit = 60000
@@ -118,13 +118,23 @@ class ExternalController < ApplicationController
 
     @gid = params[:gid]
     @sid = params[:sid]
-    if params[:file].nil? then
-      redirect_to :controller => 'external', :action => 'sheet', :group_id => @gid, :survey_id => @sid
+    @tname = params[:file_id]
+
+    @msg = flash[:notice]
+
+    if not @tname.nil? then
+      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" msg=\"#{@msg}\"`
+      render :dummy
       return
     else
-      @filename = params[:file]['upfile'].original_filename
-      @size = params[:file]['upfile'].size
-      @tname = @gid + "-" + Time.now().strftime("%Y%m%d%H%M")
+      if params[:file].nil? then
+        redirect_to :controller => 'external', :action => 'sheet', :group_id => @gid, :survey_id => @sid
+        return
+      else
+        @filename = params[:file]['upfile'].original_filename
+        @size = params[:file]['upfile'].size
+        @tname = @gid + "-" + Time.now().strftime("%Y%m%d%H%M")
+      end
     end
 
     if 0 < @size && @size <= @@size_limit && /\.xls$/ =~ @filename then
@@ -144,6 +154,28 @@ class ExternalController < ApplicationController
     end
   end
 
+  def sht_script
+
+    @gid = params[:gid]
+    @sid = params[:sid]
+    @fileid = params[:fileid]
+
+    @param_str = ""
+    params.each {|key, value|
+      @param_str += key + "=\"" + value + "\" "
+    }
+    # @errmsg = `cd ./app/external; php sht_script.php #{@param_str}`
+    # flash[:notice] = @errmsg
+    # flash[:notice] = "セーブしました"
+
+    # @html = "<PRE>\n"
+    # @html += @param_str + "\n"
+    # @html += "<PRE>\n"
+    # render :dummy
+
+    redirect_to :controller => 'external', :action => 'sht_field', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid}
+  end
+
   def sht_marker
 
     @gid = params[:gid]
@@ -153,6 +185,28 @@ class ExternalController < ApplicationController
 
     @html = `cd ./app/external; php sht_marker.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\"`
     render :dummy
+  end
+
+  def sht_config
+
+    @gid = params[:gid]
+    @sid = params[:sid]
+    @fileid = params[:fileid]
+
+    @param_str = ""
+    params.each {|key, value|
+      @param_str += key + "=\"" + value + "\" "
+    }
+    # @errmsg = `cd ./app/external; php sht_config.php #{@param_str}`
+    # flash[:notice] = @errmsg
+    # flash[:notice] = "セーブしました"
+
+    # @html = "<PRE>\n"
+    # @html += @param_str + "\n"
+    # @html += "<PRE>\n"
+    # render :dummy
+
+    redirect_to :controller => 'external', :action => 'sht_marker', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid}
   end
 
   def sht_verify

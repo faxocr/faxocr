@@ -1,8 +1,8 @@
 <?php
 /*
- * Ez-Cloud (Kantan cloud)
+ * Shinsai FaxOCR
  *
- * Copyright (C) 2011 National Institute of Public Health, Japan.
+ * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
  * All rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -97,7 +97,7 @@ function put_status()
 	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
 
 	// XXX
-	print "<form action=\"/external\sht_commit/\" method=\"POST\" id=\"form-commit\">\n";
+	print "<form action=\"/external\sht_commit/\" method=\"POST\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";

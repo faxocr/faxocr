@@ -29,20 +29,9 @@ require_once 'contrib/peruser.php';
 if (isset($file_id) && $file_id) {
 	$tgt_file = DST_DIR . $file_id . ".xls";
 } else {
-	// XXX: $errmsg = "ファイルが読み込めません";
 	put_err_page("不正なアクセスです");
 	die;
 }
-
-//
-// ヘッダ処理
-//
-$header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/jqDnR.css\" type=\"text/css\">\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.4.1.min.js\"></script>\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetedit.js\"></script>\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jqDnR.js\"></script>\n";
-include( TMP_HTML_DIR . "tpl.header.html" );
-
 
 // Excelファイル読み込み処理
 if ($tgt_file && $errmsg === "") {
@@ -59,70 +48,45 @@ if ($tgt_file && $errmsg === "") {
 }
 
 //
-// エラーメッセージ処理
-//
-if ($errmsg) {
-	print "<blockquote><font color=\"red\"><STRONG>";
-	print strconv($errmsg);
-	print "</STRONG></font></blockquote>";
-}
-
-{
-	// ステータス表示
-	print "<table width=\"100%\">\n";
-	print "<tr>\n";
-	print "<td><button onclick=\"show_marker();\" style=\"z-index:10;\">マーカー</button></td>\n";
-	print "<td align=\"right\"\"  width=\"450px\">";
-	put_status();
-	print "</td>\n";
-	print "</tr></table>\n";
-	print "<br />\n";
-}
-
-//
-// Excelファイル表示処理
+// HTMLファイル作成処理
 //
 if ($xls) {
+	$html = put_header();
+	$html .= put_css($xls);
+	$html .= put_excel($xls);
+	$html .= put_footer();
 
-	put_css($xls);
-
-	// シート表示
-	print "<center>";
-	put_excel($xls);
-	print "</center>";
-	print "<br>";
-
-	// フッタ表示
-	print "<form action=\"commit.php?ret\" method=\"POST\" id=\"form-save\">";
-	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />";
-	print "<input id=\"sbmt\" type=\"submit\" value=\"保存\" disabled/>";
-	print "</form>";
-
-	// XXX
-	print "<form action=\"setting.php\" method=\"POST\" id=\"form-setting\">";
-	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />";
-	print "<input type=\"hidden\" name=\"password\" id=\"passwd\" />";
-	print "</form>";
+	file_put_contents(DST_DIR . $file_id . ".html", $html);
 }
 
-//
-// フッタ読み込み
-//
-include( TMP_HTML_DIR . "tpl.footer.html" );
+die;
 
-	print <<< STR
+function put_header()
+{
+	$html = << STR
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <title>Shinsai FaxOCR</title>
+  <link rel="stylesheet" href="/external/css/jqDnR.css" type="text/css">
+  <script type="text/javascript" src="/external/js/jquery-1.4.1.min.js"></script>
+  <script type="text/javascript" src="/external/js/jqDnR.js"></script>
+</head>
+<body>
+
+STR;
+	return $html
+}
+
+function put_footer()
+{
+	$html = <<< STR
+
 <script type="text/javascript">
 <!--
-
-function show_marker()
-{
-	$("#ex3").show("slow");
-}
-
-function hide_marker()
-{
-	$("#ex3").hide("slow");
-}
 
 var $ = jQuery;
 
@@ -198,7 +162,7 @@ function insn_rotate() {
 -->
 </script>
 
-<div id="ex3" class="jqDnR" style="opacity:0.8; position: absolute; top:100px; left:50px;display:none">
+<div id="ex3" class="jqDnR" style="opacity:0.8; position: absolute; top:100px; left:50px;">
 <div class="jqDrag" style="height:100%">
 
 <img src="/image/mark.gif" class="mark-img" style="top: 0;left: 0">
@@ -242,9 +206,12 @@ function insn_rotate() {
 
 STR;
 
-die;
+	return $html
+}
 
-function put_excel($xls) {
+function put_excel($xls)
+{
+	var $html;
 
 	// シート表示
 	// for ($sn = 0; $sn < 1; $sn++) {
@@ -262,15 +229,15 @@ function put_excel($xls) {
 		$w = $w / 2;
 
 		// シートテーブル表示
-		print "<table class=\"sheet\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
-		print ${w} . " bgcolor=\"#FFFFFF\" style=\"border-collapse: collapse;\">";
+		$html .= "<table class=\"sheet\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
+		$html .= ${w} . " bgcolor=\"#FFFFFF\" style=\"border-collapse: collapse;\">";
 
 		if (!isset($xls->maxrow[$sn]))
 			$xls->maxrow[$sn] = 0;
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
 			// XXX
 			$trheight = $xls->getRowHeight($sn, $r) * 0.8;
-			print "  <tr height=\"" . $trheight . "\">" . "\n";
+			$html .= "  <tr height=\"" . $trheight . "\">" . "\n";
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
 				// XXX
@@ -324,54 +291,24 @@ function put_excel($xls) {
 							$rcspan .= " rowspan=\"" . $rowspan . "\"";
 						$class = " class=\"XFs" . $sn . "r" . $r . "c" . $i . "\"";
 						$id = " id=\"". $sn . "-" . $r ."-" . $i . "\"";
-						print " <td $class $rcspan $align>$dispval</td>\n";
+						$html .= " <td $class $rcspan $align>$dispval</td>\n";
 					}
 				} else {
 					$class = " class=\"XF" . $xfno . "\" ";
 					$id = " id=\"". $sn . "-" . $r . "-" . $i . "\"";
 					$width = "width=\"" . $tdwidth . "\" ";
 
-					print " <td $class $width $align>$dispval</td>\n";
+					$html .= " <td $class $width $align>$dispval</td>\n";
 				}
 			}
-			print "</tr>\n";
+			$html .= "</tr>\n";
 		}
-		print "</table>\n";
+		$html .= "</table>\n";
 
 		// シート終了
 	}
-}
 
-//
-// ステータス操作エリア表示
-//
-function put_status()
-{
-	global $file_id;
-	global $group_id;
-	global $sheet_id;
-
-	$style = array();
-	$style["normal"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffffff;padding:1px;color:gray\"";
-	$style["gray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#bbbbbb;padding:1px\"";
-	$style["lgray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#dddddd;padding:1px\"";
-	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
-
-	// XXX
-	print "<form action=\"/external\sht_verify/\" method=\"POST\" id=\"form-status\">\n";
-	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />\n";
-	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
-	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
-
-	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
-	print "<div ${style["gray"]}><span>フィールド指定</span></div>\n";
-
-	print "<div ${style["pink"]}><span>マーカー指定</span></div>\n";
-	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"this.form.submit();\">シート確認</button></div>\n";
-	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
-	print "</div>\n";
-
-	print "</form>\n";
+	return $html;
 }
 
 ?>

@@ -1,9 +1,9 @@
 /*
- * Ez-Cloud (Kantan cloud)
- * 
- * Copyright (C) 2011 National Institute of Public Health, Japan.
+ * Shinsai FaxOCR
+ *
+ * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
  * All rights Reserved.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation
@@ -190,7 +190,7 @@ function cell_click() {
 				$cmd = 'apnd-';
 			}
 
-			$form = $('form#form-commit');
+			$form = $('form#form-save');
 
 			inputVal = $.escapeHTML(inputVal);// improve escape
 			$form.append('<input type=\"hidden\" name=\"' + $cmd + cell_id + '\" value=\"' + inputVal + '\" />');
@@ -228,7 +228,7 @@ function add_row() {
 		}
 	});
 
-	$form = $('form#form-commit');
+	$form = $('form#form-save');
 
 	// セル拡張
 	new_td.each(function(target_column) {
@@ -285,7 +285,7 @@ function add_column() {
 	    $inputVal,
 	    target_number;
 
-	$form = $('form#form-commit');
+	$form = $('form#form-save');
 
 	// セル拡張
 	var target_tds = target_table.find('tr').find('td:last');
@@ -367,7 +367,7 @@ jQuery(function($) {
 		// 誤ってしまうケースがある。それを防ぐために、カラの
 		// <td>等をphpで生成してその数を数えている様子。しかし、
 		// ここは*-view.php側でgetColWidth()等をして値を渡すな
-		// りすれば良いはずが(あるいはform-commitに細工？)、
+		// りすれば良いはずが(あるいはform-saveに細工？)、
 		// なぜそうしていないのかは不明。
 		//
 		var trs = $(this).find('tr'),
@@ -383,7 +383,7 @@ jQuery(function($) {
 			tablesize_w[i] = ths.length;
 		}
 
-		var $form = $('form#form-commit');
+		var $form = $('form#form-save');
 
 		$form.append('<input type=\"hidden\" name=\"sizeh-' + i + '\" value=\"' + tablesize_h[i] + '\" />');
 		$form.append('<input type=\"hidden\" name=\"sizew-' + i + '\" value=\"' + tablesize_w[i] + '\" />');
@@ -440,7 +440,7 @@ SHEET = {
 					target.blur();
 				}
 
-				frm = document.getElementById('form-commit');
+				frm = document.getElementById('form-save');
 				frm.submit();
 			}
 			if (keyChar === 'B') {

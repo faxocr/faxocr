@@ -1,9 +1,9 @@
 /*
- * Ez-Cloud (Kantan cloud)
- * 
- * Copyright (C) 2011 National Institute of Public Health, Japan.
+ * Shinsai FaxOCR
+ *
+ * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
  * All rights Reserved.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation
@@ -166,7 +166,7 @@ function delColumn(target, idx) {
 
 	var cmd_c = '<input type="hidden" name="cell-' + targetid +
 	    '-clear" value="" />';
-	var form = $('form#form-commit');
+	var form = $('form#form-save');
 	form.append(cmd_c);
 
 	$('#field_list').flexReload();
@@ -202,7 +202,7 @@ function del_column(target, index) {
 
 	var cmd_c = '<input type="hidden" name="cell-' + targetid +
 	    '-clear" value="" />';
-	var form = $('form#form-commit');
+	var form = $('form#form-save');
 	form.append(cmd_c);
 
 	dirty = true;
@@ -214,7 +214,7 @@ function del_column(target, index) {
 // 設定済みフィールドをinputタグに変換
 //
 function pack_fields() {
-	var form = $('form#form-commit');
+	var form = $('form#form-save');
 	$('#field_list td').each(function() {
 		var fieldname = $(this).attr('name');
 		var width = $(this).width();
@@ -319,7 +319,7 @@ function on_keydown(e) {
 			if (!dirty) {
 				return false;
 			}
-			frm = document.getElementById('form-commit');
+			frm = document.getElementById('form-save');
 			pack_fields();
 			frm.submit();
 		}
@@ -430,6 +430,7 @@ SHEET = {
 			colModel: valList
 		});
 	},
+	// XXX: to be removed?
 	setParam: function() {// status menuでのurlパラメータ設定
 		var $param = $('#jsiParam'),
 		　　$hidden = $param.find('input'),
@@ -439,8 +440,8 @@ SHEET = {
 			$('#bt-password').click(function() {
 				$.jqDialog.password('パスワードを入力して下さい', function(data) {
 					$('#passwd').val(data);
-					$('#form-commit').attr('action', 'form-setup.php?file=' + $('#file').val());
-					$('#form-commit').submit();
+					$('#form-status').attr('action', 'form-setup.php?file=' + $('#file').val());
+					$('#form-status').submit();
 				});
 			});
 		} else if (hiddenVal === 'running') {
@@ -448,16 +449,16 @@ SHEET = {
 				$.jqDialog.password('パスワードを入力して下さい', function(data) {
 					$('#passwd').val(data);
 					$('#status').val('stop');
-					$('#form-commit').attr('action', 'form-list.php?file=' + $('#file').val());
-					$('#form-commit').submit();
+					$('#form-status').attr('action', 'form-list.php?file=' + $('#file').val());
+					$('#form-status').submit();
 				});
 			});
 			$('#bt-password2').click(function() {
 				$.jqDialog.password('パスワードを入力して下さい', function(data) {
 					$('#passwd').val(data);
 					$('#status').val('close');
-					$('#form-commit').attr('action', 'form-list.php?file=' + $('#file').val());
-					$('#form-commit').submit();
+					$('#form-status').attr('action', 'form-list.php?file=' + $('#file').val());
+					$('#form-status').submit();
 				});
 			});
 		} else if (hiddenVal === 'stop') {
@@ -465,16 +466,16 @@ SHEET = {
 				$.jqDialog.password('パスワードを入力して下さい', function(data) {
 					$('#passwd').val(data);
 					$('#status').val('running');
-					$('#form-commit').attr('action', 'form-list.php?file=' + $('#file').val());
-					$('#form-commit').submit();
+					$('#form-status').attr('action', 'form-list.php?file=' + $('#file').val());
+					$('#form-status').submit();
 				});
 			});
 			$('#bt-password2').click(function() {
 				$.jqDialog.password('パスワードを入力して下さい', function(data) {
 					$('#passwd').val(data);
 					$('#status').val('close');
-					$('#form-commit').attr('action', 'form-list.php?file=' + $('#file').val());
-					$('#form-commit').submit();
+					$('#form-status').attr('action', 'form-list.php?file=' + $('#file').val());
+					$('#form-status').submit();
 				});
 			});
 		} else if (hiddenVal === 'close') {
@@ -513,18 +514,21 @@ SHEET = {
 			$.jqDialog.password('パスワードを入力して下さい', function(data) { 
 				$('#passwd').val(data);
 				pack_fields();
-				$('#form-commit').attr('action', 'form-commit.php?start');
-				$('#form-commit').submit();
+				$('#form-status').attr('action', 'form-commit.php?start');
+				$('#form-status').submit();
 			});
 		});
 	}
 };
 
 $(document).ready(function() {
+
+	// XXX: tobe removed?
 	if ($('#jsiColModel').length > 0) {
 		SHEET.setFlexi();
 	}
 
+	// XXX: tobe removed?
 	if ($('#jsiParam').length > 0) {
 		SHEET.setParam();
 	}

@@ -1,8 +1,8 @@
 <?php
 /*
- * Ez-Cloud (Kantan cloud)
+ * Shinsai FaxOCR
  *
- * Copyright (C) 2011 National Institute of Public Health, Japan.
+ * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
  * All rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -37,7 +37,6 @@ $field_width = array();
 if (isset($file_id) && $file_id) {
 	$tgt_file = DST_DIR . $file_id . ".xls";
 } else {
-	// XXX: $errmsg = "ファイルが読み込めません";
 	put_err_page("不正なアクセスです");
 	die;
 }
@@ -45,6 +44,7 @@ if (isset($file_id) && $file_id) {
 //
 // ヘッダ処理
 //
+//$header_opt = "<base target=\"/external/sht_field/\">\n";
 $header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/jqcontextmenu.css\" type=\"text/css\" />\n";
 $header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/flexigrid.css\" type=\"text/css\" />\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.4.1.min.js\"></script>\n";
@@ -63,7 +63,7 @@ include( TMP_HTML_DIR . "tpl.header.html" );
 //
 // Excelファイル読み込み処理
 //
-if ($tgt_file && $errmsg === "") {
+if ($tgt_file) {
 	$xls = NEW Excel_Peruser;
 	$xls->setErrorHandling(1);
 	$xls->setInternalCharset($charset);
@@ -82,8 +82,8 @@ if ($tgt_file && $errmsg === "") {
 	}
 }
 
+// エラーメッセージ処理
 if ($errmsg) {
-	// エラーメッセージ処理
 	print "<blockquote><font color=\"red\"><strong>";
 	print strconv($errmsg);
 	print "</strong></font></blockquote>";
@@ -120,12 +120,12 @@ if ($xls) {
 	put_excel($xls);
 	put_fields();
 
-	// XXX : sht_script行きへと変更
-	print "<form action=\"form-commit.php?ret\" method=\"POST\" id=\"form-commit\">";
-	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />";
-	print "<input type=\"hidden\" name=\"password\" id=\"passwd\" />";
-	print "<button id=\"sbmt\" onclick=\"pack_fields();\" disabled/>保存</button>";
-	print "</form>";
+	print "<form action=\"/external/sht_script/\" method=\"POST\" id=\"form-save\">\n";
+	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
+	print "<button id=\"sbmt\" onclick=\"pack_fields();\" disabled/>保存</button>\n";
+	print "</form>\n";
 }
 
 //
@@ -158,7 +158,7 @@ function put_excel($xls)
 	// for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
 	$sn = 0; 
 	{
-		print "<div class=\"simpleTabsContent\">";
+		// print "<div class=\"simpleTabsContent\">";
 
 		$w = 32;
 		if (!isset($xls->maxcell[$sn]))
@@ -359,7 +359,7 @@ function put_status()
 	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
 
 	// XXX
-	print "<form action=\"/external\sht_marker/\" method=\"POST\" id=\"form-commit\">\n";
+	print "<form action=\"/external\sht_marker/\" method=\"POST\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
