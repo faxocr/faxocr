@@ -45,7 +45,7 @@ include( TMP_HTML_DIR . "tpl.header.html" );
 
 
 // Excelファイル読み込み処理
-if ($tgt_file && $errmsg === "") {
+if ($tgt_file) {
 
 	$xls = NEW Excel_Peruser;
 	$xls->setErrorHandling(1);
@@ -87,21 +87,17 @@ if ($xls) {
 	put_css($xls);
 
 	// シート表示
-	print "<center>";
+	print "<center>\n";
 	put_excel($xls);
-	print "</center>";
-	print "<br>";
+	print "</center>\n";
+	print "<br>\n";
 
 	// フッタ表示
-	print "<form action=\"commit.php?ret\" method=\"POST\" id=\"form-save\">";
-	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />";
+	print "<form action=\"/external/sht_config/\" method=\"POST\" id=\"form-save\">\n";
+	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 	print "<input id=\"sbmt\" type=\"submit\" value=\"保存\" disabled/>";
-	print "</form>";
-
-	// XXX
-	print "<form action=\"setting.php\" method=\"POST\" id=\"form-setting\">";
-	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />";
-	print "<input type=\"hidden\" name=\"password\" id=\"passwd\" />";
 	print "</form>";
 }
 
@@ -122,6 +118,7 @@ function show_marker()
 function hide_marker()
 {
 	$("#ex3").hide("slow");
+	document.getElementById('sbmt').disabled = null;
 }
 
 var $ = jQuery;
@@ -198,7 +195,7 @@ function insn_rotate() {
 -->
 </script>
 
-<div id="ex3" class="jqDnR" style="opacity:0.8; position: absolute; top:100px; left:50px;display:none">
+<div id="ex3" class="jqDnR" style="opacity:0.8; position: absolute; top:200px; left:100px;display:none">
 <div class="jqDrag" style="height:100%">
 
 <img src="/image/mark.gif" class="mark-img" style="top: 0;left: 0">
@@ -358,8 +355,9 @@ function put_status()
 	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
 
 	// XXX
-	print "<form action=\"/external\sht_verify/\" method=\"POST\" id=\"form-status\">\n";
-	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />\n";
+	print "\n";
+	print "<form action=\"/external/sht_verify/\" method=\"POST\" id=\"form-status\">\n";
+	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 

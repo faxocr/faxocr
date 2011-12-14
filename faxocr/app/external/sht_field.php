@@ -360,7 +360,7 @@ function put_status()
 
 	// XXX
 	print "<form action=\"/external\sht_marker/\" method=\"POST\" id=\"form-status\">\n";
-	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 

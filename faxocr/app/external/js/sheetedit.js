@@ -435,7 +435,11 @@ SHEET = {
 		if (ctrl) {
 			keyChar = String.fromCharCode(keycode).toUpperCase();
 			if (keyChar === 'S') {
+				var dirty = !document.getElementById('sbmt').disabled;
 				e.preventDefault();
+				if (!dirty) {
+					return;
+				}
 				if (target) {
 					target.blur();
 				}
@@ -637,7 +641,7 @@ SHEET = {
 		$('#bt-password').click(function() {
 			$.jqDialog.password('パスワードを入力して下さい', function(data) { 
 				$('#passwd').val(data);
-				$('#form-setting').submit();
+				$('#form-status').submit();
 			});
 		});
 	},

@@ -25,16 +25,19 @@ require_once 'init.php';
 require_once 'lib/common.php';
 require_once 'contrib/peruser.php';
 
+//
 // ファイルハンドリング
+//
 if (isset($file_id) && $file_id) {
 	$tgt_file = DST_DIR . $file_id . ".xls";
 } else {
-	put_err_page("不正なアクセスです");
+	print "不正なアクセスです\n";
+	// put_err_page("不正なアクセスです");
 	die;
 }
 
 // Excelファイル読み込み処理
-if ($tgt_file && $errmsg === "") {
+if ($tgt_file) {
 
 	$xls = NEW Excel_Peruser;
 	$xls->setErrorHandling(1);
@@ -63,7 +66,7 @@ die;
 
 function put_header()
 {
-	$html = << STR
+	$html = <<< STR
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -78,7 +81,7 @@ function put_header()
 <body>
 
 STR;
-	return $html
+	return $html;
 }
 
 function put_footer()
@@ -206,12 +209,12 @@ function insn_rotate() {
 
 STR;
 
-	return $html
+	return $html;
 }
 
 function put_excel($xls)
 {
-	var $html;
+	$html = "";
 
 	// シート表示
 	// for ($sn = 0; $sn < 1; $sn++) {

@@ -44,11 +44,14 @@ if ($argc > 0) {
 // Environment Variable
 //
 
-if ($_SERVER["HTTPS"]) {
+// XXX
+/*
+if (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"]) {
 	$url_base = "https://${_SERVER['HTTP_HOST']}";
 } else {
 	$url_base = "http://${_SERVER['HTTP_HOST']}";
 }
+*/
 
 if (isset($_REQUEST["file"])) {
 	$file_id = $_REQUEST["file"];

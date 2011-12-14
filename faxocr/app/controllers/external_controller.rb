@@ -180,10 +180,13 @@ class ExternalController < ApplicationController
 
     @gid = params[:gid]
     @sid = params[:sid]
-    @file = params[:file]
+    @file = params[:fileid]
+    @msg = flash[:notice]
+
+    @file = @file.nil? ? params[:file_id] : @file
     # @group = Group.find(params[:gid])
 
-    @html = `cd ./app/external; php sht_marker.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\"`
+    @html = `cd ./app/external; php sht_marker.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\"`
     render :dummy
   end
 
@@ -191,19 +194,21 @@ class ExternalController < ApplicationController
 
     @gid = params[:gid]
     @sid = params[:sid]
-    @fileid = params[:fileid]
+    @file = params[:fileid]
 
     @param_str = ""
     params.each {|key, value|
       @param_str += key + "=\"" + value + "\" "
     }
-    # @errmsg = `cd ./app/external; php sht_config.php #{@param_str}`
+
+    @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str}`
     # flash[:notice] = @errmsg
     # flash[:notice] = "セーブしました"
 
     # @html = "<PRE>\n"
     # @html += @param_str + "\n"
     # @html += "<PRE>\n"
+    # @html += @ret
     # render :dummy
 
     redirect_to :controller => 'external', :action => 'sht_marker', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid}
@@ -213,10 +218,10 @@ class ExternalController < ApplicationController
 
     @gid = params[:gid]
     @sid = params[:sid]
-    @file = params[:file]
-    # @group = Group.find(params[:gid])
+    @file = params[:fileid]
+    @msg = flash[:notice]
 
-    @html = `cd ./app/external; php sht_verify.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\"`
+    @html = `cd ./app/external; php sht_verify.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\"`
     render :dummy
   end
 
