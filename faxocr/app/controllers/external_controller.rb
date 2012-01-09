@@ -118,12 +118,13 @@ class ExternalController < ApplicationController
 
     @gid = params[:gid]
     @sid = params[:sid]
+    @target = params[:target]
     @tname = params[:file_id]
 
     @msg = flash[:notice]
 
     if not @tname.nil? then
-      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" msg=\"#{@msg}\"`
+      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" msg=\"#{@msg}\" target=\"#{@target}\"`
       render :dummy
       return
     else
@@ -146,7 +147,7 @@ class ExternalController < ApplicationController
       #  "Temp file: " + @tname
       # @html = `cd ./app/external; php reg_upload.php`
       # @html = `echo php reg_upload.php file=\"#{@tname}\"`
-      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\"`
+      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" target=\"#{@target}\"`
       render :dummy
     else
       flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
@@ -159,12 +160,13 @@ class ExternalController < ApplicationController
     @gid = params[:gid]
     @sid = params[:sid]
     @fileid = params[:fileid]
+    @target = params[:target]
 
     @param_str = ""
     params.each {|key, value|
       @param_str += key + "=\"" + value + "\" "
     }
-    # @errmsg = `cd ./app/external; php sht_script.php #{@param_str}`
+    @errmsg = `cd ./app/external; php sht_script.php #{@param_str} file_id=#{@fileid}`
     # flash[:notice] = @errmsg
     # flash[:notice] = "セーブしました"
 
@@ -173,7 +175,7 @@ class ExternalController < ApplicationController
     # @html += "<PRE>\n"
     # render :dummy
 
-    redirect_to :controller => 'external', :action => 'sht_field', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid}
+    redirect_to :controller => 'external', :action => 'sht_field', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid, :target => @target}
   end
 
   def sht_marker

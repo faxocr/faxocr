@@ -41,7 +41,7 @@ if (isset($file_id) && $file_id) {
 //
 $header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/jqDnR.css\" type=\"text/css\">\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.4.1.min.js\"></script>\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetedit.js\"></script>\n";
+// $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetedit.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jqDnR.js\"></script>\n";
 include( TMP_HTML_DIR . "tpl.header.html" );
 
@@ -119,6 +119,37 @@ function show_marker()
 
 function hide_marker()
 {
+	var form = $('form#form-save');
+
+	// block_width
+	var w = parseInt($("#ex3").css("width"));
+	var cmd = '<input type="hidden" name="block_width" ' +
+		  'value="' + w + '" />';
+	form.append(cmd);
+
+	// block_height
+	var h = parseInt($("#ex3").css("height"));
+	var cmd = '<input type="hidden" name="block_height" ' +
+		  'value="' + h + '" />';
+	form.append(cmd);
+
+	// marker
+	var cmd = '<input type="hidden" name="block_size" ' +
+		  'value="' + last_size + '" />';
+	form.append(cmd);
+
+	var m = $(".sheet_marker").get(0);
+	var x = parseInt($("#ex3").css("left"));
+	var cmd = '<input type="hidden" name="block_offsetx" ' +
+		  'value="' + (x - m.offsetLeft) + '" />';
+	form.append(cmd);
+
+	var y = parseInt($("#ex3").css("top"));
+	var cmd = '<input type="hidden" name="block_offsety" ' +
+		  'value="' + (y - m.offsetTop) + '" />';
+	form.append(cmd);
+
+	// enable button
 	$("#ex3").hide("slow");
 	document.getElementById('sbmt').disabled = null;
 }

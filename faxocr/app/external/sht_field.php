@@ -41,6 +41,16 @@ if (isset($file_id) && $file_id) {
 	die;
 }
 
+if (isset($_REQUEST["target"])) {
+	$target = $_REQUEST["target"];
+}
+
+if (file_exists(DST_DIR . $file_id . ARRAY_CONF_EXT)) {
+	$conf_sw = true;
+} else {
+	$conf_sw = false;
+}
+
 //
 // ヘッダ処理
 //
@@ -118,13 +128,21 @@ if ($xls) {
 
 	put_css($xls);
 	put_excel($xls);
+	if ($conf_sw) {
+		$dirty_label = " disabled";
+	} else {
+		$dirty_label = count($field_list) > 0 ? "" : " disabled";
+	}
 	put_fields();
+
 
 	print "<form action=\"/external/sht_script/\" method=\"POST\" id=\"form-save\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
-	print "<button id=\"sbmt\" onclick=\"pack_fields();\" disabled/>保存</button>\n";
+	print "<input type=\"hidden\" name=\"target\" value=\"" . $target . "\" />\n";
+	print "<button id=\"sbmt\" onclick=\"pack_fields();\"" . $dirty_label .
+	      "/>保存</button>\n";
 	print "</form>\n";
 }
 
@@ -353,6 +371,9 @@ function put_status()
 	global $file_id;
 	global $group_id;
 	global $sheet_id;
+	global $conf_sw;
+
+	$status_label = $conf_sw ? "" : " disabled";
 
 	$style = array();
 	$style["normal"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffffff;padding:1px;color:gray\"";
@@ -369,7 +390,7 @@ function put_status()
 	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
 	print "<div ${style["pink"]}><span>フィールド指定</span></div>\n";
 
-	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"this.form.submit();\">マーカー指定</button></div>\n";
+	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"this.form.submit();\" " . $status_label . ">マーカー指定</button></div>\n";
 
 	print "<div ${style["gray"]}><span>シート確認</span></div>\n";
 	print "<div ${style["gray"]}><span>シート登録</span></div>\n";

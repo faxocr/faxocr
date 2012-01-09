@@ -44,7 +44,9 @@
 <%= hidden_field_tag(:sid, @sid) %>
 <table width="700px" border="0" cellpadding="3" cellspacing="0" class="srcTable1">
 	<tbody><tr> 
-		<th><div align="center"><b>ファイル登録</b></div></th> 
+		<th>
+		  <div align="center"><b>ファイル登録</b></div>
+		</th> 
 		<td> <br><br>
 <center><%= file_field "file", "upfile", "size" => "60" %></center>
 <br>
@@ -55,8 +57,20 @@
 <br>
 </ul>
 </div>
+
+<hr>
+<table border="0" cellpadding="5" class="srcTable2" width="100%">
+<tr>
+<td width="150px" align="center" border="0px"><b>調査対象</b></td>
+<td>
+<input type="radio" name="target" value="registered" checked>設定済み調査対象
+<input type="radio" name="target" value="unrestricted">不特定多数　　　
+</td>
+</tr>
+</table>
 		</td> 
 	</tr> 
+
 	<tr>
 		<td colspan="2"><center><br>
 <a href="#" onclick="document.upfm.submit()"><img src="/image/submit.gif" alt="アップロード" border="0"></a>

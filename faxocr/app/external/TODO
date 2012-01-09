@@ -8,26 +8,24 @@
 	x 調査シート再登録フィールド
 	x 保存 / ctrl+sのロジックを修正
 	x 色付きセルの登録ロジックを確認、追加
-	- 対象が不特定多数か、特定対象かの指定radiobutton追加
-	- 色つきセルがある場合、saveのdisableがenable化
-	- confファイルがあれば、markerのbuttonをenable化
+	x 対象が不特定多数か、特定対象かの指定radiobutton追加
+	x 色つきセルがある場合、saveのdisableがenable化
+	x confファイルがあれば、markerのbuttonをenable化
+	- hover対応
 	- sheetlist.jsのcleanup
 
  - sht_script
-	- railsスクリプト作成機能
-		- ダミー報告者作成
-	- xlsファイル保存機能
-	- confファイル作成機能
-	- 隣接同一名フィールドを連結する内部処理
+	x xlsファイル保存機能
+	x confファイル作成機能 (なぜか、作成されない...orz)
 
  * マーカー指定
 
  - sht_marker
 	x 右上にstatusフィールドを追加
 	x 保存 / ctrl+sのロジックを修正
+	x マーカー位置をhiddenで渡すロジック追加
 	- マーカー位置指定UI修正(整数倍サイズ、マーカーサイズ自由化)
-	- マーカー位置をhiddenで渡すロジック追加
-	- sheetedit.jsのcleanup
+	- sheetedit.jsのcleanup / そもそも不要では？
 
  - sht_config
 	x html作成機能
@@ -35,7 +33,11 @@
 	x JPGサンプル作成機能
 	x ImageMagickのconvert (convert a.pdf a.png)
 	- グループID、ユーザーID、流し込み機能
-	- srml作成機能
+	- srml作成機能 (RoR側が作る？)
+	- railsスクリプト作成機能
+	- 隣接同一名フィールドを連結する内部処理
+		- sortして比較、で終了
+		- ダミー報告者作成
 
  * シート確認 / 登録 / ダウンロード
 

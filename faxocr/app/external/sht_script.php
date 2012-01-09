@@ -23,27 +23,37 @@
 require_once 'config.php';
 require_once 'init.php';
 require_once 'lib/common.php';
+require_once 'lib/file_conf.php';
 require_once 'contrib/reviser.php';
 
-// リファラーチェック
-is_referer_err();
+// XXX
+// file_put_contents("/tmp/faxocr.log", "test");
+
+if (isset($_REQUEST["file_id"])) {
+	$file_id = $_REQUEST["file_id"];
+}
 
 //
-// 不正アクセス疑い
+// ファイルハンドリング
 //
-if (!isset($file_id) || !$file_id) {
-	put_reject("不正なアクセスです");
+if (isset($file_id) && $file_id) {
+	$tgt_file = DST_DIR . $file_id . ".xls";
+} else {
+	print "不正なアクセスです\n";
+	// put_err_page("不正なアクセスです");
 	die;
 }
 
-$tgt_file = DST_DIR . $file_id . DATA_EXT;
-$template_xls = TMP_XLS;
-$tmp_file = uniqid();
+if (isset($_REQUEST["target"])) {
+	$target = $_REQUEST["target"];
+} else {
+	$target = "registered";
+}
 
 //
 // Read Excelファイル処理
 //
-if ($tgt_file && $errmsg === "") {
+if ($tgt_file) {
 	global $xls;
 	$xls = NEW Excel_Reviser;
 	$xls->setErrorHandling(1);
@@ -52,11 +62,6 @@ if ($tgt_file && $errmsg === "") {
 
 	if ($xls->isError($result)) {
 		$errmsg = $result->getMessage();
-		if (strpos($errmsg, $_FILES['userfile']['tmp_name']) !== false) {
-			$errmsg = str_replace($tgt_file, $file_name, $errmsg);
-			$errmsg = str_replace('Template file', 'Uploaded file',
-					      $errmsg);
-		}
 		$xls = null;
 	}
 
@@ -72,6 +77,8 @@ if ($tgt_file && $errmsg === "") {
 	}
 	$xls->sheetnum = count($xls->boundsheets);
 }
+
+$msg = "tgt: " . $tgt_file . "\n";
 
 //
 // reviserのClassオブジェクトを新規作成
@@ -117,11 +124,12 @@ for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
 				}
 			}
 
-			if (isset($_POST["cell-${sn}-${r}-${i}-mark"])) {
-				$val = $_POST["cell-${sn}-${r}-${i}-mark"];
+			if (isset($_REQUEST["cell-${sn}-${r}-${i}-mark"])) {
+				$val = $_REQUEST["cell-${sn}-${r}-${i}-mark"];
 				$bgcolor = 1;
-			} else if (isset($_POST["cell-${sn}-${r}-${i}-clear"])) {
-				$val = $_POST["cell-${sn}-${r}-${i}-clear"];
+$msg .= ")" . $val . "\n";
+			} else if (isset($_REQUEST["cell-${sn}-${r}-${i}-clear"])) {
+				$val = $_REQUEST["cell-${sn}-${r}-${i}-clear"];
 				$bgcolor = 0;
 			}
 
@@ -160,6 +168,9 @@ for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
 		$row_height = $xls->getRowHeight($sn, $r);
 		$reviser->chgRowHeight($sn + 2, $r, $row_height);
 	}
+
+	// $msg .= "col_width: " . $col_width . "\n";
+	// $msg .= "row_height: " . $row_height . "\n";
 }
 
 //
@@ -173,6 +184,12 @@ $reviser->rmSheet(1);
 //
 $lockfp = fopen(LOCK_FILE . $file_id, 'w');
 flock($lockfp, LOCK_EX);
+$template_xls = TMP_XLS;
+$tmp_file = uniqid();
+
+// $msg .= "tmp file: " . $tmp_file . "\n";
+// $msg .= "tmp xls: " . $template_xls . "\n";
+
 if (filesize($tgt_file)) {
 	$result = $reviser->reviseFile($template_xls, $tmp_file, TMP_DIR);
 }
@@ -188,48 +205,180 @@ flock($lockfp, LOCK_UN);
 fclose($lockfp);
 unlink(LOCK_FILE . $file_id);
 
-if (isset($_GET['ret'])) {
-	$url = $_SERVER["HTTP_REFERER"];
-	// XXX: is the url generation reasonable??
-	// (trying to remove the strings after "?")
-	$url = preg_replace("/(\?.+)/", "", $url);
-	$url = $url . "?file=" . $file_id;
+// XXX: debugging purpose
+file_put_contents("/tmp/faxocr.log",
+  "----------------------------------------\n" .
+  date("Y/m/d H:i:s") . "\n(" .
+  count($_REQUEST) . ")\n" .
+  $msg . "\n\n",
+  FILE_APPEND | LOCK_EX
+);
 
-	header('Content-Type: text/html');
-	header('Location: ' . $url);
-
-	die;
-}
-
-//
-// ヘッダ処理
-//
-$header_opt .= "<script type=\"text/javascript\" src=\"./js/jquery-1.4.1.min.js\"></script>\n";
-include( TMP_HTML_DIR . "tpl.header.html" );
-
-//
-// タイトル
-//
-print "<H1>かんたんクラウド</H1>";
-
-if ($reviser->isError($result)) {
-	$errmsg = $result->getMessage();
-
-	// エラーメッセージ処理
-	print "ファイル : " . $tgt_file . "の処理中にエラーが発生しました<BR><BR>";
-	print "<blockquote><font color=\"red\"><STRONG>";
-	print strconv($errmsg);
-	print "</STRONG></font></blockquote>";
-}
-
-print "<BR>";
-print "<div align=\"right\"><a href=\"./index.php\">[トップ]</a></div>";
-
-//
-// フッタ読み込み
-//
-include( TMP_HTML_DIR . "tpl.footer.html" );
+put_config($file_id, $_REQUEST);
+put_rails($file_id, $_REQUEST);
 
 die;
+
+//
+// config出力
+//
+function put_config($file_id, $_REQUEST)
+{
+
+	$conf = new FileConf($file_id);
+	$conf->array_destroy("field");
+
+	//
+	// XLSフィールド情報REQUEST取得
+	//
+	foreach ($_REQUEST as $item => $val) {
+		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
+		if ($loc && $loc[0]) {
+			$xls_fields = array();
+			$xls_fields["sheet_num"] = $loc[1];
+			$xls_fields["row"]       = $loc[2];
+			$xls_fields["col"]       = $loc[3];
+			$xls_fields["width"]     = $loc[4];
+			$xls_fields["item_name"] = $val;
+
+			//
+			// XLSフィールド情報保存
+			//
+			$conf->array_set("field", $xls_fields);
+		}
+	}
+	$conf->array_commit();
+}
+
+//
+// Railsスクリプトの作成
+//
+function put_rails($file_id, $_REQUEST)
+{
+
+	//
+	// XLSフィールド情報取得
+	//
+	$tgt_items = "";
+	foreach ($_REQUEST as $item => $val) {
+		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
+		if ($loc && $loc[0]) {
+			$xls_fields = array();
+			$xls_fields["sheet_num"] = $loc[1];
+			$xls_fields["row"]       = $loc[2];
+			$xls_fields["col"]       = $loc[3];
+			$xls_fields["width"]     = $loc[4];
+			$xls_fields["item_name"] = $val;
+
+			$tgt_items .= implode(",", $xls_fields) . "\n";
+		}
+	}
+
+	$tgt_script = <<< "STR"
+
+#!/usr/bin/ruby
+# -*- coding: utf-8 -*-
+
+require "rubygems"
+require "active_record"
+require "yaml"
+
+rails_prefix = ARGV[0] || "./"
+group = ARGV[1] || exit(0)
+survey = ARGV[2] || exit(0) # XXX
+
+config_db = rails_prefix + "/config/database.yml"
+db_env = "{$rails_env}"
+
+ActiveRecord::Base.configurations = YAML.load_file(config_db)
+ActiveRecord::Base.establish_connection(db_env)
+Dir.glob(rails_prefix + '/app/models/*.rb').each do |model|
+  load model
+end
+
+#
+# create a new survey
+#
+do
+  @group = Group.find(group)
+  @survey = @group.surveys.build(survey)
+  @survey.report_header = ""
+  @survey.report_footer = ""
+
+  @candidates = @group.candidates
+  @candidates.each do |candidate|
+    survey_candidate = SurveyCandidate.new
+    survey_candidate.candidate_id = candidate.id
+    survey_candidate.role = 'sr'
+    @survey.survey_candidates << survey_candidate
+  end
+  if @survey.save
+    print "success"
+  else
+    print "fail"
+  end
+end
+
+#
+# create survey properties
+#
+
+props = []
+{$tgt_items}
+
+props.each do |prop|
+
+  # object building
+  @survey_property = @survey.survey_properties.build
+  @survey_property.survey_id = survey		# integer
+  @survey_property.ocr_name = prop[0]		# string
+  @survey_property.ocr_name_full = prop[1]	# string
+  @survey_property.view_order = prop[2]		# integer
+  @survey_property.data_type = prop[3]		# string
+
+  # save
+  if @survey_property.save
+    print  prop[0] + " success\n"
+  else
+    print  prop[0] + " fail\n"
+  end
+end
+
+#
+# create a new sheet
+#
+
+#  create_table "sheets", :force => true do |t|
+#    t.string   "sheet_code",   :null => false
+#    t.string   "sheet_name",   :null => false
+#    t.integer  "survey_id",    :null => false
+#    t.integer  "block_width",  :null => false
+#    t.integer  "block_height", :null => false
+#    t.integer  "status",       :null => false
+#    t.datetime "created_at"
+#    t.datetime "updated_at"
+#  end
+
+#
+# create sheet/property mapping
+#
+
+#  create_table "sheet_properties", :force => true do |t|
+#    t.integer  "position_x"
+#    t.integer  "position_y"
+#    t.integer  "colspan"
+#    t.integer  "sheet_id"
+#    t.integer  "survey_property_id"
+#    t.datetime "created_at"
+#    t.datetime "updated_at"
+#  end
+
+exit(0)
+
+STR;
+
+	// ファイル生成
+	file_put_contents(DST_DIR . $file_id . ".rb", $tgt_script);
+}
 
 ?>
