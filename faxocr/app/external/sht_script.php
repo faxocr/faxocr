@@ -224,13 +224,14 @@ die;
 //
 function put_config($file_id, $_REQUEST)
 {
+	global $target;
 
 	$conf = new FileConf($file_id);
-	$conf->array_destroy("field");
 
 	//
 	// XLSフィールド情報REQUEST取得
 	//
+	$conf->array_destroy("field");
 	foreach ($_REQUEST as $item => $val) {
 		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
 		if ($loc && $loc[0]) {
@@ -248,6 +249,11 @@ function put_config($file_id, $_REQUEST)
 		}
 	}
 	$conf->array_commit();
+
+	if (strlen($target) != 0) {
+		$conf->set("target", $target);
+		$conf->commit();
+	}
 }
 
 //

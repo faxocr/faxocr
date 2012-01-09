@@ -15,10 +15,18 @@
 		dnr: {},
 		e: 0,
 		drag: function(v) {
-			if (M.k	== 'd')
+			if (M.k	== 'd') {
+				// move
 				E.css({left:M.X+v.pageX-M.pX,top:M.Y+v.pageY-M.pY});
-			else
-				E.css({width:Math.max(v.pageX-M.pX+M.W,0),height:Math.max(v.pageY-M.pY+M.H,0)});
+			} else {
+				// resize
+				var w = v.pageX-M.pX+M.W;
+				var h = v.pageY-M.pY+M.H;
+				w = w - (w % last_size);
+				h = h - (h % last_size);
+
+				E.css({width:Math.max(w,0),height:Math.max(h,0)});
+			}
 			return false;
 		},
 		stop: function(){

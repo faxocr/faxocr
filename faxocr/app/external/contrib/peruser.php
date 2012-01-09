@@ -1325,14 +1325,16 @@ class Excel_Peruser
 					$tmp.='text-decoration:'.$this->fontdeco($this->recFONT[$val['fontindex']]['style']) . ";\n";
 			}
 		} else $tmp.='font: '.($this->recFONT[0]['height']/Const_fontH)."px".";\n";
-		if (isset($val['fillpattern'])){
+
+		// XXX
+		if (!$border_sw && isset($val['fillpattern'])){
 			if($val['fillpattern']==1){
 				$tmp.='background-color: #'. $this->palette[$val['PtnFRcolor']] . ";\n";
 			} elseif ($val['fillpattern'] <=18 && $val['fillpattern'] >1){
 				$tmp .='background-color: #'. $this->palette[$val['PtnBGcolor']] . ";\n";
 				$tmp .= 'background-image:URL("'. $_SERVER['PHP_SELF'] .'?ptn=' . $val['fillpattern'] . '&fc=' . $val['PtnFRcolor'] . "\");\n";
 			}
-		} elseif(isset($val['PtnBGcolor'])){
+		} elseif (!$border_sw && isset($val['PtnBGcolor'])){
 			if ($val['PtnBGcolor'] < 65 && $val['PtnBGcolor'] > 0)
 				$tmp.='background-color: #'. $this->palette[$val['PtnBGcolor']] . ";\n";
 		}

@@ -175,7 +175,7 @@ class ExternalController < ApplicationController
     # @html += "<PRE>\n"
     # render :dummy
 
-    redirect_to :controller => 'external', :action => 'sht_field', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid, :target => @target}
+    redirect_to :controller => 'external', :action => 'sht_field', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid}
   end
 
   def sht_marker
@@ -217,7 +217,6 @@ class ExternalController < ApplicationController
     @file_pdf = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.pdf"
     @file_png = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.png"
 
-    # @ret = `cd #{RAILS_ROOT}; xvfb-run -a wkhtmltopdf --page-size A4 --orientation Landscape #{@file_html} #{@file_pdf}`
     @ret = `cd #{RAILS_ROOT}; xvfb-run -a wkhtmltopdf --page-size A4 --orientation Landscape #{@file_html} #{@file_pdf}`
     @ret = `convert #{@file_pdf} #{@file_png}`
 
@@ -239,7 +238,7 @@ class ExternalController < ApplicationController
 
     @gid = params[:gid]
     @sid = params[:sid]
-    @file = params[:file]
+    @file = params[:fileid]
     @group = Group.find(params[:gid])
 
     # @result = `ruby #{RAILS_ROOT}/files/#{@file}.rb #{RAILS_ROOT} #{@gid}`

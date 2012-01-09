@@ -97,6 +97,22 @@ function put_status()
 	global $group_id;
 	global $sheet_id;
 
+	print <<< STR
+<script type="text/javascript">
+<!--
+function go_prev() {
+	$("#form-status").attr("action", "/external/sht_marker/").submit();
+}
+
+function go_next() {
+	$("#form-status").attr("action", "/external/sht_commit/").submit();
+}
+
+-->
+</script>
+
+STR;
+
 	$style = array();
 	$style["normal"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffffff;padding:1px;color:gray\"";
 	$style["gray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#bbbbbb;padding:1px\"";
@@ -104,16 +120,18 @@ function put_status()
 	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
 
 	// XXX
-	print "<form action=\"/external\sht_commit/\" method=\"POST\" id=\"form-status\">\n";
-	print "<input type=\"hidden\" name=\"file\" value=\"" . $file_id . "\" />\n";
+	// action=\"/external\sht_commit/\" 
+	print "<form method=\"POST\" id=\"form-status\">\n";
+	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
 	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
 	print "<div ${style["gray"]}><span>フィールド指定</span></div>\n";
-	print "<div ${style["gray"]}><span>マーカー指定</span></div>\n";
+	print "<div ${style["gray"]}><button id=\"next\" onclick=\"go_prev();\">マーカー指定</button></div>\n";
+
 	print "<div ${style["pink"]}><span>シート確認</span></div>\n";
-	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"this.form.submit();\">シート登録</button></div>\n";
+	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"go_next();\">シート登録</button></div>\n";
 	print "</div>\n";
 
 	print "</form>\n";

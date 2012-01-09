@@ -23,9 +23,12 @@
 require_once 'config.php';
 require_once 'init.php';
 require_once 'lib/common.php';
+require_once 'lib/file_conf.php';
 require_once 'contrib/peruser.php';
 
 define('border_sw', true);
+
+$msg = "start\n";
 
 //
 // ファイルハンドリング
@@ -37,6 +40,10 @@ if (isset($file_id) && $file_id) {
 	// put_err_page("不正なアクセスです");
 	die;
 }
+
+put_config($file_id, $_REQUEST);
+get_config($file_id);
+
 
 // Excelファイル読み込み処理
 if ($tgt_file) {
@@ -61,9 +68,77 @@ if ($xls) {
 	$html .= put_excel($xls);
 	$html .= put_footer();
 	file_put_contents(DST_DIR . $file_id . ".html", $html);
+
+	$msg .= "put_excel\n";
 }
 
+// XXX: debugging purpose
+file_put_contents("/tmp/faxocr.log",
+  "----------------------------------------\n" .
+  date("Y/m/d H:i:s") . "\n(" .
+  count($_REQUEST) . ")\n" .
+  $msg . "\n\n",
+  FILE_APPEND | LOCK_EX
+);
+
 die;
+
+function get_config($file_id)
+{
+	global $field_index;
+	global $conf;
+
+	//
+	// 設定情報読込
+	//
+	if (!$conf)
+		$conf = new FileConf($file_id);
+
+	$xls_fields_list = $conf->array_getall("field");
+
+	$num = 0;
+	foreach ($xls_fields_list as $xls_fields) {
+		$location = $xls_fields["sheet_num"] . "-" .
+		   $xls_fields["row"] . "-" . $xls_fields["col"];
+		$field_index[$location] = $location;
+	}
+
+	return $field_index;
+}
+
+//
+// config出力
+//
+function put_config($file_id, $_REQUEST)
+{
+	global $target;
+	global $group_id;
+	global $sheet_id;
+	global $conf;
+
+	$conf = new FileConf($file_id);
+
+	if (isset($group_id))
+		$conf->set("gid", $group_id);
+
+	if (isset($sheet_id))
+		$conf->set("sid", $sheet_id);
+
+	foreach (array("block_width",
+			"block_height",
+			"block_size",
+			"block_offsetx",
+			"block_offsety") as $item) {
+		if (isset($_REQUEST[$item])) {
+			$val = $_REQUEST[$item];
+			if (strlen($val) != 0) {
+				$conf->set($item, $val);
+			}
+		}
+	}
+
+	$conf->commit();
+}
 
 function put_header()
 {
@@ -84,14 +159,28 @@ STR;
 
 function put_footer()
 {
+	global $conf;
+
+	$sid = $conf->get("sid");
+	$tid = "00000";
+
+	$width = $conf->get("block_width");
+	$height = $conf->get("block_height");
+	$size = $conf->get("block_size");
+	$offsetx = $conf->get("block_offsetx");
+	$offsety = $conf->get("block_offsety");
+
+	$offsetx = $offsetx > 0 ? $offsetx : 0;
+	$offsety = $offsety > 0 ? $offsety : 0;
+
 	$html = <<< STR
 
-<div id="ex3" class="jqDnR" style="opacity:0.8; top:10px; left:10px; z-index: 3; position: absolute; width: 800px; height:500px; font-size: 12px; ">
+<div id="ex3" class="jqDnR" style="opacity:0.8; top:{$offsety}px; left:{$offsetx}px; z-index: 3; position: absolute; width: {$width}px; height:{$height}px; font-size: 12px; ">
 
 <div class="jqDrag" style="height:100%; width: 100%;">
-<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; top: 0;left: 0; width: 32px;"><div style="position: absolute; left:40px; "><font style="font-size: 28pt; font-family: 'OCRB', sans-serif; ">00001</font></div>
-<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; top: 0;right: 0; width: 32px;">
-<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; bottom: 0;left: 0; width: 32px;"><div style="position: absolute; left:40px; bottom: 0"><font style="font-size: 28pt; font-family: 'OCRB', sans-serif; ">00001</font></div>
+<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; top: 0;left: 0; width: {$size}px;"><div style="position: absolute; left:40px; "><font style="line-height: 28pt; font-size: 28pt; font-family: 'Arial'; ">00001</font></div>
+<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; top: 0;right: 0; width: {$size}px;">
+<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; bottom: 0;left: 0; width: {$size}px;"><div style="position: absolute; left:40px; bottom: 0"><font style="line-height: 28pt; font-size: 28pt; font-family: 'Arial'; ">00001</font></div>
 </div>
 <div class="jqResize"></div>
 </div>
@@ -106,7 +195,14 @@ STR;
 
 function put_excel($xls)
 {
-	$html = "";
+	global $field_index;
+	global $conf;
+
+	$offsetx = $conf->get("block_offsetx");
+	$offsety = $conf->get("block_offsety");
+	$tablex = $offsetx > 0 ? 0 : 0 - $offsetx;
+	$tabley = $offsety > 0 ? 0 : 0 - $offsety;
+	$html = "<div style=\"top:{$tabley}px; left:{$tablex}px; position: absolute\">\n"; 
 
 	// シート表示
 	// for ($sn = 0; $sn < 1; $sn++) {
@@ -124,8 +220,10 @@ function put_excel($xls)
 		// $w = $w / 2;
 
 		// シートテーブル表示
-		$html .= "<table class=\"sheet\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
-		$html .= ${w} . " bgcolor=\"#FFFFFF\" style=\"border-collapse: collapse;\">";
+		$html .= "<table class=\"sheet\" border=\"0\" cellpadding=\"0\"";
+		$html .= "cellspacing=\"0\" width=\"" . ${w} . "\" ";
+		$html .= "style=\"border-collapse: collapse;\"";
+		$html .=" bgcolor=\"#FFFFFF\" >\n";
 
 		if (!isset($xls->maxrow[$sn]))
 			$xls->maxrow[$sn] = 0;
@@ -172,6 +270,10 @@ function put_excel($xls)
 
 				// セル表示
 				$bgcolor = ($xf['fillpattern'] == 1);
+				$loc = $sn . "-" . $r . "-" . $i;
+				if (isset($field_index[$loc])) {
+					$dispval = "";
+				}
 
 				if (isset($xls->celmergeinfo[$sn][$r][$i]['cond'])) {
 					if ($xls->celmergeinfo[$sn][$r][$i]['cond'] == 1) {
@@ -203,6 +305,7 @@ function put_excel($xls)
 
 		// シート終了
 	}
+	$html .= "</div>\n";
 
 	return $html;
 }

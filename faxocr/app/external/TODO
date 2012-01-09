@@ -11,6 +11,7 @@
 	x 対象が不特定多数か、特定対象かの指定radiobutton追加
 	x 色つきセルがある場合、saveのdisableがenable化
 	x confファイルがあれば、markerのbuttonをenable化
+	x .confに、targetを保存
 	- hover対応
 	- sheetlist.jsのcleanup
 
@@ -24,7 +25,8 @@
 	x 右上にstatusフィールドを追加
 	x 保存 / ctrl+sのロジックを修正
 	x マーカー位置をhiddenで渡すロジック追加
-	- マーカー位置指定UI修正(整数倍サイズ、マーカーサイズ自由化)
+	x マーカー位置指定UI修正(整数倍サイズ、マーカーサイズ自由化)
+	x フィールド指定に戻る機能
 	- sheetedit.jsのcleanup / そもそも不要では？
 
  - sht_config
@@ -32,12 +34,18 @@
 	x PDFサンプル作成機能
 	x JPGサンプル作成機能
 	x ImageMagickのconvert (convert a.pdf a.png)
-	- グループID、ユーザーID、流し込み機能
-	- srml作成機能 (RoR側が作る？)
+	x .confに、グループID、ユーザーID保存
+	x .confに、block_*を保存
+	x html生成時、枠線内リセット、オフセット調整
+	x htmlにグループID、ユーザーID流し込み機能
+
+	- srML作成機能 (RoR側が作る？要調査)
+
 	- railsスクリプト作成機能
+		- ダミー報告者作成
 	- 隣接同一名フィールドを連結する内部処理
 		- sortして比較、で終了
-		- ダミー報告者作成
+		- colspanの処理
 
  * シート確認 / 登録 / ダウンロード
 
@@ -77,3 +85,68 @@ X環境を必要とする。そこで、xvfbを用いて以下のように回避
  x sht_setup: simpletabを排除
  x simpletabs.js, simpletabs.cssを削除
  x views/groups/show.html.erbにあるsheet_id = "000"のhardcodeを修正
+
+*** *** ***
+
+<h3>見本位置</h3>
+
+<table style="position:relative; z-index:10;">
+<tr><td></td><td><img src="/image/arrow-u.gif" onmousedown="insn_move('d');" ></td><td></td><td></td></tr>
+<tr><td><img src="/image/arrow-l.gif" onmousedown="insn_move('l');" ></td><td></td><td><img src="/image/arrow-r.gif" onmousedown="insn_move('r');" >
+</td><td>　　<img src="/image/rotate.gif" onclick="insn_rotate();" ></td></tr>
+<tr><td></td><td><img src="/image/arrow-d.gif" onmousedown="insn_move('u');" >
+</td><td></td><td></td></tr>
+</table>
+
+<img id="instrctn" valign="bottom" src="/image/insn-01.gif" style="position:relative; top:-100px; left:10px; z-index:0; width:200px;">
+
+<!--
+var last_time = 0;
+
+function insn_move(d) {
+	var new_time = +new Date();
+	var diff = new_time - last_time;
+	last_time = new_time;
+
+	var ofst = $("#instrctn").offset();
+	switch (d) {
+		case 'u':
+		ofst.top += Math.ceil(2000 / diff);
+		break;
+
+		case 'l':
+		ofst.left -= Math.ceil(2000 / diff);
+		break;
+
+		case 'r':
+		ofst.left += Math.ceil(2000 / diff);
+		break;
+
+		case 'd':
+		ofst.top -= Math.ceil(2000 / diff);
+		break;
+	}
+	$("#instrctn").offset(ofst);
+}
+
+var rot = Array(
+	'insn-01.gif',
+	'insn-02.gif',
+	'insn-03.gif',
+	'insn-04.gif'
+);
+
+var rotation = 0;
+var magnitude = 0.2;
+
+function insn_rotate() {
+	rotation = (rotation > 2) ? 0 : rotation + 1;
+	var w = $("#instrctn").css("width");
+	var h = $("#instrctn").css("height");
+
+	$("#instrctn").attr("src", "/image/" + rot[rotation]);
+	$("#instrctn").css("width", h);
+	$("#instrctn").css("height", w);
+}
+
+-->

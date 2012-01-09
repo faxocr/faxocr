@@ -41,10 +41,9 @@ if (isset($file_id) && $file_id) {
 //
 $header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/jqDnR.css\" type=\"text/css\">\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.4.1.min.js\"></script>\n";
-// $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetedit.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jqDnR.js\"></script>\n";
+// $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetedit.js\"></script>\n";
 include( TMP_HTML_DIR . "tpl.header.html" );
-
 
 // Excelファイル読み込み処理
 if ($tgt_file) {
@@ -73,7 +72,19 @@ if ($errmsg) {
 	// ステータス表示
 	print "<table width=\"100%\">\n";
 	print "<tr>\n";
-	print "<td><button onclick=\"show_marker();\" style=\"z-index:10;\">マーカー</button></td>\n";
+	print "<td>\n";
+
+	print "<button onclick=\"show_marker();\" style=\"z-index:10;\">位置指定</button>";
+
+	print "<form action=\"/external/sht_config/\" method=\"POST\" id=\"form-save\">\n";
+	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
+	print "<input id=\"sbmt\" type=\"submit\" value=\"画像生成\" disabled/>\n";
+	print " (時間が掛かります)";
+	print "</form>";
+
+	print "</td>\n";
 	print "<td align=\"right\"\"  width=\"450px\">";
 	put_status();
 	print "</td>\n";
@@ -93,14 +104,6 @@ if ($xls) {
 	put_excel($xls);
 	print "</center>\n";
 	print "<br>\n";
-
-	// フッタ表示
-	print "<form action=\"/external/sht_config/\" method=\"POST\" id=\"form-save\">\n";
-	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
-	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
-	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
-	print "<input id=\"sbmt\" type=\"submit\" value=\"画像生成\" disabled/>";
-	print "</form>";
 }
 
 //
@@ -133,7 +136,7 @@ function hide_marker()
 		  'value="' + h + '" />';
 	form.append(cmd);
 
-	// marker
+	// block_size
 	var cmd = '<input type="hidden" name="block_size" ' +
 		  'value="' + last_size + '" />';
 	form.append(cmd);
@@ -157,7 +160,7 @@ function hide_marker()
 var $ = jQuery;
 
 $().ready(function() {
-  $('#ex3').jqDrag('.jqDrag').jqResize('.jqResize');
+	$('#ex3').jqDrag('.jqDrag').jqResize('.jqResize');
 });
 
 var last_size = 32;
@@ -177,58 +180,32 @@ function change_size(size) {
 	last_size = size;
 }
 
-var last_time = 0;
-
-function insn_move(d) {
-	var new_time = +new Date();
-	var diff = new_time - last_time;
-	last_time = new_time;
-
-	var ofst = $("#instrctn").offset();
-	switch (d) {
-		case 'u':
-		ofst.top += Math.ceil(2000 / diff);
-		break;
-
-		case 'l':
-		ofst.left -= Math.ceil(2000 / diff);
-		break;
-
-		case 'r':
-		ofst.left += Math.ceil(2000 / diff);
-		break;
-
-		case 'd':
-		ofst.top -= Math.ceil(2000 / diff);
-		break;
-	}
-	$("#instrctn").offset(ofst);
+function size_up() {
+	last_size = last_size + 2;
+	$(".mark-img").each( function () {
+		$(this).css("width", last_size);
+	});
 }
 
-var rot = Array(
-	'insn-01.gif',
-	'insn-02.gif',
-	'insn-03.gif',
-	'insn-04.gif'
-);
+function size_down() {
+	last_size = last_size > 17 ? (last_size - 2) : 16;
+	$(".mark-img").each( function () {
+		$(this).css("width", last_size);
+	});
+}
 
-var rotation = 0;
-var magnitude = 0.2;
+function go_prev() {
+	$("#form-status").attr("action", "/external/sht_field/").submit();
+}
 
-function insn_rotate() {
-	rotation = (rotation > 2) ? 0 : rotation + 1;
-	var w = $("#instrctn").css("width");
-	var h = $("#instrctn").css("height");
-
-	$("#instrctn").attr("src", "./image/" + rot[rotation]);
-	$("#instrctn").css("width", h);
-	$("#instrctn").css("height", w);
+function go_next() {
+	$("#form-status").attr("action", "/external/sht_verify/").submit();
 }
 
 -->
 </script>
 
-<div id="ex3" class="jqDnR" style="opacity:0.8; position: absolute; top:200px; left:100px;display:none">
+<div id="ex3" class="jqDnR" style="opacity:0.9; position: absolute; top:200px; left:100px;display:none">
 <div class="jqDrag" style="height:100%">
 
 <img src="/image/mark.gif" class="mark-img" style="top: 0;left: 0">
@@ -239,32 +216,12 @@ function insn_rotate() {
 <center>
 <h3>マーカーサイズ</h3>
 
-<input type="radio" name="size" onclick="change_size(64);">特大
-<input type="radio" name="size" onclick="change_size(48);">大
-<input type="radio" name="size" onclick="change_size(32);" checked>中
-<input type="radio" name="size" onclick="change_size(16);">小<BR>
-
-<h3>用紙方向</h3>
-
-<img valign="bottom" src="/image/direc-01.gif"><input type="radio" name="drctn" onclick="change_drctn(false);" checked>横
-<img valign="bottom" src="/image/direc-02.gif"><input type="radio" name="drctn" onclick="change_drctn(true);">縦<BR>
-
-
-<h3>見本位置</h3>
-
-<table style="position:relative; z-index:10;">
-<tr><td></td><td><img src="/image/arrow-u.gif" onmousedown="insn_move('d');" ></td><td></td><td></td></tr>
-<tr><td><img src="/image/arrow-l.gif" onmousedown="insn_move('l');" ></td><td></td><td><img src="/image/arrow-r.gif" onmousedown="insn_move('r');" >
-</td><td>　　<img src="/image/rotate.gif" onclick="insn_rotate();" ></td></tr>
-<tr><td></td><td><img src="/image/arrow-d.gif" onmousedown="insn_move('u');" >
-</td><td></td><td></td></tr>
-</table>
+縮小 <img src="/image/arrow-l.gif" onmousedown="size_down();" >
+　　<img src="/image/arrow-r.gif" onmousedown="size_up();" > 拡大<br>
 
 <BR><BR><BR>
 <button onclick="hide_marker();" style="position:relative; z-index:10;">確定</button><BR><BR>
 </center>
-
-<img id="instrctn" valign="bottom" src="/image/insn-01.gif" style="position:relative; top:-100px; left:10px; z-index:0; width:200px;">
 
 </div>
 <div class="jqResize"></div>
@@ -391,16 +348,17 @@ function put_status()
 
 	// XXX
 	print "\n";
-	print "<form action=\"/external/sht_verify/\" method=\"POST\" id=\"form-status\">\n";
+	print "<form method=\"POST\" id=\"form-status\" >\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
+	// for sht_field
+	print "<input type=\"hidden\" name=\"file_id\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
 	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
-	print "<div ${style["gray"]}><span>フィールド指定</span></div>\n";
-
+	print "<div ${style["gray"]}><button id=\"prev\" onclick=\"go_prev();\" >フィールド指定</button></div>\n";
 	print "<div ${style["pink"]}><span>マーカー指定</span></div>\n";
-	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"this.form.submit();\">シート確認</button></div>\n";
+	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"go_next();\"); \">シート確認</button></div>\n";
 	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
 	print "</div>\n";
 
