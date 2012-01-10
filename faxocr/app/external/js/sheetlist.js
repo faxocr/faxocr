@@ -12,19 +12,36 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
 
-var defaultbg;
-var default_target;
+//var defaultbg;
+//var default_target;
+var cell_sw;
 var field;
 var targetid;
 var dirty = false;
 var $ = jQuery;
+
+function HexToR(h) {
+	return parseInt((cutHex(h)).substring(0, 2), 16);
+}
+
+function HexToG(h) {
+	return parseInt((cutHex(h)).substring(2, 4), 16);
+}
+
+function HexToB(h) {
+	return parseInt((cutHex(h)).substring(4, 6), 16);
+}
+
+function cutHex(h) {
+	return (h.charAt(0) == '#') ? h.substring(1, 7) : h;
+}
 
 // to escape html tag
 (function($) {
@@ -35,15 +52,34 @@ var $ = jQuery;
 
 // initialization
 jQuery(document).ready(function($) {
-	$('.sheet td').addcontextmenu('contextmenu');
-	$('.sheet td').hover(function() {
-		defaultbg = $(this).css('backgroundColor');
-		default_target = $(this).attr('id');
-		$(this).css({backgroundColor: '#dddddd'});
-	}, function() {
-		$(this).css('backgroundColor', defaultbg);
-		defaultbg = null;
-	});
+
+	$('.sheet_field td').addcontextmenu('contextmenu');
+
+	// 各セルの背景色を取得し格納
+	cell_sw = new Array();
+	var elements = document.getElementsByTagName('*');
+	for (var elm_cnt = 0; elm_cnt < elements.length; elm_cnt++) {
+		if (elements[elm_cnt].className == 'sheet_field') {
+			var table = elements[elm_cnt];
+			var tds = table.getElementsByTagName('td');
+			for (var tb_cnt = 0; tb_cnt < tds.length; tb_cnt++) {
+				var tbg = $(tds[tb_cnt]).css('background-color');
+				h = cutHex(tbg);
+				if (h == tbg) {
+					rgb = (tbg == 'rgb(255, 255, 255)') ? 255 * 3 :
+					(tbg == 'rgba(0, 0, 0, 0)') ? 255 * 3 :
+					(tbg == 'transparent') ? 255 * 3 : 1;
+				} else {
+					r = HexToR(tbg);
+					g = HexToG(tbg);
+					b = HexToB(tbg);
+					rgb = r + g + b;
+					rgb = rgb ? rgb : 255 * 3;
+				}
+				cell_sw[tds[tb_cnt].getAttribute('id')] = (rgb == 255 * 3) ? 0 : 1;
+			}
+		}
+	}
 
 	document.onkeyup = on_keyup;
 	document.onkeydown = on_keydown;
@@ -81,9 +117,9 @@ function set_field (target) {
 		return;
 	}
 
-	if (default_target == targetid) {
-		defaultbg = target.css('backgroundColor');
-	}
+//	if (default_target == targetid) {
+//		defaultbg = target.css('backgroundColor');
+//	}
 
 	add_column(field, 80);
 }
@@ -149,14 +185,20 @@ function delColumn(target, idx) {
 	var targettd = $('#field_list td').eq(idx);
 
 	// global
-	$sval = 0;
+//	$sval = 0;
 	targetid = targettd.attr('name');
 
 	$('.nDiv tr').eq(idx).remove();
 	$('.cDrag div').eq(idx).remove();
 	$('.hDiv th').eq(idx).remove();
 	targettd.remove();
-	$('#' + targetid).html('').css('background-color', '#ffffff');
+//	$('#' + targetid).html('').css('background-color', '#ffffff');
+	$('#' + targetid).html('');
+	$('#' + targetid).removeClass('enter-selected');
+	$('#' + targetid).removeClass('click-selected');
+	$('#' + targetid).addClass('not-selected');
+	cell_sw[targetid] = 0;
+
 
 	ths = $('.hDiv th');
 	ths.each(function(num) {
@@ -192,7 +234,12 @@ function del_column(target, index) {
 	targetid = targettd.attr('name');
 
 	targettd.remove();
-	$('#' + targetid).html('').css('background-color', '#ffffff');
+//	$('#' + targetid).html('').css('background-color', '#ffffff');
+	$('#' + targetid).html('');
+	$('#' + targetid).removeClass('enter-selected');
+	$('#' + targetid).removeClass('click-selected');
+	$('#' + targetid).addClass('not-selected');
+	cell_sw[targetid] = 0;
 
 	ths = $('.hDiv th');
 	ths.each(function(num) {
@@ -249,7 +296,7 @@ function field_click() {
 		    height = $(this).height(),
 		    fsize = $(this).css('font-size'),
 		    nlines = height / 16 | 0; // int conversion
-		
+
 		txt = txt.replace(/<[^>]*>?/g, '');
 		$(this).html('<input type="text" id="active" value="'
 			+ txt
@@ -350,7 +397,7 @@ function on_keydown(e) {
 function on_keyup(e) {
 	var keycode,
 	    shift;
-	
+
 	if (e != null) {
 		// Mozilla(Firefox, NN) and Opera
 		keycode = e.which;
@@ -370,12 +417,17 @@ function on_keyup(e) {
 			return true;
 		}
 
-		$sval = 1;
+		// $sval = 1;
 		jquerycontextmenu.hidebox($, $('.jqcontextmenu'));
-		$target = $('#' + targetid).css('background-color', ctbl[$sval]);
+		// $target = $('#' + targetid).css('background-color', ctbl[$sval]);
+
+		$('#' + targetid).removeClass('not-selected');
+		$('#' + targetid).removeClass('click-selected');
+		$target = $('#' + targetid).addClass('enter-selected');
+		cell_sw[targetid] = 1;
 
 		set_field($target);
-		$sval = 0;
+		// $sval = 0;
 		targetid = null;
 
 		document.getElementById('sbmt').disabled = null;
@@ -511,7 +563,7 @@ SHEET = {
 		$('#field_list td').click(field_click);
 
 		$('#bt-password').click(function() {
-			$.jqDialog.password('パスワードを入力して下さい', function(data) { 
+			$.jqDialog.password('パスワードを入力して下さい', function(data) {
 				$('#passwd').val(data);
 				pack_fields();
 				$('#form-status').attr('action', 'form-commit.php?start');

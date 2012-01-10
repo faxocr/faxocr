@@ -3,7 +3,7 @@
  * This notice must stay intact for usage 
  * Author: Dynamic Drive at http://www.dynamicdrive.com/
  * Visit http://www.dynamicdrive.com/ for full source code
-*/
+ */
 
 jQuery.noConflict();
 
@@ -11,8 +11,8 @@ jQuery.noConflict();
 // ez-cloud用変数
 //
 var targetid;
-var ctbl = ['#FFFFFF', '#FFE5e5', '#ffd8d8', '#ffcbcb', '#ffbebe', '#ffb1b1', '#ffa3a3'];
-var sval = 0; // note: the val is referenced from other files.
+// var ctbl = ['#FFFFFF', '#FFE5e5', '#ffd8d8', '#ffcbcb', '#ffbebe', '#ffb1b1', '#ffa3a3'];
+// var sval = 0; // note: the val is referenced from other files.
 
 var jquerycontextmenu = {
 	arrowpath: 'image/arrow.gif', //full URL or path to arrow image
@@ -46,7 +46,7 @@ var jquerycontextmenu = {
 		}
 		$ul.css({left: x, top: y});
 	},
-	
+
 	showbox: function($, $contextmenu, e) {
 		$contextmenu.show();
 	},
@@ -68,7 +68,7 @@ var jquerycontextmenu = {
 		$lis.each(function(i) {
 			var $li = $(this).css({zIndex: 1000 + i}),
 				$subul = $li.find('ul:eq(0)').css({display: 'block'}); //set sub UL to "block" so we can get dimensions
-			
+
 			$subul.data('dimensions', {
 				w: $subul.outerWidth(),
 				h: $subul.outerHeight(),
@@ -110,9 +110,13 @@ var jquerycontextmenu = {
 						// other browser => typeof name is String
 						jquerycontextmenu.hidebox($, $('.jqcontextmenu'));
 						if (targetid) {
-							$("#" + targetid).css('background-color', ctbl[sval]);
+//							$("#" + targetid).css('background-color', ctbl[sval]);
+							if (cell_sw[targetid] == 1) {
+								$("#" + targetid).removeClass('enter-selected');
+								$("#" + targetid).addClass('click-selected');
+							}
 						}
-						sval = 0;
+//						sval = 0;
 						targetid = null;
 					} else {
 						// XXX
@@ -169,8 +173,7 @@ var jquerycontextmenu = {
 			field.select();
 			targetid = this.id;
 
-			sval = (defaultbg === '#FFFFFF') ? 0 : 5;
-
+			// sval = (defaultbg === '#FFFFFF') ? 0 : 5;
 			set_field($(this));
 
 			return false;

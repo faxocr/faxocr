@@ -190,7 +190,7 @@ function put_excel($xls)
 
 		// シートテーブル表示
 		print <<< STR
-<table class="sheet" border="0" cellpadding="0" cellspacing="0" width="${w}" bgcolor="#FFFFFF" style="border-collapse: collapse;">
+<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="${w}" bgcolor="#FFFFFF" style="border-collapse: collapse;">
 STR;
 		if (!isset($xls->maxrow[$sn]))
 			$xls->maxrow[$sn] = 0;

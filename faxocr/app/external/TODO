@@ -12,7 +12,7 @@
 	x 色つきセルがある場合、saveのdisableがenable化
 	x confファイルがあれば、markerのbuttonをenable化
 	x .confに、targetを保存
-	- hover対応
+	x hover対応
 	- sheetlist.jsのcleanup
 
  - sht_script
@@ -27,7 +27,7 @@
 	x マーカー位置をhiddenで渡すロジック追加
 	x マーカー位置指定UI修正(整数倍サイズ、マーカーサイズ自由化)
 	x フィールド指定に戻る機能
-	- sheetedit.jsのcleanup / そもそも不要では？
+	x sheetedit.jsのcleanup / そもそも不要では？
 
  - sht_config
 	x html作成機能

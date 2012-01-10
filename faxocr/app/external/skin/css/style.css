@@ -680,6 +680,31 @@ form {
 	background-color: #dddddd;
 }
 
+.sheet_field {
+	text-align: left !important;
+	table-layout: fixed;
+}
+
+.sheet_field td {
+	word-wrap: break-word;
+}
+
+.sheet_field td.not-selected {
+	background-color: #ffffff;
+}
+
+.sheet_field td.enter-selected {
+	background-color: #ffe5e5;
+}
+
+.sheet_field td.click-selected {
+	background-color: #ffb1b1;
+}
+
+.sheet_field td:hover {
+	background-color: #ccdddd;
+}
+
 .filelist tr:hover {
 	 background-color: #ccffff;
 }
