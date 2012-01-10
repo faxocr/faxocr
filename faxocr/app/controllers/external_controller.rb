@@ -147,7 +147,8 @@ class ExternalController < ApplicationController
       #  "Temp file: " + @tname
       # @html = `cd ./app/external; php reg_upload.php`
       # @html = `echo php reg_upload.php file=\"#{@tname}\"`
-      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" target=\"#{@target}\"`
+      @filename.slice!(/\.\w+$/)
+      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" target=\"#{@target}\" sname=\"#{@filename}\"`
       render :dummy
     else
       flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
@@ -203,22 +204,24 @@ class ExternalController < ApplicationController
       @param_str += key + "=\"" + value + "\" "
     }
 
-    @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str}`
-    # flash[:notice] = @errmsg
-    # flash[:notice] = "セーブしました"
-
     # @html = "<PRE>\n"
     # @html += @param_str + "\n"
     # @html += "<PRE>\n"
     # @html += @ret
     # render :dummy
 
-    @file_html = "#{RAILS_ROOT}/files/#{@file}.html"
-    @file_pdf = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.pdf"
-    @file_png = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.png"
+    if (params[:func]) then
+      @file_html = "#{RAILS_ROOT}/files/#{@file}.html"
+      @file_pdf = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.pdf"
+      @file_png = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.png"
 
-    @ret = `cd #{RAILS_ROOT}; xvfb-run -a wkhtmltopdf --page-size A4 --orientation Landscape #{@file_html} #{@file_pdf}`
-    @ret = `convert #{@file_pdf} #{@file_png}`
+      @ret = `cd #{RAILS_ROOT}; xvfb-run -a wkhtmltopdf --page-size A4 --orientation Landscape #{@file_html} #{@file_pdf}`
+      @ret = `convert #{@file_pdf} #{@file_png}`
+    else
+      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{RAILS_ENV}\"`
+      # flash[:notice] = @errmsg
+      # flash[:notice] = "セーブしました"
+    end
 
     redirect_to :controller => 'external', :action => 'sht_marker', :params => {:gid => @gid, :sid => @sid, :file_id => @file}
   end
@@ -241,7 +244,7 @@ class ExternalController < ApplicationController
     @file = params[:fileid]
     @group = Group.find(params[:gid])
 
-    # @result = `ruby #{RAILS_ROOT}/files/#{@file}.rb #{RAILS_ROOT} #{@gid}`
+    @result = `ruby #{RAILS_ROOT}/files/#{@file}.rb #{RAILS_ROOT} #{@gid}`
 
     flash[:notice] = "シートを登録しました"
     redirect_to group_url(@group)

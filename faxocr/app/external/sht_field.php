@@ -61,8 +61,14 @@ $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.4.1
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jqcontextmenu.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/flexigrid.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetlist.js\"></script>\n";
+
 $body_opt .= "<ul id=\"contextmenu\" class=\"jqcontextmenu\">\n";
 $body_opt .= "<li>　フィールド名 <input id=\"field\" size=10 value=\"\"></li>\n";
+// $body_opt .= "<HR>\n";
+// $body_opt .= "<li><a onclick=\"\$sval = 1;\">数字</a></li>\n";
+// $body_opt .= "<li><a onclick=\"\$sval = 2;\">○×△</a></li>\n";
+// $body_opt .= "<li><a onclick=\"\$sval = 3;\">画像</a></li>\n";
+// $body_opt .= "<HR>\n";
 $body_opt .= "<li class=\"btGray\"><a onclick=\"sval = 0;reset_field();\">リセット</a></li>\n";
 $body_opt .= "</ul>\n";
 $body_opt .= "<ul id=\"fieldreset\" class=\"jqcontextmenu\">\n";
@@ -140,6 +146,7 @@ if ($xls) {
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
+	print "<input type=\"hidden\" name=\"sname\" value=\"" . $sheet_name . "\" />\n";
 	print "<input type=\"hidden\" name=\"target\" value=\"" . $target . "\" />\n";
 	print "<button id=\"sbmt\" onclick=\"pack_fields();\"" . $dirty_label .
 	      "/>保存</button>\n";

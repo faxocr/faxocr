@@ -44,7 +44,7 @@ if (isset($file_id) && $file_id) {
 
 put_config($file_id, $_REQUEST);
 get_config($file_id);
-
+put_rails($file_id);
 
 // Excelファイル読み込み処理
 if ($tgt_file) {
@@ -97,7 +97,7 @@ function get_config($file_id)
 
 	$xls_fields_list = $conf->array_getall("field");
 
-	$num = 0;
+	$num = 0; // XXX: needed?
 	foreach ($xls_fields_list as $xls_fields) {
 		$location = $xls_fields["sheet_num"] . "-" .
 		   $xls_fields["row"] . "-" . $xls_fields["col"];
@@ -309,6 +309,247 @@ function put_excel($xls)
 	$html .= "</div>\n";
 
 	return $html;
+}
+
+//
+// Railsスクリプトの作成
+//
+function put_rails($file_id)
+{
+	global $rails_env;
+
+	$tgt_items = "";
+
+	if (!$conf)
+		$conf = new FileConf($file_id);
+
+	$size = $conf->get("block_size") ? $conf->get("block_size") : 32;
+	$sheet_name = $conf->get("name");
+	$width = $conf->get("block_width") / $size;
+	$height = $conf->get("block_height") / $size;
+
+	//
+	// XLSフィールド情報取得
+	//
+	$xls_fields_list = $conf->array_getall("field");
+	$fields_list = array();
+	foreach ($xls_fields_list as $fields) {
+		$col = $fields["col"];
+		$row = $fields["row"];
+		$id = $row * 100 + $col;
+		$fields_list += array($id => $fields);
+	}
+	ksort($fields_list);
+
+	$cnt = 0;
+	foreach ($fields_list as $fields) {
+		$cspan = isset($fields["colspan"]) ? $fields["colspan"] : 1;
+		$name = $fields["item_name"];
+		$col = $fields["col"];
+		$row = $fields["row"];
+		$type = $fields["type"];
+		$cnt++;
+		$tgt_items .= "props << [\"{$name}\", " .
+			      	         "\"{$name}\", " .
+			      	         "{$cnt}, " .
+			      	         "\"{$type}\", " .
+			      	         "{$col}, " .
+			      	         "{$row}, " .
+			      	         "{$cspan}]\n";
+	}
+
+	/*
+	foreach ($_REQUEST as $item => $val) {
+		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
+		if ($loc && $loc[0]) {
+			$xls_fields = array();
+			$xls_fields["sheet_num"] = $loc[1];
+			$xls_fields["row"]       = $loc[2];
+			$xls_fields["col"]       = $loc[3];
+			$xls_fields["width"]     = $loc[4];
+			$xls_fields["item_name"] = $val;
+			$location = "${loc[1]}-${loc[2]}-${loc[3]}";
+
+			$cspan = isset($list_colspan[$location]) ? 
+			       $list_colspan[$location] : 1;
+
+			// $tgt_items .= implode(",", $xls_fields) . "\n";
+			// props << ["テスト", "テスト", 1, "number", 1, 11, 1]
+			$tgt_items .= "props << [\"{$val}\", " .
+				      	         "\"{$val}\", " .
+				      	         "{0}, " .
+				      	         "\"number\", " .
+				      	         "{$loc[3]}, " .
+				      	         "{$loc[2]}, " .
+				      	         "{$cspan}]\n";
+		}
+	}
+	*/
+
+	$tgt_script = <<< "STR"
+#!/usr/bin/ruby
+# -*- coding: utf-8 -*-
+
+require "rubygems"
+require "active_record"
+require "yaml"
+
+rails_prefix = ARGV[0] || "./"
+group = ARGV[1] || exit(0)
+filename = "{$sheet_name}" || "自動生成サーベイ" # XXX
+
+config_db = rails_prefix + "/config/database.yml"
+db_env = "{$rails_env}" || "development" # XXX
+cellinfo = Hash.new()
+
+ActiveRecord::Base.configurations = YAML.load_file(config_db)
+ActiveRecord::Base.establish_connection(db_env)
+
+Dir.glob(rails_prefix + '/app/models/*.rb').each do |model|
+  load model
+end
+
+# Initialization
+@group = Group.find(group)
+
+#
+# create a default candidate (hardcoded)
+#
+@candidate = @group.candidates.build
+@candidate.candidate_code = "00000" 		# (string, not null)
+@candidate.candidate_name = "一般報告者"	# (string, not null)
+@candidate.group_id = group			# (int, not null)
+@candidate.tel_number = "03-1111-1111"		# (string)
+@candidate.fax_number = "03-1111-1111"		# (string)
+if @candidate.save
+  print "default candidate: success\\n"
+else
+  print "default candidate: fail\\n"
+end
+
+#
+# create a new survey
+#
+@survey = @group.surveys.build
+@survey.survey_name = filename
+@survey.status = 1 # 0: close, 1: open
+@survey.report_header = ""
+@survey.report_footer = ""
+
+@candidates = @group.candidates
+@candidates.each do |candidate|
+  survey_candidate = SurveyCandidate.new
+  survey_candidate.candidate_id = candidate.id
+  survey_candidate.role = 'sr'
+  if (candidate.id) then
+    @survey.survey_candidates << survey_candidate
+  end
+end
+if @survey.save
+  print "survey candidate: success\\n"
+else
+  print "survey candidate: fail\\n"
+  exit(0)
+end
+survey_id = @survey.id
+
+#
+# create survey properties
+#
+
+#
+# [Property]
+#
+# [0] survey_property.ocr_name
+# [1] survey_property.ocr_name_full
+# [2] survey_property.view_order
+# [3] survey_property.data_type
+# [4] sheet_property.position_x
+# [5] sheet_property.position_y
+# [6] sheet_property.colspan
+
+# XXX
+props = []
+{$tgt_items}
+
+props.each do |prop|
+
+  # object building
+  @survey_property = @survey.survey_properties.build
+  @survey_property.survey_id = survey_id	# integer
+  @survey_property.ocr_name = prop[0]		# string (must be unique!)
+  @survey_property.ocr_name_full = prop[1]	# string
+  @survey_property.view_order = prop[2]		# integer
+  @survey_property.data_type = prop[3]		# string
+  # print prop[0] + "/" + prop[1] + "\\n"
+
+  # save
+  if @survey_property.save
+    print  "survey property " + prop[0] + ": success\\n"
+    cellinfo[@survey_property.id] = [prop[4], prop[5], prop[6]]
+  else
+    print  "survey property " + prop[0] + ": fail\\n"
+    exit(0)
+  end
+end
+
+#
+# create sheet/property mapping
+#
+@sheet = @survey.sheets.build
+
+# sheet作成
+@sheet.sheet_code = survey_id.to_s # string
+@sheet.sheet_name = "自動生成シート" # string
+@sheet.survey_id = survey_id # integer
+@sheet.block_width = {$width} || 0 # XXX
+@sheet.block_height = {$height} || 0 # XXX
+@sheet.status = 1
+# save
+if @sheet.save
+  print  "sheet: save success\\n"
+else
+  print  "sheet: save fail\\n"
+  exit(0)
+end
+
+#
+# sheet_property generation
+#
+survey_properties = @survey.survey_properties
+survey_properties.each do |@survey_property|
+
+  prop = cellinfo[@survey_property.id]
+  if prop.nil? then
+    next
+  end
+  # survey_propertyからコピー
+  sheet_property = SheetProperty.new
+  sheet_property.sheet_id = @sheet.object_id
+  sheet_property.survey_property_id = @survey_property.id
+  sheet_property.position_x = prop[0]
+  sheet_property.position_y = prop[1]
+  sheet_property.colspan = prop[2]
+  @sheet.sheet_properties << sheet_property
+
+  # print "> " + prop[0].to_s + "/" + prop[1].to_s + "/" + prop[2].to_s + "\\n"
+end
+
+# save
+if @sheet.save
+  print  "sheet_property: save success\\n"
+else
+  print  "sheet_property: save fail\\n"
+  exit(0)
+end
+
+exit(0)
+
+
+STR;
+
+	// ファイル生成
+	file_put_contents(DST_DIR . $file_id . ".rb", $tgt_script);
 }
 
 ?>

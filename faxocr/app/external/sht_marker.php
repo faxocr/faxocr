@@ -75,14 +75,22 @@ if ($errmsg) {
 	print "<td>\n";
 
 	print "<button onclick=\"show_marker();\" style=\"z-index:10;\">位置指定</button>";
-
 	print "<form action=\"/external/sht_config/\" method=\"POST\" id=\"form-save\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
-	print "<input id=\"sbmt\" type=\"submit\" value=\"画像生成\" disabled/>\n";
-	print " (時間が掛かります)";
 	print "</form>";
+
+	if (file_exists(DST_DIR . $file_id . ".rb")) {
+		print "<form action=\"/external/sht_config/\" method=\"POST\"/>\n";
+		print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
+		print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
+		print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
+		print "<input type=\"hidden\" name=\"func\" value=\"generate\" />\n";
+		print "<input id=\"sbmt\" type=\"submit\" value=\"画像生成\"/>\n";
+		print " (時間が掛かります)";
+		print "</form>";
+	}
 
 	print "</td>\n";
 	print "<td align=\"right\"\"  width=\"450px\">";
@@ -154,7 +162,10 @@ function hide_marker()
 
 	// enable button
 	$("#ex3").hide("slow");
-	document.getElementById('sbmt').disabled = null;
+
+	// XXX: experimental
+	// document.getElementById('sbmt').disabled = null;
+	$("#form-save").submit();
 }
 
 var $ = jQuery;
@@ -340,6 +351,8 @@ function put_status()
 	global $group_id;
 	global $sheet_id;
 
+	$status_label = file_exists(DST_DIR . $file_id . ".rb") ? "" : "disabled";
+
 	$style = array();
 	$style["normal"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffffff;padding:1px;color:gray\"";
 	$style["gray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#bbbbbb;padding:1px\"";
@@ -358,7 +371,7 @@ function put_status()
 	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
 	print "<div ${style["gray"]}><button id=\"prev\" onclick=\"go_prev();\" >フィールド指定</button></div>\n";
 	print "<div ${style["pink"]}><span>マーカー指定</span></div>\n";
-	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"go_next();\"); \">シート確認</button></div>\n";
+	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"go_next();\"); {$status_label} \">シート確認</button></div>\n";
 	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
 	print "</div>\n";
 

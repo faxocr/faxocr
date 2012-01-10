@@ -7,7 +7,7 @@ require "yaml"
 
 rails_prefix = ARGV[0] || "./"
 group = ARGV[1] || exit(0)
-survey = ARGV[2] || exit(0) # XXX: is this needed?
+filename = ARGV[2] || "自動生成サーベイ" # conf.name
 
 config_db = rails_prefix + "/config/database.yml"
 # XXX
@@ -44,8 +44,8 @@ end
 # create a new survey
 #
 @survey = @group.surveys.build
-@survey.survey_name = "自動生成サーベイ" # XXX
-@survey.status = 0 # XXX: NEEDS INITIAL VALUE HERE
+@survey.survey_name = filename
+@survey.status = 1 # 0: close, 1: open
 @survey.report_header = ""
 @survey.report_footer = ""
 
@@ -62,6 +62,7 @@ else
   print "survey candidate: fail\n"
   exit(0)
 end
+survey_id = @survey.id
 
 #
 # create survey properties
@@ -78,6 +79,7 @@ end
 # [5] sheet_property.position_y
 # [6] sheet_property.colspan
 
+# XXX
 props = []
 props << ["テスト", "テスト", 1, "number", 1, 11, 1]
 props << ["フォーム１", "フォーム１", 1, "number", 2, 12, 1]
@@ -89,7 +91,7 @@ props.each do |prop|
 
   # object building
   @survey_property = @survey.survey_properties.build
-  @survey_property.survey_id = survey		# integer
+  @survey_property.survey_id = survey_id	# integer
   @survey_property.ocr_name = prop[0]		# string (must be unique!)
   @survey_property.ocr_name_full = prop[1]	# string
   @survey_property.view_order = prop[2]		# integer
@@ -112,9 +114,9 @@ end
 @sheet = @survey.sheets.build
 
 # sheet作成
-@sheet.sheet_code = "自動生成シート" + survey.to_s
-@sheet.sheet_name = "自動生成シート" + survey.to_s
-@sheet.survey_id = survey
+@sheet.sheet_code = "自動生成シート" # string
+@sheet.sheet_name = "自動生成シート" # string
+@sheet.survey_id = survey_id # integer
 @sheet.block_width = 20 # XXX
 @sheet.block_height = 10 # XXX
 @sheet.status = 1

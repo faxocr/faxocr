@@ -13,6 +13,9 @@
 	x confファイルがあれば、markerのbuttonをenable化
 	x .confに、targetを保存
 	x hover対応
+	- jqcontextmenuでの「数字」「画像」「○△×」指定
+		- "width (\d+)"の代わりに、"type (\w+)"を利用
+		- sht_script.phpも適宜修正
 	- sheetlist.jsのcleanup
 
  - sht_script
@@ -42,15 +45,20 @@
 		x colspanの処理
 		x sortして比較、で終了
 		x sortが数値比較で無いため、要注意
-	- railsスクリプト作成機能
+	x railsスクリプト作成機能
 		x survey作成 @group.surveys
 		x 調査対象作成 @group.candidates
 		x survey_property作成 @survey.survey_properties
 		x sheet_properties (sheet/property mapping)作成
 		x ダミー報告者作成 (調査対象がいない場合)
-		- sheet作成スクリプト
-
-	- srML作成機能 (RoR側が作る？要調査)
+		x sheet作成スクリプト
+			x conf書き込みタイミング
+			x *.rbの実行確認
+		x sht_markerの*.rb作成タイミング修正
+			x sname, targetが消える問題
+			x sht_mark -> field移動の正常確認
+	x 調査項目表示順序の未ソート問題
+	x .rbできないと、シート確認に進めないように
 
  * シート確認 / 登録 / ダウンロード
 
@@ -60,11 +68,17 @@
 	x 右上にstatusフィールドを追加
 	x 作成したJPGを表示
 
+ - sht_marker
+	- PDF画像調整
+	- 「不特定多数」「特定対象」のRails的調整
+	- 「不特定多数」「特定対象」のPDF処理的調整
+	- PDF施設ID流し込み機能
+	- zip作成
+
  - sht_commit
 	x route.rb修正
-	- PDF作成
-	- zip作成
-	- railsスクリプトの実行
+	x Railsスクリプトの実行
+	- srML作成機能 (RoR側が作る？要調査)
 
  - extern/download
 	x .pdf、.zip、の確認ロジックを追加

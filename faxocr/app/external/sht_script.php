@@ -212,7 +212,6 @@ fclose($lockfp);
 unlink(LOCK_FILE . $file_id);
 
 put_config($file_id, $_REQUEST);
-put_rails($file_id, $_REQUEST);
 
 // XXX: debugging purpose
 file_put_contents("/tmp/faxocr.log",
@@ -262,12 +261,12 @@ function is_next($prev, $next)
 function put_config($file_id, $_REQUEST)
 {
 	global $target;
+	global $sheet_name;
 	global $list_colspan;
-
-	global $msg;
 
 	$conf = new FileConf($file_id);
 
+	$list_requests = array();
 	foreach ($_REQUEST as $item => $val) {
 		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
 		if ($loc && $loc[0]) {
@@ -286,16 +285,17 @@ function put_config($file_id, $_REQUEST)
 		$label = $list_requests["${loc[1]}-${loc[2]}-${col}"];
 		while (isset($list_requests["${loc[1]}-${loc[2]}-${col}"]) &&
 		       $list_requests["${loc[1]}-${loc[2]}-${col}"] == $label) {
-			$col++;
 			$cnt++;
+
+			// XXX
+			if ($cnt > 1)
+				$list_colspan["${loc[1]}-${loc[2]}-${col}"] = 0;
+			$col++; // should be here
 		}
 		if ($cnt > 1) {
 			$list_colspan[$item] = $cnt;
-// $msg .= $item . "\t". $cnt . "\n";
 		}
 	}
-
-// $msg .= implode(",", $list_colspan);
 
 	// XLSフィールド情報REQUEST取得
 	$conf->array_destroy("field");
@@ -309,9 +309,16 @@ function put_config($file_id, $_REQUEST)
 			$xls_fields["width"]     = $loc[4];
 			$xls_fields["item_name"] = $val;
 
+			# XXX: number, rating, image
+			$xls_fields["type"] = "number";
+
 			$location = "${loc[1]}-${loc[2]}-${loc[3]}";
-// $msg .= "]" . $location . "\n";
+
 			if (isset($list_colspan[$location])) {
+
+				if ($list_colspan[$location] == 0)
+					continue;
+
 				$xls_fields["colspan"] = $list_colspan[$location];
 			}
 
@@ -321,141 +328,15 @@ function put_config($file_id, $_REQUEST)
 	}
 	$conf->array_commit();
 
-	if (strlen($target) != 0) {
+	if (isset($target) && strlen($target) > 0) {
 		$conf->set("target", $target);
-		$conf->commit();
-	}
-}
-
-//
-// Railsスクリプトの作成
-//
-function put_rails($file_id, $_REQUEST)
-{
-
-	//
-	// XLSフィールド情報取得
-	//
-	$tgt_items = "";
-	foreach ($_REQUEST as $item => $val) {
-		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
-		if ($loc && $loc[0]) {
-			$xls_fields = array();
-			$xls_fields["sheet_num"] = $loc[1];
-			$xls_fields["row"]       = $loc[2];
-			$xls_fields["col"]       = $loc[3];
-			$xls_fields["width"]     = $loc[4];
-			$xls_fields["item_name"] = $val;
-
-			$tgt_items .= implode(",", $xls_fields) . "\n";
-		}
 	}
 
-	$tgt_script = <<< "STR"
+	if (isset($sheet_name) && strlen($sheet_name) > 0) {
+		$conf->set("name", $sheet_name);
+	}
 
-#!/usr/bin/ruby
-# -*- coding: utf-8 -*-
-
-require "rubygems"
-require "active_record"
-require "yaml"
-
-rails_prefix = ARGV[0] || "./"
-group = ARGV[1] || exit(0)
-survey = ARGV[2] || exit(0) # XXX
-
-config_db = rails_prefix + "/config/database.yml"
-db_env = "{$rails_env}"
-
-ActiveRecord::Base.configurations = YAML.load_file(config_db)
-ActiveRecord::Base.establish_connection(db_env)
-Dir.glob(rails_prefix + '/app/models/*.rb').each do |model|
-  load model
-end
-
-#
-# create a new survey
-#
-do
-  @group = Group.find(group)
-  @survey = @group.surveys.build(survey)
-  @survey.report_header = ""
-  @survey.report_footer = ""
-
-  @candidates = @group.candidates
-  @candidates.each do |candidate|
-    survey_candidate = SurveyCandidate.new
-    survey_candidate.candidate_id = candidate.id
-    survey_candidate.role = 'sr'
-    @survey.survey_candidates << survey_candidate
-  end
-  if @survey.save
-    print "success"
-  else
-    print "fail"
-  end
-end
-
-#
-# create survey properties
-#
-
-props = []
-{$tgt_items}
-
-props.each do |prop|
-
-  # object building
-  @survey_property = @survey.survey_properties.build
-  @survey_property.survey_id = survey		# integer
-  @survey_property.ocr_name = prop[0]		# string
-  @survey_property.ocr_name_full = prop[1]	# string
-  @survey_property.view_order = prop[2]		# integer
-  @survey_property.data_type = prop[3]		# string
-
-  # save
-  if @survey_property.save
-    print  prop[0] + " success\n"
-  else
-    print  prop[0] + " fail\n"
-  end
-end
-
-#
-# create a new sheet
-#
-
-#  create_table "sheets", :force => true do |t|
-#    t.string   "sheet_code",   :null => false
-#    t.string   "sheet_name",   :null => false
-#    t.integer  "survey_id",    :null => false
-#    t.integer  "block_width",  :null => false
-#    t.integer  "block_height", :null => false
-#    t.integer  "status",       :null => false
-#    t.datetime "created_at"
-#    t.datetime "updated_at"
-#  end
-
-#
-# create sheet/property mapping
-#
-
-#  create_table "sheet_properties", :force => true do |t|
-#    t.integer  "position_x"
-#    t.integer  "position_y"
-#    t.integer  "colspan"
-#    t.integer  "sheet_id"
-#    t.integer  "survey_property_id"
-#    t.datetime "created_at"
-#    t.datetime "updated_at"
-#  end
-
-exit(0)
-
-STR;
-
-	// ファイル生成
-	file_put_contents(DST_DIR . $file_id . ".rb", $tgt_script);
+	$conf->commit();
 }
 
 ?>

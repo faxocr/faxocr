@@ -65,6 +65,10 @@ if (isset($_REQUEST["sid"])) {
 	$sheet_id = $_REQUEST["sid"];
 }
 
+if (isset($_REQUEST["sname"])) {
+	$sheet_name = $_REQUEST["sname"];
+}
+
 if (isset($_REQUEST["rails_env"])) {
 	$rails_env = $_REQUEST["rails_env"];
 }
