@@ -42,14 +42,13 @@
 		x colspanの処理
 		x sortして比較、で終了
 		x sortが数値比較で無いため、要注意
-
 	- railsスクリプト作成機能
 		x survey作成 @group.surveys
 		x 調査対象作成 @group.candidates
-		o ダミー報告者作成 (調査対象がいない場合)
-		- survey_property作成 @survey.survey_properties
-		- sheet作成
-		- sheet_properties (sheet/property mapping)作成
+		x survey_property作成 @survey.survey_properties
+		x sheet_properties (sheet/property mapping)作成
+		x ダミー報告者作成 (調査対象がいない場合)
+		- sheet作成スクリプト
 
 	- srML作成機能 (RoR側が作る？要調査)
 
