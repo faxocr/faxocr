@@ -38,14 +38,20 @@
 	x .confに、block_*を保存
 	x html生成時、枠線内リセット、オフセット調整
 	x htmlにグループID、ユーザーID流し込み機能
-
-	- srML作成機能 (RoR側が作る？要調査)
+	x 隣接同一名フィールドを連結する内部処理
+		x colspanの処理
+		x sortして比較、で終了
+		x sortが数値比較で無いため、要注意
 
 	- railsスクリプト作成機能
-		- ダミー報告者作成
-	- 隣接同一名フィールドを連結する内部処理
-		- sortして比較、で終了
-		- colspanの処理
+		x survey作成 @group.surveys
+		x 調査対象作成 @group.candidates
+		o ダミー報告者作成 (調査対象がいない場合)
+		- survey_property作成 @survey.survey_properties
+		- sheet作成
+		- sheet_properties (sheet/property mapping)作成
+
+	- srML作成機能 (RoR側が作る？要調査)
 
  * シート確認 / 登録 / ダウンロード
 

@@ -34,7 +34,8 @@ $msg = "start\n";
 // ファイルハンドリング
 //
 if (isset($file_id) && $file_id) {
-	$tgt_file = DST_DIR . $file_id . ".xls";
+	// $tgt_file = DST_DIR . $file_id . ".xls";
+	$tgt_file = DST_DIR . $file_id . ORIG_EXT;
 } else {
 	print "不正なアクセスです\n";
 	// put_err_page("不正なアクセスです");

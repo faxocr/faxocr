@@ -33,6 +33,8 @@ if (isset($_REQUEST["file_id"])) {
 	$file_id = $_REQUEST["file_id"];
 }
 
+$list_colspan = array();
+
 //
 // ファイルハンドリング
 //
@@ -116,6 +118,10 @@ for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
 				if ($xls->celmergeinfo[$sn][$r][$i]['cond'] == 1) {
 					$rowspan = $xls->celmergeinfo[$sn][$r][$i]['rspan'];
 					$colspan = $xls->celmergeinfo[$sn][$r][$i]['cspan'];
+
+					if ($colspan > 1) {
+						$list_colspan["${sn}-${r}-${i}"] = $colspan;
+					}
 
 					$reviser->setCellMerge($sn + 2, $r, $r + $rowspan - 1, $i,
 							       $i + $colspan - 1);
@@ -205,6 +211,9 @@ flock($lockfp, LOCK_UN);
 fclose($lockfp);
 unlink(LOCK_FILE . $file_id);
 
+put_config($file_id, $_REQUEST);
+put_rails($file_id, $_REQUEST);
+
 // XXX: debugging purpose
 file_put_contents("/tmp/faxocr.log",
   "----------------------------------------\n" .
@@ -214,10 +223,38 @@ file_put_contents("/tmp/faxocr.log",
   FILE_APPEND | LOCK_EX
 );
 
-put_config($file_id, $_REQUEST);
-put_rails($file_id, $_REQUEST);
-
 die;
+
+function is_next($prev, $next)
+{
+	global $msg;
+
+// $msg .= "0";
+	if (!isset($prev) || !isset($next)) {
+		return false;
+	}
+
+// $msg .= "1(${prev[1]}, ${next[1]})";
+	# sheet_num
+	if ($prev[1] != $next[1]) {
+		return false;
+	}
+
+// $msg .= "2(${prev[2]}, ${next[2]})";
+	# row
+	if ($prev[2] != $next[2]) {
+		return false;
+	}
+
+// $msg .= "3(${prev[3]}, ${next[3]})\n";
+	# col
+	if ($next[3] - $prev[3] == 1) {
+		return true;
+	}
+
+// $msg .= "4\n";
+	return false;
+}
 
 //
 // config出力
@@ -225,12 +262,42 @@ die;
 function put_config($file_id, $_REQUEST)
 {
 	global $target;
+	global $list_colspan;
+
+	global $msg;
 
 	$conf = new FileConf($file_id);
 
-	//
+	foreach ($_REQUEST as $item => $val) {
+		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
+		if ($loc && $loc[0]) {
+			$location = "${loc[1]}-${loc[2]}-${loc[3]}";
+			$list_requests[$location] = $val;
+		}
+	}
+
+	foreach ($list_requests as $item => $val) {
+		preg_match("/(\d+)-(\d+)-(\d+)/", $item, $loc);
+		if ($loc && $loc[0]) {
+			$col = $loc[3];
+		}
+
+		$cnt = 0;
+		$label = $list_requests["${loc[1]}-${loc[2]}-${col}"];
+		while (isset($list_requests["${loc[1]}-${loc[2]}-${col}"]) &&
+		       $list_requests["${loc[1]}-${loc[2]}-${col}"] == $label) {
+			$col++;
+			$cnt++;
+		}
+		if ($cnt > 1) {
+			$list_colspan[$item] = $cnt;
+// $msg .= $item . "\t". $cnt . "\n";
+		}
+	}
+
+// $msg .= implode(",", $list_colspan);
+
 	// XLSフィールド情報REQUEST取得
-	//
 	$conf->array_destroy("field");
 	foreach ($_REQUEST as $item => $val) {
 		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
@@ -242,9 +309,13 @@ function put_config($file_id, $_REQUEST)
 			$xls_fields["width"]     = $loc[4];
 			$xls_fields["item_name"] = $val;
 
-			//
+			$location = "${loc[1]}-${loc[2]}-${loc[3]}";
+// $msg .= "]" . $location . "\n";
+			if (isset($list_colspan[$location])) {
+				$xls_fields["colspan"] = $list_colspan[$location];
+			}
+
 			// XLSフィールド情報保存
-			//
 			$conf->array_set("field", $xls_fields);
 		}
 	}
