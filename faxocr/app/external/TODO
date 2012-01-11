@@ -13,14 +13,14 @@
 	x confファイルがあれば、markerのbuttonをenable化
 	x .confに、targetを保存
 	x hover対応
-	- jqcontextmenuでの「数字」「画像」「○△×」指定
-		- "width (\d+)"の代わりに、"type (\w+)"を利用
-		- sht_script.phpも適宜修正
+	x jqcontextmenuでの「数字」「画像」「○△×」指定
+	x "width (\d+)"の代わりに、"type (\w+)"を利用
 	- sheetlist.jsのcleanup
 
  - sht_script
 	x xlsファイル保存機能
 	x confファイル作成機能 (なぜか、作成されない...orz)
+	x 「数字」「画像」「○△×」指定
 
  * マーカー指定
 
@@ -69,16 +69,16 @@
 	x 作成したJPGを表示
 
  - sht_marker
+	- 「不特定多数」「特定対象」のRails的調整 ★
 	- PDF画像調整
-	- 「不特定多数」「特定対象」のRails的調整
-	- 「不特定多数」「特定対象」のPDF処理的調整
 	- PDF施設ID流し込み機能
+	- 「不特定多数」「特定対象」のPDF処理的調整
 	- zip作成
 
  - sht_commit
 	x route.rb修正
 	x Railsスクリプトの実行
-	- srML作成機能 (RoR側が作る？要調査)
+	x srML作成機能 (procfaxがfaxデータをfetchする際に、get_srml()が呼ばれる)
 
  - extern/download
 	x .pdf、.zip、の確認ロジックを追加

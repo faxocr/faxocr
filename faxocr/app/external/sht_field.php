@@ -64,12 +64,13 @@ $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetlist.js
 
 $body_opt .= "<ul id=\"contextmenu\" class=\"jqcontextmenu\">\n";
 $body_opt .= "<li>　フィールド名 <input id=\"field\" size=10 value=\"\"></li>\n";
-// $body_opt .= "<HR>\n";
-// $body_opt .= "<li><a onclick=\"\$sval = 1;\">数字</a></li>\n";
-// $body_opt .= "<li><a onclick=\"\$sval = 2;\">○×△</a></li>\n";
-// $body_opt .= "<li><a onclick=\"\$sval = 3;\">画像</a></li>\n";
-// $body_opt .= "<HR>\n";
-$body_opt .= "<li class=\"btGray\"><a onclick=\"sval = 0;reset_field();\">リセット</a></li>\n";
+$body_opt .= "<li>\n";
+$body_opt .= "<li><a onclick=\"cell_type[targetid] = 1;\">数字</a></li>\n";
+$body_opt .= "<li><a onclick=\"cell_type[targetid] = 2;\">○×△</a></li>\n";
+$body_opt .= "<li><a onclick=\"cell_type[targetid] = 3;\">画像</a></li>\n";
+$body_opt .= "</li>\n";
+$body_opt .= "<HR>\n";
+$body_opt .= "<li class=\"btGray\"><a onclick=\"cell_type[targetid] = -1;reset_field();\">リセット</a></li>\n";
 $body_opt .= "</ul>\n";
 $body_opt .= "<ul id=\"fieldreset\" class=\"jqcontextmenu\">\n";
 $body_opt .= "<li style=\"z-index:10\"><a onclick=\"del_column();\">リセット</a></li>\n";

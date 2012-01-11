@@ -264,6 +264,11 @@ function put_config($file_id, $_REQUEST)
 	global $sheet_name;
 	global $list_colspan;
 
+	$str_type = array(0 => "number",
+			  1 => "number",
+			  2 => "rating",
+			  3 => "image");
+
 	$conf = new FileConf($file_id);
 
 	$list_requests = array();
@@ -306,11 +311,9 @@ function put_config($file_id, $_REQUEST)
 			$xls_fields["sheet_num"] = $loc[1];
 			$xls_fields["row"]       = $loc[2];
 			$xls_fields["col"]       = $loc[3];
-			$xls_fields["width"]     = $loc[4];
 			$xls_fields["item_name"] = $val;
-
-			# XXX: number, rating, image
-			$xls_fields["type"] = "number";
+			# number, rating, image
+			$xls_fields["type"]       = $str_type[$loc[4]];
 
 			$location = "${loc[1]}-${loc[2]}-${loc[3]}";
 

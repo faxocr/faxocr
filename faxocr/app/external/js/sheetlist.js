@@ -22,6 +22,7 @@
 //var defaultbg;
 //var default_target;
 var cell_sw;
+var cell_type;
 var field;
 var targetid;
 var dirty = false;
@@ -54,6 +55,7 @@ function cutHex(h) {
 jQuery(document).ready(function($) {
 
 	$('.sheet_field td').addcontextmenu('contextmenu');
+	cell_type = new Array();
 
 	// 各セルの背景色を取得し格納
 	cell_sw = new Array();
@@ -264,9 +266,19 @@ function pack_fields() {
 	var form = $('form#form-save');
 	$('#field_list td').each(function() {
 		var fieldname = $(this).attr('name');
-		var width = $(this).width();
-
 		var txt = $(this).text();
+		var type;
+
+		if (fieldname == "0")
+			return;
+		if (typeof(cell_type[fieldname]) == 'undefined') {
+			type = 1;
+		} else if (cell_type[fieldname] != -1) {
+			type = cell_type[fieldname];
+		} else {
+			return;
+		}
+
 		txt = txt.replace(/<\s*script[^>]*>[\s\S]*?<\s*\/script>/ig,
 				  '');
 		txt = $.escapeHTML(txt);
@@ -274,7 +286,7 @@ function pack_fields() {
 		var cmd_m = '<input type="hidden" name="cell-' + fieldname +
 		    '-mark" value="' + txt + '" />';
 		var cmd_f = '<input type="hidden" name="field-' + fieldname +
-		    '-' + width + '" value="' + txt + '" />';
+		    '-' + type + '" value="' + txt + '" />';
 
 		form.append(cmd_m);
 		form.append(cmd_f);
