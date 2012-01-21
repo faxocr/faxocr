@@ -19,8 +19,6 @@
  *
  */
 
-//var defaultbg;
-//var default_target;
 var cell_sw;
 var cell_type;
 var field;
@@ -44,6 +42,11 @@ function cutHex(h) {
 	return (h.charAt(0) == '#') ? h.substring(1, 7) : h;
 }
 
+// existence check
+function isset(data) {
+	return ( typeof( data ) != 'undefined' );
+}
+
 // to escape html tag
 (function($) {
 	$.escapeHTML = function(val) {
@@ -53,6 +56,10 @@ function cutHex(h) {
 
 // initialization
 jQuery(document).ready(function($) {
+
+	if ($('#jsiSetup').length > 0) {
+		SHEET.setFlexiInSetup();
+	}
 
 	$('.sheet_field td').addcontextmenu('contextmenu');
 	cell_type = new Array();
@@ -87,11 +94,6 @@ jQuery(document).ready(function($) {
 	document.onkeydown = on_keydown;
 });
 
-// existence check
-function isset(data) {
-	return ( typeof( data ) != 'undefined' );
-}
-
 //
 // セル指定クリック時関数
 //
@@ -118,10 +120,6 @@ function set_field (target) {
 		targettd.find('div').text(field);
 		return;
 	}
-
-//	if (default_target == targetid) {
-//		defaultbg = target.css('backgroundColor');
-//	}
 
 	add_column(field, 80);
 }
@@ -187,14 +185,12 @@ function delColumn(target, idx) {
 	var targettd = $('#field_list td').eq(idx);
 
 	// global
-//	$sval = 0;
 	targetid = targettd.attr('name');
 
 	$('.nDiv tr').eq(idx).remove();
 	$('.cDrag div').eq(idx).remove();
 	$('.hDiv th').eq(idx).remove();
 	targettd.remove();
-//	$('#' + targetid).html('').css('background-color', '#ffffff');
 	$('#' + targetid).html('');
 	$('#' + targetid).removeClass('enter-selected');
 	$('#' + targetid).removeClass('click-selected');
@@ -236,7 +232,6 @@ function del_column(target, index) {
 	targetid = targettd.attr('name');
 
 	targettd.remove();
-//	$('#' + targetid).html('').css('background-color', '#ffffff');
 	$('#' + targetid).html('');
 	$('#' + targetid).removeClass('enter-selected');
 	$('#' + targetid).removeClass('click-selected');
@@ -429,17 +424,13 @@ function on_keyup(e) {
 			return true;
 		}
 
-		// $sval = 1;
 		jquerycontextmenu.hidebox($, $('.jqcontextmenu'));
-		// $target = $('#' + targetid).css('background-color', ctbl[$sval]);
-
 		$('#' + targetid).removeClass('not-selected');
 		$('#' + targetid).removeClass('click-selected');
 		$target = $('#' + targetid).addClass('enter-selected');
 		cell_sw[targetid] = 1;
 
 		set_field($target);
-		// $sval = 0;
 		targetid = null;
 
 		document.getElementById('sbmt').disabled = null;
@@ -449,111 +440,6 @@ function on_keyup(e) {
 var SHEET = SHEET || {};// namespace
 
 SHEET = {
-	setFlexi: function() {
-		// set flexigrid in form-list.php
-		var $listHidden = $('#jsiListHidden'),
-		    $hiddens = $listHidden.find('input'),
-		    isResize = $hiddens.eq(4).val() === 'true' ? true : false,
-		    isPager = $hiddens.eq(5).val() === 'true' ? true : false,
-		    isRp = $hiddens.eq(6).val() === 'true' ? true : false,
-		    rpNum = $hiddens.eq(7).val()*1,
-		    isNov = $hiddens.eq(9).val() === 'true' ? true : false,
-		    isToggle = $hiddens.eq(10).val() === 'true' ? true : false,
-		    isTableToggle = $hiddens.eq(11).val() === 'true' ? true : false,
-		    $colModel = $('#jsiColModel'),
-		    $colModels = $colModel.find('input'),
-		    colModelVal,
-		    valList = [],
-		    ary = [];
-
-		for (var i = 0, max = $colModels.length; i < max; i++) {
-			colModelVal = $.escapeHTML($colModels.eq(i).val());
-			ary[i] = colModelVal.split(',');
-			valList[i] = {display: ary[i][0],
-				      name: ary[i][0],
-				      width: ary[i][1],
-				      align: 'left'};
-		}
-
-		$('#field_list').flexigrid({
-			url: $hiddens.eq(0).val(),
-			dataType: $hiddens.eq(1).val(),
-			height: $hiddens.eq(2).val(),
-			width: $hiddens.eq(3).val(),
-			resizable: isResize,
-			usepager: isPager,
-			useRp: isRp,
-			rp: rpNum,
-			method: $hiddens.eq(8).val(),
-			novstripe: isNov,
-			showToggleBtn: isToggle,
-			showTableToggleBtn: isTableToggle,
-			procmsg: $hiddens.eq(12).val(),
-			pagestat: $hiddens.eq(13).val(),
-			pagetext: $hiddens.eq(14).val(),
-			colModel: valList
-		});
-	},
-	// XXX: to be removed?
-	setParam: function() {// status menuでのurlパラメータ設定
-		var $param = $('#jsiParam'),
-		　　$hidden = $param.find('input'),
-		　　hiddenVal = $hidden.val();
-
-		if (hiddenVal === 'start') {
-			$('#bt-password').click(function() {
-				$.jqDialog.password('パスワードを入力して下さい', function(data) {
-					$('#passwd').val(data);
-					$('#form-status').attr('action', 'form-setup.php?file=' + $('#file').val());
-					$('#form-status').submit();
-				});
-			});
-		} else if (hiddenVal === 'running') {
-			$('#bt-password1').click(function() {
-				$.jqDialog.password('パスワードを入力して下さい', function(data) {
-					$('#passwd').val(data);
-					$('#status').val('stop');
-					$('#form-status').attr('action', 'form-list.php?file=' + $('#file').val());
-					$('#form-status').submit();
-				});
-			});
-			$('#bt-password2').click(function() {
-				$.jqDialog.password('パスワードを入力して下さい', function(data) {
-					$('#passwd').val(data);
-					$('#status').val('close');
-					$('#form-status').attr('action', 'form-list.php?file=' + $('#file').val());
-					$('#form-status').submit();
-				});
-			});
-		} else if (hiddenVal === 'stop') {
-			$('#bt-password1').click(function() {
-				$.jqDialog.password('パスワードを入力して下さい', function(data) {
-					$('#passwd').val(data);
-					$('#status').val('running');
-					$('#form-status').attr('action', 'form-list.php?file=' + $('#file').val());
-					$('#form-status').submit();
-				});
-			});
-			$('#bt-password2').click(function() {
-				$.jqDialog.password('パスワードを入力して下さい', function(data) {
-					$('#passwd').val(data);
-					$('#status').val('close');
-					$('#form-status').attr('action', 'form-list.php?file=' + $('#file').val());
-					$('#form-status').submit();
-				});
-			});
-		} else if (hiddenVal === 'close') {
-			$('#bt-password3').click(function() {
-				$.jqDialog.password('パスワードを入力して下さい', function(data) {
-					url = $('#form_url').val();
-					$('#status').val('close');
-					$('#passwd2').val(data);
-					$('#next_url').val(url);
-					$('#form-list').submit();
-				});
-			});
-		}
-	},
 	setFlexiInSetup: function() {// set flexigrid in form-setup.php
 		$('#field_list').flexigrid({
 			showToggleBtn:false,
@@ -584,20 +470,3 @@ SHEET = {
 		});
 	}
 };
-
-$(document).ready(function() {
-
-	// XXX: tobe removed?
-	if ($('#jsiColModel').length > 0) {
-		SHEET.setFlexi();
-	}
-
-	// XXX: tobe removed?
-	if ($('#jsiParam').length > 0) {
-		SHEET.setParam();
-	}
-
-	if ($('#jsiSetup').length > 0) {
-		SHEET.setFlexiInSetup();
-	}
-});

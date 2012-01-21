@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 <?php
 /*
  * Shinsai FaxOCR
@@ -74,6 +75,7 @@ if ($xls) {
 }
 
 // XXX: debugging purpose
+/*
 file_put_contents("/tmp/faxocr.log",
   "----------------------------------------\n" .
   date("Y/m/d H:i:s") . "\n(" .
@@ -81,6 +83,7 @@ file_put_contents("/tmp/faxocr.log",
   $msg . "\n\n",
   FILE_APPEND | LOCK_EX
 );
+*/
 
 die;
 
@@ -112,7 +115,6 @@ function get_config($file_id)
 //
 function put_config($file_id, $_REQUEST)
 {
-	global $target;
 	global $group_id;
 	global $sheet_id;
 	global $conf;
@@ -327,6 +329,7 @@ function put_rails($file_id)
 	$sheet_name = $conf->get("name");
 	$width = $conf->get("block_width") / $size;
 	$height = $conf->get("block_height") / $size;
+	$target = $conf->get("target") == "registered" ? 1 : 0;
 
 	//
 	// XLSフィールド情報取得
@@ -357,34 +360,6 @@ function put_rails($file_id)
 			      	         "{$row}, " .
 			      	         "{$cspan}]\n";
 	}
-
-	/*
-	foreach ($_REQUEST as $item => $val) {
-		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
-		if ($loc && $loc[0]) {
-			$xls_fields = array();
-			$xls_fields["sheet_num"] = $loc[1];
-			$xls_fields["row"]       = $loc[2];
-			$xls_fields["col"]       = $loc[3];
-			$xls_fields["width"]     = $loc[4];
-			$xls_fields["item_name"] = $val;
-			$location = "${loc[1]}-${loc[2]}-${loc[3]}";
-
-			$cspan = isset($list_colspan[$location]) ? 
-			       $list_colspan[$location] : 1;
-
-			// $tgt_items .= implode(",", $xls_fields) . "\n";
-			// props << ["テスト", "テスト", 1, "number", 1, 11, 1]
-			$tgt_items .= "props << [\"{$val}\", " .
-				      	         "\"{$val}\", " .
-				      	         "{0}, " .
-				      	         "\"number\", " .
-				      	         "{$loc[3]}, " .
-				      	         "{$loc[2]}, " .
-				      	         "{$cspan}]\n";
-		}
-	}
-	*/
 
 	$tgt_script = <<< "STR"
 #!/usr/bin/ruby
@@ -436,15 +411,25 @@ end
 @survey.report_header = ""
 @survey.report_footer = ""
 
-@candidates = @group.candidates
-@candidates.each do |candidate|
+if {$target} > 0 then
+  @candidates = @group.candidates
+  @candidates.each do |candidate|
+    survey_candidate = SurveyCandidate.new
+    survey_candidate.candidate_id = candidate.id
+    survey_candidate.role = 'sr'
+    if (candidate.id) then
+      @survey.survey_candidates << survey_candidate
+    end
+  end
+else
   survey_candidate = SurveyCandidate.new
-  survey_candidate.candidate_id = candidate.id
+  survey_candidate.candidate_id = @candidate.id
   survey_candidate.role = 'sr'
-  if (candidate.id) then
+  if (@candidate.id) then
     @survey.survey_candidates << survey_candidate
   end
 end
+
 if @survey.save
   print "survey candidate: success\\n"
 else

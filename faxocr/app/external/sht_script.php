@@ -133,7 +133,6 @@ for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
 			if (isset($_REQUEST["cell-${sn}-${r}-${i}-mark"])) {
 				$val = $_REQUEST["cell-${sn}-${r}-${i}-mark"];
 				$bgcolor = 1;
-$msg .= ")" . $val . "\n";
 			} else if (isset($_REQUEST["cell-${sn}-${r}-${i}-clear"])) {
 				$val = $_REQUEST["cell-${sn}-${r}-${i}-clear"];
 				$bgcolor = 0;
@@ -214,6 +213,7 @@ unlink(LOCK_FILE . $file_id);
 put_config($file_id, $_REQUEST);
 
 // XXX: debugging purpose
+/*
 file_put_contents("/tmp/faxocr.log",
   "----------------------------------------\n" .
   date("Y/m/d H:i:s") . "\n(" .
@@ -221,37 +221,31 @@ file_put_contents("/tmp/faxocr.log",
   $msg . "\n\n",
   FILE_APPEND | LOCK_EX
 );
+*/
 
 die;
 
 function is_next($prev, $next)
 {
-	global $msg;
-
-// $msg .= "0";
 	if (!isset($prev) || !isset($next)) {
 		return false;
 	}
 
-// $msg .= "1(${prev[1]}, ${next[1]})";
 	# sheet_num
 	if ($prev[1] != $next[1]) {
 		return false;
 	}
 
-// $msg .= "2(${prev[2]}, ${next[2]})";
 	# row
 	if ($prev[2] != $next[2]) {
 		return false;
 	}
 
-// $msg .= "3(${prev[3]}, ${next[3]})\n";
 	# col
 	if ($next[3] - $prev[3] == 1) {
 		return true;
 	}
 
-// $msg .= "4\n";
 	return false;
 }
 

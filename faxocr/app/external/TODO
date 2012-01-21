@@ -1,4 +1,28 @@
 
+ * PDF生成
+
+ - sht_marker / sht_config
+	- 「不特定多数」「特定対象」のPDF処理的調整
+	- PDF画像調整
+	- PDF施設ID流し込み機能
+	- zip作成
+
+ - extern/download
+	- external_controller.rb:downloadに、zip/pdf切り替えロジックを追加
+
+ x pdf生成 / wkhtmltopdf
+	x cssを使ったoverlayも透過もちゃんと処理できる
+	x シートIDと機関IDを埋め込む
+
+ただし、apt-getでインストールしたwkhtmltopdfは、QTパッチが当たっておらず、
+X環境を必要とする。そこで、xvfbを用いて以下のように回避
+
+   sudo apt-get install xvfb
+   xvfb-run -a -s "-screen 0 640x480x16" wkhtmltopdf path_html path_pdf
+   xvfb-run -a wkhtmltopdf --page-size A4 --orientation Landscape e.html e.pdf
+
+*** *** ***
+
  * フィールド指定
 
  - sht_field
@@ -15,7 +39,8 @@
 	x hover対応
 	x jqcontextmenuでの「数字」「画像」「○△×」指定
 	x "width (\d+)"の代わりに、"type (\w+)"を利用
-	- sheetlist.jsのcleanup
+	x test.rb削除
+	x sheetlist.jsのcleanup
 
  - sht_script
 	x xlsファイル保存機能
@@ -59,6 +84,7 @@
 			x sht_mark -> field移動の正常確認
 	x 調査項目表示順序の未ソート問題
 	x .rbできないと、シート確認に進めないように
+	x 「不特定多数」「特定対象」のRails的調整
 
  * シート確認 / 登録 / ダウンロード
 
@@ -67,13 +93,6 @@
 	x route.rb修正
 	x 右上にstatusフィールドを追加
 	x 作成したJPGを表示
-
- - sht_marker
-	- 「不特定多数」「特定対象」のRails的調整 ★
-	- PDF画像調整
-	- PDF施設ID流し込み機能
-	- 「不特定多数」「特定対象」のPDF処理的調整
-	- zip作成
 
  - sht_commit
 	x route.rb修正
@@ -84,20 +103,6 @@
 	x .pdf、.zip、の確認ロジックを追加
 	x route.rbにpdf downloadの追加を確認
 	x views/sheets/_list.html.erb
-	- external_controller.rb:downloadに、zip/pdf切り替えロジックを追加
-
-*** *** ***
-
- x pdf生成 / wkhtmltopdf
-	x cssを使ったoverlayも透過もちゃんと処理できる
-	x シートIDと機関IDを埋め込む
-
-ただし、apt-getでインストールしたwkhtmltopdfは、QTパッチが当たっておらず、
-X環境を必要とする。そこで、xvfbを用いて以下のように回避
-
-   sudo apt-get install xvfb
-   xvfb-run -a -s "-screen 0 640x480x16" wkhtmltopdf path_html path_pdf
-   xvfb-run -a wkhtmltopdf --page-size A4 --orientation Landscape e.html e.pdf
 
 *** *** ***
 
