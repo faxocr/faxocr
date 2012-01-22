@@ -53,12 +53,22 @@ class ExternalController < ApplicationController
     # @limit = "128K"
 
     @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
+    if @gid.nil? then
+      redirect_to :controller => 'faxocr'
+      return
+    end
     @action = "/external/reg_upload/"
   end
 
   def reg_upload
 
     @gid = params[:gid]
+
+    if @gid.nil? then
+      redirect_to :controller => 'faxocr'
+      return
+    end
+
     if params[:file].nil? then
       redirect_to :controller => 'external', :action => 'register', :id => @gid
       return
