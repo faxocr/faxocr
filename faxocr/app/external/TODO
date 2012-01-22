@@ -14,8 +14,8 @@
 	x cssを使ったoverlayも透過もちゃんと処理できる
 	x シートIDと機関IDを埋め込む
 
-ただし、apt-getでインストールしたwkhtmltopdfは、QTパッチが当たっておらず、
-X環境を必要とする。そこで、xvfbを用いて以下のように回避
+	ただし、apt-getでインストールしたwkhtmltopdfは、QTパッチが当たって
+	おらず、X環境を必要とする。そこで、xvfbを用いて以下のように回避
 
    sudo apt-get install xvfb
    xvfb-run -a -s "-screen 0 640x480x16" wkhtmltopdf path_html path_pdf
