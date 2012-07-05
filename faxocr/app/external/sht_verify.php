@@ -71,13 +71,14 @@ if ($errmsg) {
 {
 	print "<div align=\"center\" style=\"background-color: lightgray;\">\n";
 	print "<BR>\n";
-	if (file_exists(DST_DIR . $file_id . ".png")) {
+//	if (file_exists(DST_DIR . $file_id . ".png")) {
+	if (file_exists(DST_DIR . $group_id . "-" . $sheet_id . ".png")) {
 		print "<img src=\"/external/getimg/" . $group_id . "/" . $sheet_id . 
 		         "\" width=\"500px\"><br>\n";
 		print "<a href=\"/external/download/" . $group_id . "/" . $sheet_id . 
 		        "\">[Sample PDF]</a>\n";
 	} else {
-		print "画像ファイルがありません<br><br>\n";
+		print "画像ファイルがありません $file_id<br><br>\n";
 	}
 	print "</div>\n";
 	print "<div align=\"right\">\n";

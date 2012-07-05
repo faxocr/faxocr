@@ -390,7 +390,7 @@ function put_status()
 	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
 
 	// XXX
-	print "<form action=\"/external\sht_marker/\" method=\"POST\" id=\"form-status\">\n";
+	print "<form action=\"/external/sht_marker/\" method=\"POST\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
