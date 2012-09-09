@@ -34,7 +34,7 @@
 	<% if params[:controller] == "sheets" %>
     <% if @current_user.has_survey_role(@group.id) %>
     <td class="surveysobject_manage">
-<a href=<%="\"/external/download/" + @group.id.to_s + "/" + sheet.id.to_s + "\""%> >[PDF]</a>
+<a href=<%="\"/external/download_zip/" + @group.id.to_s + "/" + sheet.id.to_s + "\""%> >[PDF]</a>
 <%= link_to '[編集]', group_survey_sheet_path(@group, @survey, sheet) %>
 <%= link_to '[削除]', group_survey_sheet_path(@group, @survey, sheet), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
     <% else %>
@@ -42,7 +42,7 @@
     <% end %>
     <% else %>
     <td class="surveysobject_manage">
-      <a href=<%="\"/external/download/" + @group.id.to_s + "/" + sheet.id.to_s + "\""%> >[PDF]</a>
+      <a href=<%="\"/external/download_zip/" + @group.id.to_s + "/" + sheet.id.to_s + "\""%> >[PDF]</a>
     </td>
     <% end %>
   </tr>

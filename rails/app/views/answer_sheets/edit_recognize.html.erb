@@ -1,9 +1,10 @@
 <h1>FAX受信調査シートのコード指定による再読み込み</h1>
 
-<% form_for([@group,@survey,@answer_sheet], :url => {:action => :update_recognize}) do |f| %>
+<% form_for([@group,@survey,@answer_sheet]) do |f| %>
   <%= f.error_messages %>
   <%= f.hidden_field :date %>
   <%= f.hidden_field :sheet_image %>
+
   <p>
     送信FAX番号<br />
     <%= f.text_field :sender_number %>
@@ -14,11 +15,11 @@
   </p>
   <p>
     シートコード<br />
-    <%= f.text_field :analyzed_sheet_code %>
+    <%= f.text_field :sheet_code %>
   </p>
   <p>
     調査対象コード<br />
-    <%= f.text_field :analyzed_candidate_code %>
+    <%= f.text_field :candidate_code %>
   </p>
   <p>
     <%= f.submit 'Update' %>

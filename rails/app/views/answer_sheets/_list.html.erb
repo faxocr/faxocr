@@ -10,12 +10,10 @@
 	<% if @current_user.has_administrator_group %>
     <th class="surveysobject">エラー送信種別</th>
 	<% end %>
-	<% if params[:controller] == "answer_sheets" %>
 	<% if @current_user.has_survey_role(@current_group.id) %>
     <th class="surveysobject" colspan="2">操作</th>
 	<% else %>
     <th class="surveysobject">操作</th>
-	<% end %>
 	<% end %>
   </tr>
   <% count = 0 %>
@@ -34,11 +32,9 @@
 	<% if @current_user.has_administrator_group %>
     <td class="surveysobject"><%=h answer_sheet.printable_srerror %></td>
 	<% end %>
-	<% if params[:controller] == "answer_sheets" %>
     <td class="surveysobject_manage"><%= link_to '表示', group_survey_answer_sheet_path(@group, @survey, answer_sheet) %></td>
 	<% if @current_user.has_survey_role(@current_group.id) %>
     <td class="surveysobject_manage"><%= link_to '削除', group_survey_answer_sheet_path(@group, @survey, answer_sheet), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
-	<% end %>
 	<% end %>
   </tr>
 <% end %>

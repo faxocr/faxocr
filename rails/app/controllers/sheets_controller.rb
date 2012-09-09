@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class SheetsController < ApplicationController
   before_filter :verify_group_authority
   # GET /sheets
@@ -94,7 +95,7 @@ class SheetsController < ApplicationController
     sheet_property = SheetProperty.find_by_sheet_id(params[:id])
     sheet_ids = @survey.sheet_ids
     answer_sheet = AnswerSheet.find_by_sheet_id(sheet_ids)
-    if sheet_property != nil && answer_sheet != nil 
+    if sheet_property != nil || answer_sheet != nil 
       flash[:notice] = "このシートは使用されているため削除できません"
     else
       @sheet.destroy

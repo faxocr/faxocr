@@ -118,7 +118,6 @@ for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
 				if ($xls->celmergeinfo[$sn][$r][$i]['cond'] == 1) {
 					$rowspan = $xls->celmergeinfo[$sn][$r][$i]['rspan'];
 					$colspan = $xls->celmergeinfo[$sn][$r][$i]['cspan'];
-
 					if ($colspan > 1) {
 						$list_colspan["${sn}-${r}-${i}"] = $colspan;
 					}
@@ -192,8 +191,8 @@ flock($lockfp, LOCK_EX);
 $template_xls = TMP_XLS;
 $tmp_file = uniqid();
 
-// $msg .= "tmp file: " . $tmp_file . "\n";
-// $msg .= "tmp xls: " . $template_xls . "\n";
+/* $msg .= "tmp file: " . $tmp_file . "\n"; */
+/* $msg .= "tmp xls: " . $template_xls . "\n"; */
 
 if (filesize($tgt_file)) {
 	$result = $reviser->reviseFile($template_xls, $tmp_file, TMP_DIR);
@@ -274,32 +273,25 @@ function put_config($file_id, $_REQUEST)
 		}
 	}
 
+	uksort($list_requests, 'strnatcmp');
+
 	foreach ($list_requests as $item => $val) {
-		preg_match("/(\d+)-(\d+)-(\d+)/", $item, $loc);
-		if ($loc && $loc[0]) {
-			$col = $loc[3];
-		}
+		if (!isset($list_colspan[$item]))
+			$list_colspan[$item] = 0;
+	}
 
-		$cnt = 0;
-		$label = $list_requests["${loc[1]}-${loc[2]}-${col}"];
-		while (isset($list_requests["${loc[1]}-${loc[2]}-${col}"]) &&
-		       $list_requests["${loc[1]}-${loc[2]}-${col}"] == $label) {
-			$cnt++;
-
-			// XXX
-			if ($cnt > 1)
-				$list_colspan["${loc[1]}-${loc[2]}-${col}"] = 0;
-			$col++; // should be here
-		}
-		if ($cnt > 1) {
-			$list_colspan[$item] = $cnt;
-		}
+	$array_counts = array_count_values($list_requests);
+	foreach ($array_counts as $key => $val) {
+		$l = array_search ($key, $list_requests, FALSE);
+		if ($list_colspan[$l] == 0)
+			$list_colspan[$l] = $val;
 	}
 
 	// XLSフィールド情報REQUEST取得
 	$conf->array_destroy("field");
 	foreach ($_REQUEST as $item => $val) {
 		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
+		
 		if ($loc && $loc[0]) {
 			$xls_fields = array();
 			$xls_fields["sheet_num"] = $loc[1];

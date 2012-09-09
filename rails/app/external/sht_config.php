@@ -27,7 +27,7 @@ require_once 'lib/common.php';
 require_once 'lib/file_conf.php';
 require_once 'contrib/peruser.php';
 
-define('border_sw', true);
+define('sht_config', true);
 
 $msg = "start\n";
 
@@ -101,10 +101,17 @@ function get_config($file_id)
 	$xls_fields_list = $conf->array_getall("field");
 
 	$num = 0; // XXX: needed?
+
 	foreach ($xls_fields_list as $xls_fields) {
-		$location = $xls_fields["sheet_num"] . "-" .
-		   $xls_fields["row"] . "-" . $xls_fields["col"];
+		$location = $xls_fields["sheet_num"] . "-" . $xls_fields["row"] . "-" . $xls_fields["col"];
 		$field_index[$location] = $location;
+		if (isset($xls_fields["colspan"])) {
+			for($i=1; $i<$xls_fields["colspan"]; $i++) {
+				$col = $xls_fields["col"]+$i;
+				$location = $xls_fields["sheet_num"] . "-" . $xls_fields["row"] . "-" . $col;
+				$field_index[$location] = $location;
+			}
+		}
 	}
 
 	return $field_index;
@@ -127,11 +134,8 @@ function put_config($file_id, $_REQUEST)
 	if (isset($sheet_id))
 		$conf->set("sid", $sheet_id);
 
-	foreach (array("block_width",
-			"block_height",
-			"block_size",
-			"block_offsetx",
-			"block_offsety") as $item) {
+	foreach (array("block_width", "block_height", "block_size", "block_offsetx",
+								 "block_offsety", "candidate_code") as $item) {
 		if (isset($_REQUEST[$item])) {
 			$val = $_REQUEST[$item];
 			if (strlen($val) != 0) {
@@ -162,36 +166,8 @@ STR;
 
 function put_footer()
 {
-	global $conf;
-
-	$sid = $conf->get("sid");
-	$tid = "00000";
-
-	$width = $conf->get("block_width");
-	$height = $conf->get("block_height");
-	$size = $conf->get("block_size");
-	$offsetx = $conf->get("block_offsetx");
-	$offsety = $conf->get("block_offsety");
-
-	$offsetx = $offsetx > 0 ? $offsetx : 0;
-	$offsety = $offsety > 0 ? $offsety : 0;
-
-	$html = <<< STR
-
-<div id="ex3" class="jqDnR" style="opacity:0.8; top:{$offsety}px; left:{$offsetx}px; z-index: 3; position: absolute; width: {$width}px; height:{$height}px; font-size: 12px; ">
-
-<div class="jqDrag" style="height:100%; width: 100%;">
-<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; top: 0;left: 0; width: {$size}px;"><div style="position: absolute; left:40px; "><font style="line-height: 28pt; font-size: 28pt; font-family: 'Arial'; ">00001</font></div>
-<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; top: 0;right: 0; width: {$size}px;">
-<img src="http://localhost:3000/image/mark.gif" class="mark-img" style="position: absolute; bottom: 0;left: 0; width: {$size}px;"><div style="position: absolute; left:40px; bottom: 0"><font style="line-height: 28pt; font-size: 28pt; font-family: 'Arial'; ">00001</font></div>
-</div>
-<div class="jqResize"></div>
-</div>
-
-</body>
-</html>
-
-STR;
+	$html .= "</body>\n";
+	$html .= "</html>\n";
 
 	return $html;
 }
@@ -201,44 +177,67 @@ function put_excel($xls)
 	global $field_index;
 	global $conf;
 
+	$sid = sprintf("%05d", $conf->get("sid"));
+	$cid = strtok($conf->get("candidate_code"), "-");
+	$width = $conf->get("block_width");
+	$height = $conf->get("block_height");
+	$size = $conf->get("block_size");
 	$offsetx = $conf->get("block_offsetx");
 	$offsety = $conf->get("block_offsety");
-	$tablex = $offsetx > 0 ? 0 : 0 - $offsetx;
-	$tabley = $offsety > 0 ? 0 : 0 - $offsety;
-	$html = "<div style=\"top:{$tabley}px; left:{$tablex}px; position: absolute\">\n"; 
+	$offsetx = $offsetx > 0 ? $offsetx : 0;
+	$offsety = $offsety > 0 ? $offsety : 0;
 
 	// シート表示
 	// for ($sn = 0; $sn < 1; $sn++) {
 
-	$sn = 0; 
-	{
-		$w = 32;
-		if (!isset($xls->maxcell[$sn]))
-			$xls->maxcell[$sn] = 0;
-		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$w += $xls->getColWidth($sn, $i);
-		}
+	$sn = 0;
 
-		// XXX
-		// $w = $w / 2;
+	$tblwidth = 0;
+	$tblheight = 0;
+	for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
+		$tblwidth += $xls->getColWidth($sn, $i);
+	}
+	for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
+		$tblheight += $xls->getRowHeight($sn, $i);
+	}
 
+	// シートウインドウ
+	$scale = get_scaling($tblwidth, $tblheight, 960);
+	$tdwidth = $xls->getColWidth($sn, 0) * $scale;
+	$trheight = $xls->getRowHeight($sn, 0) * $scale;
+	$tblwidth = $tdwidth * ($xls->maxcell[$sn]+1);
+	$tblheight = $trheight * ($xls->maxrow[$sn]+1);
+	// マーカーウインドウ
+	$scale = get_scaling($width, $height, 960);
+	$width = $width * $scale;
+	$height = $height * $scale;
+	$size = $size * $scale * 0.95;
+	$left = $size * 2;
+	
+	while ($cid != FALSE) {
+		$cid = sprintf("%05d", $cid);
+
+		$html .= "\n<hr style=\"page-break-after:always; visibility:hidden;\">\n\n";
+		
+		$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"top:{$offsety}px; left:{$offsetx}px; z-index: 3; position: relative; width: {$width}px; height:{$height}px; font-size: 12px; \">\n";
+		$html .= "<img src=\"http://localhost:3000/image/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;left: 0; width: {$size}px;\"><div style=\"position: absolute; left:{$left}px; \"><font style=\"line-height: {$size}px; font-size: {$size}px; font-family: 'OCRB'; \">$cid</font></div>\n";
+		$html .= "<img src=\"http://localhost:3000/image/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;right: 0; width: {$size}px;\">\n";
+		$html .= "<img src=\"http://localhost:3000/image/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: {$size}px;\"><div style=\"position: absolute; left:{$left}px; bottom: 0\"><font style=\"line-height: {$size}px; font-size: {$size}px; font-family: 'OCRB'; \">$sid</font></div>\n";
+
+		$cid = strtok("-");
+		
 		// シートテーブル表示
 		$html .= "<table class=\"sheet\" border=\"0\" cellpadding=\"0\"";
-		$html .= "cellspacing=\"0\" width=\"" . ${w} . "\" ";
-		$html .= "style=\"border-collapse: collapse;\"";
+		$html .= " cellspacing=\"0\" width=\"" . ${tblwidth} . "\" height=\"" . ${tblheight} . "\"";
+		$html .= " style=\"table-layout:fixed; border-collapse: collapse;\"";
 		$html .=" bgcolor=\"#FFFFFF\" >\n";
 
-		if (!isset($xls->maxrow[$sn]))
-			$xls->maxrow[$sn] = 0;
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
-			// XXX
-			$trheight = $xls->getRowHeight($sn, $r) * 0.8;
+			
 			$html .= "  <tr height=\"" . $trheight . "\">" . "\n";
+			
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
-				$tdwidth = $xls->getColWidth($sn, $i);
-// XXX
-//				$tdwidth = $tdwidth / 2;
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
 				if (isset($xls->hlink[$sn][$r][$i])){
@@ -247,7 +246,7 @@ function put_excel($xls)
 
 				$xf = $xls->getAttribute($sn, $r, $i);
 				if (isset($xf['wrap']) && $xf['wrap'])
-					$dispval = ereg_replace("\n", "<br />", $dispval);
+					$dispval = preg_replace('/\n/', '<br />', $dispval);
 				$xfno = ($xf['xf'] > 0) ? $xf['xf'] : 0;
 
 				$align = "x";
@@ -297,19 +296,15 @@ function put_excel($xls)
 				} else {
 					$class = " class=\"XF" . $xfno . "\" ";
 					$id = " id=\"". $sn . "-" . $r . "-" . $i . "\"";
-					$width = "width=\"" . $tdwidth . "\" ";
-
-					$html .= " <td $class $width $align>$dispval</td>\n";
+					$html .= " <td nowrap=\"nowrap\" $class $align>$dispval</td>\n";
 				}
 			}
 			$html .= "</tr>\n";
 		}
 		$html .= "</table>\n";
-
-		// シート終了
-	}
-	$html .= "</div>\n";
-
+		$html .= "</div>\n";
+	}  // while ($cid != FALSE)
+	
 	return $html;
 }
 
@@ -319,7 +314,8 @@ function put_excel($xls)
 function put_rails($file_id)
 {
 	global $rails_env;
-
+	global $conf;
+	
 	$tgt_items = "";
 
 	if (!$conf)
@@ -327,8 +323,8 @@ function put_rails($file_id)
 
 	$size = $conf->get("block_size") ? $conf->get("block_size") : 32;
 	$sheet_name = $conf->get("name");
-	$width = $conf->get("block_width") / $size;
-	$height = $conf->get("block_height") / $size;
+	$width = $conf->get("block_width") / $size - 2;
+	$height = $conf->get("block_height") / $size - 2;
 	$target = $conf->get("target") == "registered" ? 1 : 0;
 
 	//
@@ -400,6 +396,7 @@ if @candidate.save
   print "default candidate: success\\n"
 else
   print "default candidate: fail\\n"
+  @candidate = Candidate.find_by_candidate_code(@candidate.candidate_code)
 end
 
 #
@@ -484,7 +481,8 @@ end
 @sheet = @survey.sheets.build
 
 # sheet作成
-@sheet.sheet_code = survey_id.to_s # string
+# @sheet.sheet_code = survey_id.to_s # string
+@sheet.sheet_code = "%05d" % {$conf->get("sid")}
 @sheet.sheet_name = "自動生成シート" # string
 @sheet.survey_id = survey_id # integer
 @sheet.block_width = {$width} || 0 # XXX
@@ -512,8 +510,8 @@ survey_properties.each do |@survey_property|
   sheet_property = SheetProperty.new
   sheet_property.sheet_id = @sheet.object_id
   sheet_property.survey_property_id = @survey_property.id
-  sheet_property.position_x = prop[0]
-  sheet_property.position_y = prop[1]
+  sheet_property.position_x = prop[0] - 1
+  sheet_property.position_y = prop[1] - 1
   sheet_property.colspan = prop[2]
   @sheet.sheet_properties << sheet_property
 

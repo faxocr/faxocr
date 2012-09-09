@@ -130,6 +130,8 @@ class ExternalController < ApplicationController
     @sid = params[:sid]
     @target = params[:target]
     @tname = params[:file_id]
+    @group = Group.find(params[:gid])
+    @candidates = @group.candidates
 
     @msg = flash[:notice]
 
@@ -148,7 +150,10 @@ class ExternalController < ApplicationController
       end
     end
 
-    if 0 < @size && @size <= @@size_limit && /\.xls$/ =~ @filename then
+    if @target == "registered" && @candidates.size == 0 then
+        flash[:notice] = "設定済み調査対象がありません"
+        redirect_to :controller => 'faxocr'
+    elsif 0 < @size && @size <= @@size_limit && /\.xls$/ =~ @filename then
       File.open("#{RAILS_ROOT}/files/#{@tname}" + ".xls", "wb") {
         |f| f.write(params[:file]['upfile'].read)
       }
@@ -208,6 +213,9 @@ class ExternalController < ApplicationController
     @gid = params[:gid]
     @sid = params[:sid]
     @file = params[:fileid]
+    @target = params[:target]
+    @group = Group.find(params[:gid])
+    @candidates = @group.candidates
 
     @param_str = ""
     params.each {|key, value|
@@ -220,13 +228,31 @@ class ExternalController < ApplicationController
     # @html += @ret
     # render :dummy
 
+    @param_str += "candidate_code=\""
+    @param_str += "00000-"
+    if @target == "1"
+      @candidates.each do |candidate|
+        if candidate.candidate_code =~ /\d{5}/ && candidate.candidate_code != "00000"
+          @param_str += candidate.candidate_code + "-"
+        end
+      end
+    end
+    @param_str += "\""
+
     if (params[:func]) then
       @file_html = "#{RAILS_ROOT}/files/#{@file}.html"
-      @file_pdf = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.pdf"
-      @file_png = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.png"
+      @file_prefix = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}"
+      @orient = params[:orient]
 
-      @ret = `cd #{RAILS_ROOT}; xvfb-run -a wkhtmltopdf --page-size A4 --orientation Landscape #{@file_html} #{@file_pdf}`
-      @ret = `convert #{@file_pdf} #{@file_png}`
+      @ret = `cd #{RAILS_ROOT}; xvfb-run -a wkhtmltopdf --page-size A4 -O #{@orient} #{@file_html} #{@file_prefix}.pdf`
+      @ret = `pdftk #{@file_prefix}.pdf cat 2-end output #{@file_prefix}-00000.pdf`
+      @ret = `pdftk #{@file_prefix}-00000.pdf burst output #{@file_prefix}-%05d.pdf`
+      @ret = `rm -f #{@file_prefix}-00000.pdf`
+      @ret = `convert #{@file_prefix}-00001.pdf #{@file_prefix}.png`
+      @ret = `rm -f #{@file_prefix}.zip; zip -j #{@file_prefix}.zip #{@file_prefix}-*.pdf`
+      @ret = `cp #{@file_prefix}-00001.pdf #{@file_prefix}.pdf`
+      @ret = `rm -f #{@file_prefix}-*.pdf`
+      @ret = `rm -f doc_data.txt`
     else
       @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{RAILS_ENV}\"`
       # flash[:notice] = @errmsg
@@ -277,6 +303,17 @@ class ExternalController < ApplicationController
     send_file(@file_pdf,
               {:filename => "#{@gid}-#{@sid}.pdf",
                 :type => "application/pdf"})
+  end
+
+  def download_zip
+
+    @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
+    @sid = params[:survey_id]
+    @file_zip = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.zip"
+
+    send_file(@file_zip,
+              {:filename => "#{@gid}-#{@sid}.zip",
+                :type => "application/zip"})
   end
 
   def getimg

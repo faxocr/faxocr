@@ -25,7 +25,8 @@ class GroupsController < ApplicationController
     @group = Group.find(params[:id])
     @surveys = @group.surveys
     # @candidates = @group.candidates
-    @sht_id = AnswerSheet.last.nil? ? 1 : AnswerSheet.last.id + 1
+    # @sht_id = AnswerSheet.last.nil? ? 1 : AnswerSheet.last.id + 1
+    @sht_id = Sheet.last.nil? ? 1 : Sheet.last.id + 1
 
     respond_to do |format|
       format.html # show.html.erb

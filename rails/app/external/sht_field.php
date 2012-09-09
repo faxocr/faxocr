@@ -63,28 +63,28 @@ $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/flexigrid.js
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetlist.js\"></script>\n";
 
 $body_opt .= "<ul id=\"contextmenu\" class=\"jqcontextmenu\">\n";
-$body_opt .= "<li>　フィールド名 <input id=\"field\" size=10 value=\"\"></li>\n";
-$body_opt .= "<li>\n";
+$body_opt .= "<li>　フィールド名 <input id=\"field\" size=\"10\" value=\"\" /></li>\n";
 $body_opt .= "<li><a onclick=\"cell_type[targetid] = 1;\">数字</a></li>\n";
 $body_opt .= "<li><a onclick=\"cell_type[targetid] = 2;\">○×△</a></li>\n";
 $body_opt .= "<li><a onclick=\"cell_type[targetid] = 3;\">画像</a></li>\n";
-$body_opt .= "</li>\n";
-$body_opt .= "<HR>\n";
 $body_opt .= "<li class=\"btGray\"><a onclick=\"cell_type[targetid] = -1;reset_field();\">リセット</a></li>\n";
 $body_opt .= "</ul>\n";
 $body_opt .= "<ul id=\"fieldreset\" class=\"jqcontextmenu\">\n";
 $body_opt .= "<li style=\"z-index:10\"><a onclick=\"del_column();\">リセット</a></li>\n";
 $body_opt .= "</ul>\n";
+
 include( TMP_HTML_DIR . "tpl.header.html" );
 
 //
 // Excelファイル読み込み処理
 //
 if ($tgt_file) {
+	global $xls;	
 	$xls = NEW Excel_Peruser;
 	$xls->setErrorHandling(1);
 	$xls->setInternalCharset($charset);
 	$result = $xls->fileread($tgt_file);
+
 	if ($xls->isError($result)) {
 		$errmsg = $result->getMessage();
 		$xls = null;
@@ -96,6 +96,26 @@ if ($tgt_file) {
 				  ") が、多すぎます";
 			$xls = null;
 		}
+	}
+
+	if ($xls) {
+		$sn = 0;		
+		$tblwidth = 0;
+		$tblheight = 0;
+		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
+			$tblwidth += $xls->getColWidth($sn, $i);
+		}
+		for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
+			$tblheight += $xls->getRowHeight($sn, $i);
+		}
+		if (($xls->getColWidth($sn, 0) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
+			$xls = null;
+		}
+		else if (($xls->getRowHeight($sn, 0) * ($xls->maxrow[$sn]+1)) != $tblheight) {
+			$xls = null;
+		}
+		if(!$xls)
+			$errmsg = "セルが正方形になっていません";
 	}
 }
 
@@ -112,18 +132,15 @@ if ($errmsg) {
 	print "<tr>\n";
 
 	print "<td>\n";
-	print "<form enctype=\"multipart/form-data\" method=\"POST\" " .
-	  "action=\"/external/sht_field/\">\n";
+	print "<form enctype=\"multipart/form-data\" method=\"post\" " . "action=\"/external/sht_field/\">\n";
 	print "対象ファイル： <input id=\"file_upfile\" type=\"file\" name=\"file[upfile]\" size=\"60\" />\n";
-	print "<input id=\"gid\" name=\"gid\" type=\"hidden\" value=\"" . 
-	      $group_id . "\" />\n";
-	print "<input id=\"sid\" name=\"sid\" type=\"hidden\" value=\"" . 
-	      $sheet_id . "\" />\n";
-	print "<input type=\"submit\" value=\"再読み込み\">\n";
+	print "<input id=\"gid\" name=\"gid\" type=\"hidden\" value=\"" . $group_id . "\" />\n";
+	print "<input id=\"sid\" name=\"sid\" type=\"hidden\" value=\"" . $sheet_id . "\" />\n";
+	print "<input type=\"submit\" value=\"再読み込み\" />\n";
 	print "</form>\n";
 	print "</td>\n";
 
-	print "<td align=\"right\"\"  width=\"450px\">\n";
+	print "<td align=\"right\" width=\"450\">\n";
 	put_status();
 	print "</td>\n";
 	print "</tr></table>\n";
@@ -132,25 +149,22 @@ if ($errmsg) {
 
 // Excelファイル表示処理
 if ($xls) {
-
 	put_css($xls);
 	put_excel($xls);
 	if ($conf_sw) {
 		$dirty_label = " disabled";
 	} else {
-		$dirty_label = count($field_list) > 0 ? "" : " disabled";
+		$dirty_label = count($field_list) > 0 ? "" : "disabled=\"disabled\"";
 	}
 	put_fields();
 
-
-	print "<form action=\"/external/sht_script/\" method=\"POST\" id=\"form-save\">\n";
+	print "<form action=\"/external/sht_script/\" method=\"post\" id=\"form-save\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sname\" value=\"" . $sheet_name . "\" />\n";
-	print "<input type=\"hidden\" name=\"target\" value=\"" . $target . "\" />\n";
-	print "<button id=\"sbmt\" onclick=\"pack_fields();\"" . $dirty_label .
-	      "/>保存</button>\n";
+	print "<input type=\"hidden\" name=\"target\" value=\"" . $target . "\" />\n";	
+	print "<button type=\"button\" id=\"sbmt\" onclick=\"this.disabled=true; pack_fields();\" {$dirty_label}>保存</button>\n";
 	print "</form>\n";
 }
 
@@ -168,7 +182,9 @@ function put_excel($xls)
 {
 	global $field_list;
 	global $field_width;
-
+	global $tblwidth;
+	global $tblheight;
+	
 	// タブコントロール表示
 	// print "<div class=\"simpleTabs\">";
 	// print "<ul class=\"simpleTabsNavigation\">";
@@ -182,35 +198,25 @@ function put_excel($xls)
 
 	// シート表示
 	// for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
-	$sn = 0; 
+	$sn = 0;
 	{
-		// print "<div class=\"simpleTabsContent\">";
-
-		$w = 32;
-		if (!isset($xls->maxcell[$sn]))
-			$xls->maxcell[$sn] = 0;
-		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$w += $xls->getColWidth($sn, $i);
-		}
-
-// XXX
-//$w = $w / 2;
-
+		$scale = get_scaling($tblwidth, $tblheight, 940);
+		$tdwidth = floor($xls->getColWidth($sn, 0) * $scale);		
+		$trheight = floor($xls->getRowHeight($sn, 0) * $scale);
+		$tblwidth = $tdwidth * ($xls->maxcell[$sn]+1);
+		
 		// シートテーブル表示
 		print <<< STR
-<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="${w}" bgcolor="#FFFFFF" style="border-collapse: collapse;">
+		\n<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="${tblwidth}" bgcolor="#FFFFFF" style="table-layout:fixed; border-collapse: collapse;">\n
 STR;
 		if (!isset($xls->maxrow[$sn]))
 			$xls->maxrow[$sn] = 0;
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
-			// XXX
-			$trheight = $xls->getRowHeight($sn, $r) * 0.8;
+			
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
+
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
-				$tdwidth = $xls->getColWidth($sn, $i);
-// XXX
-//				$tdwidth = $tdwidth / 2;
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
 				$dispval = htmlspecialchars($dispval);
@@ -221,7 +227,7 @@ STR;
 
 				$xf = $xls->getAttribute($sn, $r, $i);
 				if (isset($xf["wrap"]) && $xf["wrap"])
-					$dispval = ereg_replace("\n", "<br />", $dispval);
+					$dispval = preg_replace('/\n/', '<br />', $dispval);
 				$xfno = ($xf["xf"] > 0) ? $xf["xf"] : 0;
 
 				$align = "x";
@@ -279,7 +285,6 @@ STR;
 							$dispval = "<b>" . $dispval . "</b>";
 							$field_width[$id] = $tdwidth;
 						}
-
 						$class = " class=\"XFs" . $sn . "r" . $r . "c" . $i . "\"";
 						$id = " id=\"". $sn . "-" . $r ."-" . $i . "\"";
 						print " <td $class $id $name $rcspan $align>". $dispval . "</td>\n";
@@ -292,13 +297,13 @@ STR;
 						} else {
 							$field_list[$id] = $dispval = $id;
 						}
+
 						$dispval = "<b>" . $dispval . "</b>";
 						$field_width[$id] = $tdwidth;
 					}
 					$class = " class=\"XF" . $xfno . "\" ";
-					$width = "width=\"" . $tdwidth . "\" ";
 					$id = " id=\"". $sn . "-" . $r . "-" . $i . "\"";
-					print " <td $class $id $width $align>". $dispval . "</td>\n";
+					print " <td nowrap=\"nowrap\" $class $id $align>". $dispval . "</td>\n";
 				}
 			}
 			print "</tr>\n";
@@ -307,7 +312,7 @@ STR;
 		// print "</div>\n"; // シート終了 (simpleTabsContent)
 	}
 	// print "</div>\n"; // タブ全体終了 (simpleTabs)
-	print "</center><br>\n";
+	print "</center><br />\n";
 }
 
 //
@@ -390,21 +395,19 @@ function put_status()
 	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
 
 	// XXX
-	print "<form action=\"/external/sht_marker/\" method=\"POST\" id=\"form-status\">\n";
+	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";	
+	print "<form action=\"/external/sht_marker/\" method=\"post\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
-
-	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
+	
 	print "<div ${style["pink"]}><span>フィールド指定</span></div>\n";
-
-	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"this.form.submit();\" " . $status_label . ">マーカー指定</button></div>\n";
-
+	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; this.form.submit();\" " . $status_label . ">マーカー指定</button></div>\n";
 	print "<div ${style["gray"]}><span>シート確認</span></div>\n";
 	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
-	print "</div>\n";
-
+	
 	print "</form>\n";
+	print "</div>\n";	
 }
 
 ?>

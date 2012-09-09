@@ -93,6 +93,10 @@ ActionController::Routing::Routes.draw do |map|
     :controller => 'external',
     :action => 'download'
 
+  map.connect 'external/download_zip/:group_id/:survey_id',
+    :controller => 'external',
+    :action => 'download_zip'
+
   map.connect 'external/getimg/:group_id/:survey_id',
     :controller => 'external',
     :action => 'getimg'

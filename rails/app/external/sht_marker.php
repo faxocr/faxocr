@@ -23,6 +23,7 @@
 require_once 'config.php';
 require_once 'init.php';
 require_once 'lib/common.php';
+require_once 'lib/file_conf.php';
 require_once 'contrib/peruser.php';
 
 // define('border_sw', true);
@@ -42,7 +43,7 @@ if (isset($file_id) && $file_id) {
 $header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/jqDnR.css\" type=\"text/css\">\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.4.1.min.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jqDnR.js\"></script>\n";
-// $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetedit.js\"></script>\n";
+//$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetedit.js\"></script>\n";
 include( TMP_HTML_DIR . "tpl.header.html" );
 
 // Excelファイル読み込み処理
@@ -69,31 +70,41 @@ if ($errmsg) {
 }
 
 {
+	global $conf;
+
+	if (!$conf)
+		$conf = new FileConf($file_id);
+	
+	$target = $conf->get("target") == "registered" ? 1 : 0;
+	
 	// ステータス表示
 	print "<table width=\"100%\">\n";
 	print "<tr>\n";
 	print "<td>\n";
 
-	print "<button onclick=\"show_marker();\" style=\"z-index:10;\">位置指定</button>";
-	print "<form action=\"/external/sht_config/\" method=\"POST\" id=\"form-save\">\n";
+	print "<button onclick=\"show_marker();\" style=\"z-index:10;\">位置指定</button>\n";
+	print "<form action=\"/external/sht_config/\" method=\"post\" id=\"form-save\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
-	print "</form>";
+	print "<input type=\"hidden\" name=\"target\" value=\"" . $target . "\" />\n";
+	print "</form>\n";
 
 	if (file_exists(DST_DIR . $file_id . ".rb")) {
-		print "<form action=\"/external/sht_config/\" method=\"POST\"/>\n";
+		$orientation = ($conf->get("block_width") > $conf->get("block_height")) ? "Landscape" : "Portrait";
+		print "<form action=\"/external/sht_config/\" method=\"post\">\n";
 		print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 		print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 		print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 		print "<input type=\"hidden\" name=\"func\" value=\"generate\" />\n";
-		print "<input id=\"sbmt\" type=\"submit\" value=\"画像生成\"/>\n";
+		print "<input type=\"hidden\" name=\"orient\" value=\"" . $orientation . "\" />\n";
+		print "<input id=\"sbmt\" type=\"submit\" value=\"PDF生成\" />\n";
 		print " (時間が掛かります)";
 		print "</form>";
 	}
 
 	print "</td>\n";
-	print "<td align=\"right\"\"  width=\"450px\">";
+	print "<td align=\"right\" width=\"450px\">";
 	put_status();
 	print "</td>\n";
 	print "</tr></table>\n";
@@ -111,13 +122,8 @@ if ($xls) {
 	print "<center>\n";
 	put_excel($xls);
 	print "</center>\n";
-	print "<br>\n";
+	print "<br />\n";
 }
-
-//
-// フッタ読み込み
-//
-include( TMP_HTML_DIR . "tpl.footer.html" );
 
 	print <<< STR
 <script type="text/javascript">
@@ -174,32 +180,17 @@ $().ready(function() {
 	$('#ex3').jqDrag('.jqDrag').jqResize('.jqResize');
 });
 
-var last_size = 32;
-
-function change_size(size) {
-
-	$(".mark-img").each( function () {
-		$(this).css("width", size);
-	});
-
-	var w = parseInt($("#instrctn").css("width"));
-	var h = parseInt($("#instrctn").css("height"));
-
-	$("#instrctn").css("height", h * size / last_size);
-	$("#instrctn").css("width", w * size / last_size);
-
-	last_size = size;
-}
+var last_size = $marker_size;
 
 function size_up() {
-	last_size = last_size + 2;
+	last_size = last_size + 1;
 	$(".mark-img").each( function () {
 		$(this).css("width", last_size);
 	});
 }
 
 function size_down() {
-	last_size = last_size > 17 ? (last_size - 2) : 16;
+	last_size = last_size > 17 ? (last_size - 1) : 16;
 	$(".mark-img").each( function () {
 		$(this).css("width", last_size);
 	});
@@ -213,25 +204,25 @@ function go_next() {
 	$("#form-status").attr("action", "/external/sht_verify/").submit();
 }
 
--->
+// -->
 </script>
 
 <div id="ex3" class="jqDnR" style="opacity:0.9; position: absolute; top:200px; left:100px;display:none">
 <div class="jqDrag" style="height:100%">
 
-<img src="/image/mark.gif" class="mark-img" style="top: 0;left: 0">
-<img src="/image/mark.gif" class="mark-img" style="top: 0;right: 0">
-<img src="/image/mark.gif" class="mark-img" style="bottom: 0;left: 0">
+<img src="/image/mark.gif" class="mark-img" style="top: 0;left: 0; width: {$marker_size}px;" />
+<img src="/image/mark.gif" class="mark-img" style="top: 0;right: 0; width: {$marker_size}px;" />
+<img src="/image/mark.gif" class="mark-img" style="bottom: 0;left: 0; width: {$marker_size}px;" />
 
-<BR><BR>
+<br /><br />
 <center>
 <h3>マーカーサイズ</h3>
 
-縮小 <img src="/image/arrow-l.gif" onmousedown="size_down();" >
-　　<img src="/image/arrow-r.gif" onmousedown="size_up();" > 拡大<br>
+縮小 <img src="/image/arrow-l.gif" onmousedown="size_down();" />
+　　<img src="/image/arrow-r.gif" onmousedown="size_up();" /> 拡大<br />
 
-<BR><BR><BR>
-<button onclick="hide_marker();" style="position:relative; z-index:10;">確定</button><BR><BR>
+<br /><br /><br />
+<button onclick="hide_marker();" style="position:relative; z-index:10;">確定</button><br /><br />
 </center>
 
 </div>
@@ -240,40 +231,50 @@ function go_next() {
 
 STR;
 
+//
+// フッタ読み込み
+//
+include( TMP_HTML_DIR . "tpl.footer.html" );
+
 die;
+
+$marker_size = 0;
 
 function put_excel($xls) {
 
+	global $marker_size;
+	
 	// シート表示
 	// for ($sn = 0; $sn < 1; $sn++) {
 
-	$sn = 0; 
+	$sn = 0;
 	{
-		$w = 32;
-		if (!isset($xls->maxcell[$sn]))
-			$xls->maxcell[$sn] = 0;
+		$tblwidth = 0;
+		$tblheight = 0;
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$w += $xls->getColWidth($sn, $i);
+			$tblwidth += $xls->getColWidth($sn, $i);
 		}
-
-		// XXX
-		// $w = $w / 2;
-
+		for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
+			$tblheight += $xls->getRowHeight($sn, $i);
+		}
+		$scale = get_scaling($tblwidth, $tblheight, 940);
+		$tdwidth = floor($xls->getColWidth($sn, 0) * $scale);
+		$trheight = floor($xls->getRowHeight($sn, 0) * $scale);
+		$tblwidth = $tdwidth * ($xls->maxcell[$sn]+1);
+		
+		$marker_size = $tdwidth;
+		
 		// シートテーブル表示
 		print "<table class=\"sheet_marker\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
-		print ${w} . " bgcolor=\"#FFFFFF\" style=\"border-collapse: collapse;\">";
+		print ${tblwidth} . "\" bgcolor=\"#FFFFFF\" style=\"table-layout:fixed; border-collapse: collapse;\">\n";
 
 		if (!isset($xls->maxrow[$sn]))
 			$xls->maxrow[$sn] = 0;
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
-			// XXX
-			$trheight = $xls->getRowHeight($sn, $r) * 0.8;
-			print "  <tr height=\"" . $trheight . "\">" . "\n";
-			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
-				$tdwidth = $xls->getColWidth($sn, $i);
-// XXX
-//				$tdwidth = $tdwidth / 2;
+			print "  <tr height=\"" . $trheight . "\">" . "\n";
+			
+			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
@@ -283,21 +284,21 @@ function put_excel($xls) {
 
 				$xf = $xls->getAttribute($sn, $r, $i);
 				if (isset($xf['wrap']) && $xf['wrap'])
-					$dispval = ereg_replace("\n", "<br />", $dispval);
+					$dispval = preg_replace('/\n/', '<br />', $dispval);
 				$xfno = ($xf['xf'] > 0) ? $xf['xf'] : 0;
 
 				$align = "x";
 				if (isset($xf['halign']) && $xf['halign'] != 0)
 					$align= "";
 				if ($align == "x") {
-					if ($xf['type'] == Type_RK) $align = " Align=\"right\"";
-					else if ($xf['type'] == Type_RK2) $align = " Align=\"right\"";
-					else if ($xf['type'] == Type_NUMBER) $align = " Align=\"right\"";
-					else if ($xf['type'] == Type_FORMULA && is_numeric($dispval)) $align = " Align=\"right\"";
-					else if ($xf['type'] == Type_FORMULA2 && is_numeric($dispval)) $align = " Align=\"right\"";
-					else if ($xf['type'] == Type_FORMULA && ($dispval=="TRUE" || $dispval=="FALSE")) $align = " Align=\"center\"";
-					else if ($xf['type'] == Type_FORMULA2 && ($dispval=="TRUE" || $dispval=="FALSE")) $align = " Align=\"center\"";
-					else if ($xf['type'] == Type_BOOLERR) $align = " Align=\"center\"";
+					if ($xf['type'] == Type_RK) $align = " align=\"right\"";
+					else if ($xf['type'] == Type_RK2) $align = " align=\"right\"";
+					else if ($xf['type'] == Type_NUMBER) $align = " align=\"right\"";
+					else if ($xf['type'] == Type_FORMULA && is_numeric($dispval)) $align = " align=\"right\"";
+					else if ($xf['type'] == Type_FORMULA2 && is_numeric($dispval)) $align = " align=\"right\"";
+					else if ($xf['type'] == Type_FORMULA && ($dispval=="TRUE" || $dispval=="FALSE")) $align = " align=\"center\"";
+					else if ($xf['type'] == Type_FORMULA2 && ($dispval=="TRUE" || $dispval=="FALSE")) $align = " align=\"center\"";
+					else if ($xf['type'] == Type_BOOLERR) $align = " align=\"center\"";
 					else $align= '';
 					if ($xf['format'] == "@") $align = "";
 				} else {
@@ -329,9 +330,8 @@ function put_excel($xls) {
 				} else {
 					$class = " class=\"XF" . $xfno . "\" ";
 					$id = " id=\"". $sn . "-" . $r . "-" . $i . "\"";
-					$width = "width=\"" . $tdwidth . "\" ";
 
-					print " <td $class $width $align>$dispval</td>\n";
+					print " <td nowrap=\"nowrap\" $class $align>$dispval</td>\n";
 				}
 			}
 			print "</tr>\n";
@@ -351,7 +351,7 @@ function put_status()
 	global $group_id;
 	global $sheet_id;
 
-	$status_label = file_exists(DST_DIR . $file_id . ".rb") ? "" : "disabled";
+	$status_label = file_exists(DST_DIR . $file_id . ".rb") ? "" : "disabled=\"disabled\"";
 
 	$style = array();
 	$style["normal"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffffff;padding:1px;color:gray\"";
@@ -361,21 +361,21 @@ function put_status()
 
 	// XXX
 	print "\n";
-	print "<form method=\"POST\" id=\"form-status\" >\n";
+	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";	
+	print "<form method=\"post\" id=\"form-status\" >\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	// for sht_field
 	print "<input type=\"hidden\" name=\"file_id\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
-	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
-	print "<div ${style["gray"]}><button id=\"prev\" onclick=\"go_prev();\" >フィールド指定</button></div>\n";
+	print "<div ${style["gray"]}><button type=\"button\" id=\"prev\" onclick=\"this.disabled=true; go_prev();\" >フィールド指定</button></div>\n";
 	print "<div ${style["pink"]}><span>マーカー指定</span></div>\n";
-	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"go_next();\"); {$status_label} \">シート確認</button></div>\n";
+	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_next();\" {$status_label}>シート確認</button></div>\n";
 	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
-	print "</div>\n";
-
+	
 	print "</form>\n";
+	print "</div>\n";
 }
 
 ?>

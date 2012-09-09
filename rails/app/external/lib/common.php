@@ -400,4 +400,48 @@ function put_password_page($file_id = null, $return_url)
 	print "</html>\n";
 }
 
+function get_scaling($w, $h, $lside)
+{
+	$a4_aspect = (210 / 297);
+	$a4_width = 0;
+	$a4_height = 0;
+	
+	if ($w > $h) {
+		// 横長シート
+		$a4_width = $lside;
+		$a4_height = $a4_aspect * $a4_width;
+	} else {
+		// 縦長シート
+		$a4_height = $lside;
+		$a4_width = $a4_aspect * $a4_height;
+	}
+
+	$scale = 1;
+	
+	if (($a4_width < $w) && ($a4_height < $h)) {
+		if(($a4_width / $w) > ($a4_height / $h)) {
+			$scale = $a4_height / $h;				
+		}
+		else {
+			$scale = $a4_width / $w;				
+		}
+	}
+	elseif ($a4_width < $w) {
+		$scale = $a4_width / $w;
+	}
+	elseif ($a4_height < $h) {
+		$scale = $a4_height / $h;
+	}
+	else {
+		if(($a4_width / $w) > ($a4_height / $h)) {
+			$scale = $a4_height / $h;
+		}
+		else {
+			$scale = $a4_width / $w;	
+		}
+	}
+	
+	return $scale;
+}
+
 ?>

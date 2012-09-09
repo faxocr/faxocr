@@ -1,4 +1,5 @@
 <?PHP
+error_reporting(1);
 /**
  * Excel_Reviser Version 0.30beta  Author:kishiyan
  *		with Image OBJ patch       Co-author:sake&ume

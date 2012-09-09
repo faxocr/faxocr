@@ -76,7 +76,7 @@ if ($errmsg) {
 		print "<img src=\"/external/getimg/" . $group_id . "/" . $sheet_id . 
 		         "\" width=\"500px\"><br>\n";
 		print "<a href=\"/external/download/" . $group_id . "/" . $sheet_id . 
-		        "\">[Sample PDF]</a>\n";
+		        "\">[PDFプレビュー]</a>\n";
 	} else {
 		print "画像ファイルがありません $file_id<br><br>\n";
 	}
@@ -124,21 +124,21 @@ STR;
 	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
 
 	// XXX
-	// action=\"/external\sht_commit/\" 
+	// action=\"/external\sht_commit/\"
+	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
+	
 	print "<form method=\"POST\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
-	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
 	print "<div ${style["gray"]}><span>フィールド指定</span></div>\n";
-	print "<div ${style["gray"]}><button id=\"next\" onclick=\"go_prev();\">マーカー指定</button></div>\n";
-
+	print "<div ${style["gray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_prev();\">マーカー指定</button></div>\n";
 	print "<div ${style["pink"]}><span>シート確認</span></div>\n";
-	print "<div ${style["lgray"]}><button id=\"next\" onclick=\"go_next();\">シート登録</button></div>\n";
-	print "</div>\n";
+	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_next();\">シート登録</button></div>\n";
 
 	print "</form>\n";
+	print "</div>\n";	
 }
 
 ?>

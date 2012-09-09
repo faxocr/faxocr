@@ -87,7 +87,7 @@ define('Type_DEFCOLWIDTH', 0x55);
 define('Type_COLINFO', 0x7d);
 define('Type_MERGEDCELLS', 0xe5);
 define('Type_HLINK', 0x1b8);
-define('Const_fontH', 14);
+define('Const_fontH', 16);
 
 
 class Excel_Peruser
@@ -1181,8 +1181,8 @@ class Excel_Peruser
 				$tmp.='border-bottom-width: '. $this->getwidth($val['Bstyle']) . ";\n";
 				$tmp.='border-bottom-style: '. $this->getstyle($val['Bstyle']) . ";\n";
 			} else {
-	$tmp .= "border-bottom-width: 1px;\n";
-	$tmp .= "border-bottom-style: dotted;\n";
+				$tmp .= "border-bottom-width: 1px;\n";
+				$tmp .= "border-bottom-style: dotted;\n";
 			}
 		}
 		if (isset($val['Bcolor'])){
@@ -1212,8 +1212,8 @@ class Excel_Peruser
 				$tmp.='border-right-width: '. $this->getwidth($val['Rstyle']) . ";\n";
 				$tmp.='border-right-style: '. $this->getstyle($val['Rstyle']) . ";\n";
 			} else {
-	$tmp .= "border-right-width: 1px;\n";
-	$tmp .= "border-right-style: dotted;\n";
+				$tmp .= "border-right-width: 1px;\n";
+				$tmp .= "border-right-style: dotted;\n";
 			}
 		}
 		if (isset($val['Rcolor'])){
@@ -1254,8 +1254,8 @@ class Excel_Peruser
 				$tmp.='border-top-width: '. $this->getwidth($val['Tstyle']) . ";\n";
 				$tmp.='border-top-style: '. $this->getstyle($val['Tstyle']) . ";\n";
 			} else {
-	$tmp .= "border-top-width: 1px;\n";
-	$tmp .= "border-top-style: dotted;\n";
+				$tmp .= "border-top-width: 1px;\n";
+				$tmp .= "border-top-style: dotted;\n";
 			}
 		}
 		if (isset($val['Tcolor'])){
@@ -1285,8 +1285,8 @@ class Excel_Peruser
 				$tmp.='border-left-width: '. $this->getwidth($val['Lstyle']) . ";\n";
 				$tmp.='border-left-style: '. $this->getstyle($val['Lstyle']) . ";\n";
 			} else {
-	$tmp .= "border-left-width: 1px;\n";
-	$tmp .= "border-left-style: dotted;\n";
+				$tmp .= "border-left-width: 1px;\n";
+				$tmp .= "border-left-style: dotted;\n";
 			}
 		}
 		if (isset($val['Lcolor'])){
@@ -1352,16 +1352,117 @@ class Excel_Peruser
 		return $tmp;
 	}
 
+	function getCssBR_($val,$key=-1){
+		$tmp='';
+		if (isset($val['Bstyle'])){
+			if ($val['Bstyle']!=0){
+				$tmp.='border-bottom-width: '. $this->getwidth($val['Bstyle']) . "\n";
+				$tmp.='border-bottom-style: '. $this->getstyle($val['Bstyle']) . "\n";
+			}
+		}
+		if (isset($val['Bcolor'])){
+			if ($val['Bcolor']!=0 && $val['Bcolor']<56){
+				$tmp.='border-bottom-color: #'. $this->palette[$val['Bcolor']] . ";\n";
+			} else $tmp.='border-bottom-color: #'. $this->palette[0] . ";\n";
+		}
+		if (isset($val['Rstyle'])){
+			if ($val['Rstyle']!=0){
+				$tmp.='border-right-width: '. $this->getwidth($val['Rstyle']) . "\n";
+				$tmp.='border-right-style: '. $this->getstyle($val['Rstyle']) . "\n";
+			}
+		}
+		if (isset($val['Rcolor'])){
+			if ($val['Rcolor']!=0 && $val['Rcolor']<56){
+				$tmp.='border-right-color: #'. $this->palette[$val['Rcolor']] . ";\n";
+			} else $tmp.='border-right-color: #'. $this->palette[0] . ";\n";
+		}
+		return $tmp;
+	}
+
+	function getCssTL_($val,$key=-1){
+		$tmp='';
+		if (isset($val['Tstyle'])){
+			if ($val['Tstyle']!=0){
+				$tmp.='border-top-width: '. $this->getwidth($val['Tstyle']) . "\n";
+				$tmp.='border-top-style: '. $this->getstyle($val['Tstyle']) . "\n";
+			}
+		}
+		if (isset($val['Tcolor'])){
+			if ($val['Tcolor']!=0 && $val['Tcolor']<56){
+				$tmp.='border-top-color: #'. $this->palette[$val['Tcolor']] . ";\n";
+			} else $tmp.='border-top-color: #'. $this->palette[0] . ";\n";
+		}
+		if (isset($val['Lstyle'])){
+			if ($val['Lstyle']!=0){
+				$tmp.='border-left-width: '. $this->getwidth($val['Lstyle']) . "\n";
+				$tmp.='border-left-style: '. $this->getstyle($val['Lstyle']) . "\n";
+			}
+		}
+		if (isset($val['Lcolor'])){
+			if ($val['Lcolor']!=0 && $val['Lcolor']<56){
+				$tmp.='border-left-color: #'. $this->palette[$val['Lcolor']] . ";\n";
+			} else $tmp.='border-left-color: #'. $this->palette[0] . ";\n";
+		}
+		$ftmp='';
+		if ($key==0) $val['fontindex']=0;
+		if (isset($val['fontindex'])){
+			if ($val['fontindex']>=0){
+				if ($this->recFONT[$val['fontindex']]['color'] < 56)
+					$tmp.='color: #'. $this->palette[$this->recFONT[$val['fontindex']]['color']] . ";\n";
+				if($this->recFONT[$val['fontindex']]['style'] & 0x2) $ftmp.=' italic';
+				if($this->recFONT[$val['fontindex']]['style'] & 0x1) $ftmp.=' bold';
+				$ftmp.=' '.($this->recFONT[$val['fontindex']]['height']/Const_fontH)."px";
+				$ftmp.=' "'.$this->recFONT[$val['fontindex']]['fontname'].'"';
+				$tmp.='font: '. $ftmp . ";\n";
+				if($this->recFONT[$val['fontindex']]['style'] & 0xc)
+					$tmp.='text-decoration:'.$this->fontdeco($this->recFONT[$val['fontindex']]['style']) . ";\n";
+			}
+		} else $tmp.='font: '.($this->recFONT[0]['height']/Const_fontH)."px".";\n";
+		if (isset($val['fillpattern'])){
+			if($val['fillpattern']==1){
+//					$tmp.='background-color: #'. $this->palette[$val['PtnFRcolor']] . ";\n";
+			} elseif ($val['fillpattern'] <=18 && $val['fillpattern'] >1){
+				$tmp .='background-color: #'. $this->palette[$val['PtnBGcolor']] . ";\n";
+				$tmp .= 'background-image:URL("'. $_SERVER['PHP_SELF'] .'?ptn=' . $val['fillpattern'] . '&fc=' . $val['PtnFRcolor'] . "\");\n";
+			}
+		} elseif(isset($val['PtnBGcolor'])){
+			if ($val['PtnBGcolor'] < 65 && $val['PtnBGcolor'] > 0)
+				$tmp.='background-color: #'. $this->palette[$val['PtnBGcolor']] . ";\n";
+		}
+		if (!isset($val['wrap'])) $tmp.='white-space: nowrap;'."\n";
+		if (isset($val['valign'])){
+			if ($val['halign']==1) $tmp.='text-align: left;'."\n";
+			if ($val['halign']==2) $tmp.='text-align: center;'."\n";
+			if ($val['halign']==3) $tmp.='text-align: right;'."\n";
+			if ($val['halign']==5) $tmp.='text-align: justify;'."\n";
+			if ($val['valign']==1) $tmp.='vertical-align: middle;'."\n";
+			if ($val['valign']==2) $tmp.='vertical-align: bottom;'."\n";
+			if ($val['valign']==0) $tmp.='vertical-align: top;'."\n";
+		}
+		return $tmp;
+	}
+		
 	function makecss() {
 		$tmp = '';
-		foreach ($this->recXF as $key => $val) {
- //  print $key . ", " . var_dump($val) . "<BR>\n";
-			$tmp .= ".XF". $key . " {\n";
-			$tmp .= $this->getCssBR($val, $key);
-			$tmp .= $this->getCssTL($val, $key);
-			$tmp .= "}\n";
+		if (defined('sht_config')) {
+			foreach ($this->recXF as $key => $val) {
+				$tmp .= ".XF". $key . " {\n";
+				$tmp .= $this->getCssBR_($val, $key);
+				$tmp .= $this->getCssTL_($val, $key);
+				$tmp .= "}\n";
+			}
+			$tmp .= $this->makecssMG_();
 		}
-		$tmp .= $this->makecssMG();
+		else {
+			foreach ($this->recXF as $key => $val) {
+				//  print $key . ", " . var_dump($val) . "<BR>\n";
+				$tmp .= ".XF". $key . " {\n";
+				$tmp .= $this->getCssBR($val, $key);
+				$tmp .= $this->getCssTL($val, $key);
+				$tmp .= "}\n";
+			}
+			$tmp .= $this->makecssMG();
+		}
 		return $tmp."\n";
 	}
 
@@ -1387,6 +1488,27 @@ class Excel_Peruser
 		return $tmp;
 	}
 
+	function makecssMG_(){
+		$tmp='';
+		foreach($this->celmergeinfo as $sn => $sval){
+			foreach($sval as $row=> $rval){
+				foreach($rval as $col=> $val){
+					if ($val['cond']==1){
+					$xfst=$this->cellblock[$sn][$row][$col]['xf'];
+					$xfen=$this->cellblock[$sn][$row+$val['rspan']-1][$col+$val['cspan']-1]['xf'];
+					$valst=$this->recXF[$xfst];
+					$valen=$this->recXF[$xfen];
+					$tmp.=".XFs". $sn . "r" . $row . "c" . $col . " {\n";
+					$tmp.=$this->getCssBR_($valen);
+					$tmp.=$this->getCssTL_($valst);
+					$tmp.="}\n";
+					}
+				}
+			}
+		}
+		return $tmp;
+	}
+	
 	function dispcell($sn,$row,$col,$mode=0){
 	  if (isset($this->cellblock[$sn][$row][$col])){
 		$cell=$this->cellblock[$sn][$row][$col];

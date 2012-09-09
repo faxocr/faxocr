@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class AddInitialData < ActiveRecord::Migration
   def self.up
 
@@ -31,7 +32,7 @@ class AddInitialData < ActiveRecord::Migration
     fb_survey.save
 
     fb_candidate = Candidate.new # id = 1
-    fb_candidate.candidate_code = 'FALLBACK'
+    fb_candidate.candidate_code = '99999'
     fb_candidate.candidate_name = '不明な調査対象'
     fb_candidate.group_id = admin_group.id
     fb_candidate.tel_number = 'FALLBACK'

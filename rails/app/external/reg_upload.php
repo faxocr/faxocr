@@ -71,11 +71,11 @@ if ($xls) {
 			$item_id = trim(strconv($xls->dispcell(0, $r, 1)));
 
 			$item_tel = strconv($xls->dispcell(0, $r, 2));
-			$item_tel = ereg_replace("[^0-9]", "", $item_tel);
+			$item_tel = preg_replace("/[^0-9]/", "", $item_tel);
 			$item_tel = trim($item_tel);
 
 			$item_fax = strconv($xls->dispcell(0, $r, 3));
-			$item_fax = ereg_replace("[^0-9]", "", $item_fax);
+			$item_fax = preg_replace("/[^0-9]/", "", $item_fax);
 			$item_fax = trim($item_fax);
 
 			if ($item_name && $item_id && $item_tel && $item_fax) {
@@ -121,7 +121,7 @@ props.each do |prop|
   # object building
   @candidate.group_id = group # integer
   @candidate.candidate_name = prop[0] # string
-  @candidate.candidate_code = prop[1] # string
+  @candidate.candidate_code = "%05d" % prop[1] # string
   @candidate.tel_number = prop[2] # string
   @candidate.fax_number = prop[3] # string
 
@@ -275,7 +275,7 @@ STR;
 
 				$xf = $xls->getAttribute($sn, $r, $i);
 				if (isset($xf["wrap"]) && $xf["wrap"])
-					$dispval = ereg_replace("(\r\n|\n)", "<br />", $dispval);
+					$dispval = preg_replace("/(\r\n|\n)/", "<br />", $dispval);
 
 				$xfno = ($xf["xf"] > 0) ? $xf["xf"] : 0;
 

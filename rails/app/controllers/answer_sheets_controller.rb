@@ -1,4 +1,4 @@
-# -*- coding: undecided -*-
+# -*- coding: utf-8 -*-
 class AnswerSheetsController < ApplicationController
   before_filter :verify_group_authority
   # GET /answer_sheets
