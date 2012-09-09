@@ -9,6 +9,9 @@ TARGET  = srhelper
 $(TARGET): $(OBJS)
 	$(CC) -o $@ $(OBJS)
 
+install:
+	cp $(TARGET) ../../bin
+
 srhelper.o: srhelper.c
 
 clean:
