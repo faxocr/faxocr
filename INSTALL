@@ -18,45 +18,52 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-# note
+# 注意事項
 
-ディレクトリは、下記に展開すること。(faxocr/faxocrがファックス画像等に
-アクセスする際、ディレクトリがハードコードされている。)
+ - ディレクトリは、/home/faxocr/に展開すること。
+   (ディレクトリがハードコードされているケースがあるため)
 
-/home/faxocr/
+ - 最新版のインストールドキュメントは、下記google sitesより入手して下さい。
 
-##################################################################
+   https://sites.google.com/site/faxocr2010/install-documents/on-premises
 
-1. Install package of ubuntu.
+# ディレクトリ説明
 
-sudo apt-get install autoconf
-sudo apt-get install g++
-sudo apt-get install libx11-dev
-sudo apt-get install libfreetype6-dev
-sudo apt-get install libxml2-dev
-sudo apt-get install libmysqlclient-dev
-sudo apt-get install libssl-dev
-sudo apt-get install netpbm
-sudo apt-get install wkhtmltopdf
-sudo apt-get install ttf-vlgothic ttf-kochi-gothic
+ - Faxsystem/
 
-2. Download sources from OSS.
-Cluscore
-http://cluscore.googlecode.com
-OpenCV 1.1pre1
-http://sourceforge.net/projects/opencvlibrary
+   ファックスに関するデータが置かれます。パーミッションに注意して下さい。
 
-3. Install OSS softwares.
-svn checkout http://cluscore.googlecode.com/svn/trunk/ cluscore
-cd cluscore
-./configure
-make
-sudo make install
-cd ..
+ - INSTALL
 
-4. Set the crontab.
-$crontab -e
-# m h  dom mon dow   command
-0-59/10 * * * * sh ./procfax.sh >> Faxsystem/Log/cron_procfax.log
-0-59/15 * * * * sh ./procreport.sh >> Faxsystem/Log/cron_procreport.log
+   このファイルです。
 
+ - Maildir/
+
+   ファックス画像を受け取るためのメールに関連したディレクトリです。
+
+ - bin/
+
+   Faxocrシステムに関する下記のようなスクリプトが置かれています。
+
+    - getfax		popでfax添付メールを取ってくる
+    - sheetreader*	srml形式のシート定義に基づきfax画像を解析します
+    - srhelper*		発信者番号等の取得を行います
+    - procfax.sh	cron実行されるfax処理スクリプト本体
+			rails/script/getsrml.rbというrubyスクリプトを呼び、
+			srml定義ファイルを自動アップデートするなどします
+    - procreport.sh	cron実行されるレポート作成スクリプト本体
+    - sendfax		エラーfaxのセンドバック処理を行います
+
+    (*) srcにてコンパイルする必要
+
+ - etc/
+
+   Faxocrシステムの設定用ディレクトリです。
+
+ - rails/
+
+   Faxocrシステムのユーザーインターフェースが置かれています。
+
+ - src/
+
+   Faxocrシステムに関連した、sheet-readerやkocr等のソースコードを置きます。

@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# Shinsai FaxOCR / getfax
+#
+#  - Fetches fax-attached emails
+#
+
+# get configuration
+
+CONF_FILE=~faxocr/etc/faxocr.conf
+CONF_PROC=~faxocr/bin/doconfig.sh
+
+. $CONF_FILE
+. $CONF_PROC
+
+# create .fetchmailrc
+FETCHMAILDATA=~/.fetchmailrc
+if [ ! -e $FETCHMAILDATA -o $CONF_FILE -nt $FETCHMAILDATA ] ; then
+
+    if [ "$POP3_SSL" = "true" ] ; then
+	POP3_SSL="ssl"
+    else
+	POP3_SSL=""
+    fi
+
+    echo poll $POP3_HOST port $POP3_PORT protocol pop3 user \"$POP3_USER\" password \"$POP3_PASSWORD\" mda "/usr/bin/procmail" $POP3_SSL > $FETCHMAILDATA
+    chmod 600 $FETCHMAILDATA
+fi
+
+# do fetch fax
+fetchmail

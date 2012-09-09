@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# Shinsai FaxOCR / sendfax
+#
+#  - Send fax through file attachment
+#
+# % sendfax fax_number subject attachmentfile
+#
+
+# get configuration
+
+CONF_FILE=~faxocr/etc/faxocr.conf
+CONF_PROC=~faxocr/bin/doconfig.sh
+
+. $CONF_FILE
+. $CONF_PROC
+
+FAX_NO=$1
+FAX_SUBJ=$2
+FAX_IMG=$3
+FAX_TO=$FAX_NO"@"$FAX_SEND_TARGET
+
+if [ "$FAX_SEND_TYPE" = "ifax" ] ; then
+
+    PASSWD_FILE=/tmp/sendfaxfile$$
+    if [ "$FAXUSER" != "" ] ; then
+	echo "#userid="$FAXUSER > $PASSWD_FILE
+	echo "#passwd="$FAXPASS >> $PASSWD_FILE
+    else
+	echo "" > $PASSWD_FILE
+    fi
+
+    if [ "$SMTP_HOST" = "no" ] ; then
+	sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -o message-file=$PASSWD_FILE -f $FAX_SEND_FROM
+    else
+	sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -o message-file=$PASSWD_FILE -f $FAX_SEND_FROM \
+	    -o tls=$SMTP_SSL -s $SMTP_HOST:$SMTP_PORT -xu $SMTP_USER -xp $SMTP_PASSWORD
+    fi
+
+    rm $PASSWD_FILE
+
+elif [ "$FAX_SEND_TYPE" = "faximo" ] ; then
+
+    if [ "$SMTP_HOST" = "no" ] ; then
+	sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null
+    else
+	sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null \
+	    -o tls=$SMTP_SSL -s $SMTP_HOST:$SMTP_PORT -xu $SMTP_USER -xp $SMTP_PASSWORD
+    fi
+
+elif [ "$FAX_SEND_TYPE" = "messageplus" ] ; then
+
+    if [ "$SMTP_HOST" = "no" ] ; then
+	sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null
+    else
+	sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null \
+	    -o tls=$SMTP_SSL -s $SMTP_HOST:$SMTP_PORT -xu $SMTP_USER -xp $SMTP_PASSWORD
+    fi
+fi

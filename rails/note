@@ -15,11 +15,6 @@
  - 以上を行うと、旧システムとの互換性が無くなるので、断念...(本当は、
    migrationでどうにかできなくはないのだが...)
 
- * アカウント
-
-user: admin
-pass: admin
-
  * PHP関連ディレクトリ / ファイル
 
 /faxocr/faxocr/app/controllers/external_controller.rb	PHP driver
