@@ -58,6 +58,12 @@
 
    Faxocrシステムの設定用ディレクトリです。
 
+   etc/ocrb.ttf(OCRBフォント)は、Matthew Skalaによる作で、下記より
+   ダウンロードさせて頂きました。
+
+   http://ansuz.sooke.bc.ca/page/fonts
+   http://ansuz.sooke.bc.ca/fonts/ocr.zip
+
  - rails/
 
    Faxocrシステムのユーザーインターフェースが置かれています。
