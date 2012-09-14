@@ -10,6 +10,10 @@ if [ -z "$SERVER_TYPE" ]; then
     SERVER_TYPE="default"
 fi
 
+if [ "$OCR_ENGINE" = "kocr" ]; then
+    OCR_DIR="-l ~faxocr/etc/"
+fi
+
 #
 # AWS specific processing
 #

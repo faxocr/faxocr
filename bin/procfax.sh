@@ -105,7 +105,7 @@ do
 		echo BACKUP TIF: $BACKTIFF >> $LOG
 
 		convert -resample 200 $TIFFILE $BACKTIFF
-		sheetreader -m rails -c $SHEETREADERCONF -r $FTO -s $FFROM -p $ANALYZEDIR \
+		sheetreader -m rails -c $SHEETREADERCONF $OCR_DIR -r $FTO -s $FFROM -p $ANALYZEDIR \
 		    $BACKTIFF 2>> $LOG 1> $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb"
 		SRRESULT=$?
 		echo SHEETREADER: $SRRESULT
