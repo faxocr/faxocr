@@ -220,9 +220,9 @@ function put_excel($xls)
 		$html .= "\n<hr style=\"page-break-after:always; visibility:hidden;\">\n\n";
 		
 		$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"top:{$offsety}px; left:{$offsetx}px; z-index: 3; position: relative; width: {$width}px; height:{$height}px; font-size: 12px; \">\n";
-		$html .= "<img src=\"http://localhost:3000/image/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;left: 0; width: {$size}px;\"><div style=\"position: absolute; left:{$left}px; \"><font style=\"line-height: {$size}px; font-size: {$size}px; font-family: 'OCRB'; \">$cid</font></div>\n";
-		$html .= "<img src=\"http://localhost:3000/image/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;right: 0; width: {$size}px;\">\n";
-		$html .= "<img src=\"http://localhost:3000/image/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: {$size}px;\"><div style=\"position: absolute; left:{$left}px; bottom: 0\"><font style=\"line-height: {$size}px; font-size: {$size}px; font-family: 'OCRB'; \">$sid</font></div>\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;left: 0; width: {$size}px;\"><div style=\"position: absolute; left:{$left}px; \"><font style=\"line-height: {$size}px; font-size: {$size}px; font-family: 'OCRB'; \">$cid</font></div>\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;right: 0; width: {$size}px;\">\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: {$size}px;\"><div style=\"position: absolute; left:{$left}px; bottom: 0\"><font style=\"line-height: {$size}px; font-size: {$size}px; font-family: 'OCRB'; \">$sid</font></div>\n";
 
 		$cid = strtok("-");
 		

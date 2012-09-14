@@ -108,7 +108,10 @@ if ($tgt_file) {
 		for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
 			$tblheight += $xls->getRowHeight($sn, $i);
 		}
-		if (($xls->getColWidth($sn, 0) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
+		if (($xls->getColWidth($sn, 0)) != ($xls->getRowHeight($sn, 0))) {
+			$xls = null;
+		}
+		else if (($xls->getColWidth($sn, 0) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
 			$xls = null;
 		}
 		else if (($xls->getRowHeight($sn, 0) * ($xls->maxrow[$sn]+1)) != $tblheight) {
