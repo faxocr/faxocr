@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'iconv'
 class ExportController < ApplicationController
   before_filter :verify_survey_authority
@@ -48,7 +49,7 @@ class ExportController < ApplicationController
         "#{a.date.to_s(:date_nomal)},#{a.candidate.candidate_name},#{a.candidate.tel_number}"
       for columname in columnames do
         rp = AnswerSheetProperty.find_by_answer_sheet_id_and_ocr_name(a.id, columname)
-        csv_string = "#{csv_string},#{rp.ocr_value}"
+        csv_string = (rp == nil) ? "#{csv_string}\r\n" : "#{csv_string},#{rp.ocr_value}"
       end
         csv_string = "#{csv_string}\r\n"
     end
