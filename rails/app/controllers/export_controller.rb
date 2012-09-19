@@ -52,7 +52,7 @@ class ExportController < ApplicationController
       end
       if line_string != nil
         csv_string = csv_string + 
-          "#{a.date.to_s(:date_nomal)},#{a.candidate.candidate_name},#{a.candidate.tel_number}," + 
+          "#{a.date.to_s(:date_nomal)},#{a.candidate.candidate_name},#{a.candidate.tel_number}" + 
           line_string + "\r\n"
       end
     end
