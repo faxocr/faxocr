@@ -45,13 +45,16 @@ class ExportController < ApplicationController
     csv_string = "#{csv_string}\r\n"
     #Makes data.
     @answer_sheets.each do |a|
-      csv_string = csv_string +
-        "#{a.date.to_s(:date_nomal)},#{a.candidate.candidate_name},#{a.candidate.tel_number}"
+      line_string = nil
       for columname in columnames do
         rp = AnswerSheetProperty.find_by_answer_sheet_id_and_ocr_name(a.id, columname)
-        csv_string = (rp == nil) ? "#{csv_string}\r\n" : "#{csv_string},#{rp.ocr_value}"
+        line_string = (rp == nil) ? "#{line_string}," : "#{line_string},#{rp.ocr_value}"
       end
-        csv_string = "#{csv_string}\r\n"
+      if line_string != nil
+        csv_string = csv_string + 
+          "#{a.date.to_s(:date_nomal)},#{a.candidate.candidate_name},#{a.candidate.tel_number}," + 
+          line_string + "\r\n"
+      end
     end
     disposition_string = "inline; filename=\"#{year}#{month}#{day}_#{@survey.survey_name}.csv\""
     if request.user_agent =~ /windows/i

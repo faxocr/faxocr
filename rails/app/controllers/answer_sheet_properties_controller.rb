@@ -1,4 +1,4 @@
-# -*- coding: undecided -*-
+# -*- coding: utf-8 -*-
 class AnswerSheetPropertiesController < ApplicationController
   before_filter :verify_group_authority
   # GET /answer_sheet_properties
@@ -37,12 +37,16 @@ class AnswerSheetPropertiesController < ApplicationController
     @answer_sheet = AnswerSheet.find(params[:answer_sheet_id])
     @answer_sheet_property = @answer_sheet.answer_sheet_properties.find(params[:id])
 
-    response.headers['Content-Type'] = 'image/png'
-    image = ""
-    File.open("#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet_property.ocr_image}").each do |buff|
-      image = image + buff
-    end
-    render :text => image, :layout => false
+    send_file("#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet_property.ocr_image}",
+              :type => 'image/png',
+              :disposition => 'inline')
+
+#    response.headers['Content-Type'] = 'image/png'
+#    image = ""
+#    File.open("#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet_property.ocr_image}").each do |buff|
+#      image = image + buff
+#    end
+#    render :text => image, :layout => false
   end
 
   # GET /answer_sheet_properties/new

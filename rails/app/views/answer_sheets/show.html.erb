@@ -33,7 +33,8 @@
 <div>
   <h3>調査シート</h3>
 <p style="-webkit-transform: rotate(-90deg); -webkit-transform-origin:250px 250px;">
-  <%= image_tag(image_group_survey_answer_sheet_path(@group, @survey, @answer_sheet), :width => '500') %>
+  <%= link_to image_tag(image_group_survey_answer_sheet_path(@group, @survey, @answer_sheet), { :width => '500', :border => '0', :alt => 'faximg'}), image_group_survey_answer_sheet_path(@group, @survey, @answer_sheet) %>
+
 </p>
 </div>
 </td>

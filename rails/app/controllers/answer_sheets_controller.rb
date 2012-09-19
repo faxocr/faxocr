@@ -102,12 +102,17 @@ class AnswerSheetsController < ApplicationController
     if sheet == nil
       redirect_to(group_survey_answer_sheets_url(@group, @survey))
     end
-    response.headers['Content-Type'] = 'image/png'
-    image = ""
-    File.open("#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}").each do |buff|
-      image = image + buff
-    end
-    render :text => image, :layout => false
+
+    send_file("#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}",
+              :type => 'image/png',
+              :disposition => 'inline')
+
+#    response.headers['Content-Type'] = 'image/png'
+#    image = ""
+#    File.open("#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}").each do |buff|
+#      image = image + buff
+#    end
+#    render :text => image, :layout => false
   end
 
   # GET /answer_sheets/new
