@@ -67,11 +67,11 @@ int main(int argc, char *argv[])
 			    reg_cmp = 1;
 				service = SRHELPER_SERVICE_FAXIMO;
 			}
-			else if (strcmp(service_cstr, "ifax") == 0)
+			else if (strcmp(service_cstr, "bizfax") == 0)
 			{
 			    regcomp(&reg, number_tag, REG_EXTENDED);
 			    reg_cmp = 1;
-				service = SRHELPER_SERVICE_IFAX;
+				service = SRHELPER_SERVICE_BIZFAX;
 			}
 			else if (strcmp(service_cstr, "messageplus") == 0)
 			{

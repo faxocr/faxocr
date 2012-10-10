@@ -20,7 +20,7 @@ FAX_SUBJ=$2
 FAX_IMG=$3
 FAX_TO=$FAX_NO"@"$FAX_SEND_TARGET
 
-if [ "$FAX_SEND_TYPE" = "ifax" ] ; then
+if [ "$FAX_SEND_TYPE" = "bizfax" ] ; then
 
     PASSWD_FILE=/tmp/sendfaxfile$$
     if [ "$FAXUSER" != "" ] ; then
