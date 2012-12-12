@@ -2,4 +2,5 @@
 .loadpath
 .cvsignore
 .tmp*
+log/*
 CVS
