@@ -32,7 +32,7 @@
 	    <% if /^(sheet_properties)$/ =~ params[:controller] %>
 		  &gt;&nbsp;<%= link_to 'シートの調査項目', group_survey_sheet_sheet_properties_path(@group, @survey, @sheet) %>
 	      <% if !(/^(sheet_properties)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
-	      &gt;&nbsp;<%= link_to @sheet_property.id, group_survey_sheet_sheet_properties_path(@group, @survey, @sheet, @sheet_property) %>
+	      &gt;&nbsp;<%= link_to @sheet_property.survey_property.ocr_name_full, group_survey_sheet_sheet_properties_path(@group, @survey, @sheet, @sheet_property) %>
 	      <% end %>
 	    <% end %>
 	  <% elsif /^(survey_properties)$/ =~ params[:controller] %>
