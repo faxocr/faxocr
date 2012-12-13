@@ -38,7 +38,7 @@
 	  <% elsif /^(survey_properties)$/ =~ params[:controller] %>
 	    &gt;&nbsp;<%= link_to '調査項目', group_survey_survey_properties_path(@group, @survey) %>
 	    <% if !(/^(survey_properties)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
-	      &gt;&nbsp;<%= link_to @survey_property.ocr_name, group_survey_survey_property_path(@group, @survey, @survey_property) %>
+	      &gt;&nbsp;<%= link_to @survey_property.ocr_name_full, group_survey_survey_property_path(@group, @survey, @survey_property) %>
 	    <% end %>
 	  <% elsif /^(survey_candidates)$/ =~ params[:controller] %>
 	    &gt;&nbsp;<%= link_to '調査対象', group_survey_survey_candidates_path(@group, @survey) %>
