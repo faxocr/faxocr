@@ -108,17 +108,26 @@ if ($tgt_file) {
 		for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
 			$tblheight += $xls->getRowHeight($sn, $i);
 		}
-		if (($xls->getColWidth($sn, 0)) != ($xls->getRowHeight($sn, 0))) {
+
+		// cellのサイズの縦横比が10%以上はエラー
+		$cellaspect_range = 0.1;
+		$cellaspect = $xls->getColWidth($sn, 0) / $xls->getRowHeight($sn, 0);
+		if ($cellaspect != 1) {
+			// cellが厳密に正方形ではない場合メッセージのみ表示
+			$errmsg = "";
+		} 
+		else if (($celaspect < 1 - $cellaspect_range) && ($celaspect > 1 + $cellaspect_range)) {
 			$xls = null;
+			$errmsg = "セルが正方形になっていません";
 		}
 		else if (($xls->getColWidth($sn, 0) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
 			$xls = null;
+			$errmsg = "セルはすべて同じサイズにしてください";
 		}
 		else if (($xls->getRowHeight($sn, 0) * ($xls->maxrow[$sn]+1)) != $tblheight) {
 			$xls = null;
+			$errmsg = "セルはすべて同じサイズにしてください";
 		}
-		if(!$xls)
-			$errmsg = "セルが正方形になっていません";
 	}
 }
 
@@ -205,7 +214,9 @@ function put_excel($xls)
 	{
 		$scale = get_scaling($tblwidth, $tblheight, 940);
 		$tdwidth = floor($xls->getColWidth($sn, 0) * $scale);		
-		$trheight = floor($xls->getRowHeight($sn, 0) * $scale);
+		$trheight = $tdwidth;
+		// cellは正方形なのでサイズは幅にあわせる
+		//$trheight = floor($xls->getRowHeight($sn, 0) * $scale);
 		$tblwidth = $tdwidth * ($xls->maxcell[$sn]+1);
 		
 		// シートテーブル表示

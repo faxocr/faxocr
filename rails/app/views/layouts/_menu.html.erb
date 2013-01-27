@@ -14,7 +14,7 @@
 		<% else %>
 		<li><%= link_to "ユーザ設定", group_users_path(@authorized_group || @current_group)%></li>
 		<% end %>
-		<li>　　　　　　　　　　　　　　　　　　　　　　　　</li>
+		<li></li>
 		<li><%= link_to 'ログアウト', {:action=>"logout", :controller=>"faxocr"}, :class => "welcome_logout" %>
 	</ul>
 </div>
