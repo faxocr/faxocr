@@ -109,24 +109,30 @@ if ($tgt_file) {
 			$tblheight += $xls->getRowHeight($sn, $i);
 		}
 
+		// cellの最小サイズ
+		$min_width = 6;
+		$min_height = 10;
+
 		// cellのサイズの縦横比が10%以上はエラー
 		$cellaspect_range = 0.1;
 		$cellaspect = $xls->getColWidth($sn, 0) / $xls->getRowHeight($sn, 0);
 		if ($cellaspect != 1) {
 			// cellが厳密に正方形ではない場合メッセージのみ表示
 			$errmsg = "";
-		} 
-		else if (($celaspect < 1 - $cellaspect_range) && ($celaspect > 1 + $cellaspect_range)) {
+		}
+		if (($celaspect < 1 - $cellaspect_range) && ($celaspect > 1 + $cellaspect_range)) {
 			$xls = null;
 			$errmsg = "セルが正方形になっていません";
-		}
-		else if (($xls->getColWidth($sn, 0) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
+		} else if (($xls->getColWidth($sn, 0) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
 			$xls = null;
 			$errmsg = "セルはすべて同じサイズにしてください";
-		}
-		else if (($xls->getRowHeight($sn, 0) * ($xls->maxrow[$sn]+1)) != $tblheight) {
+		} else if (($xls->getRowHeight($sn, 0) * ($xls->maxrow[$sn]+1)) != $tblheight) {
 			$xls = null;
 			$errmsg = "セルはすべて同じサイズにしてください";
+		} else if (($xls->maxcell[$sn]+1 <= $min_width || $xls->maxrow[$sn]+1 <= $min_height) || ($xls->maxrow[$sn]+1 <= $min_width || $xls->maxcell[$sn]+1 <= $min_height)) {
+			// シートサイズチェック
+			$xls = null;
+			$errmsg = "シートのサイズが小さすぎます ".$min_width."x".$min_height."以上にしてください";
 		}
 	}
 }
