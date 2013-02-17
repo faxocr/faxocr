@@ -112,6 +112,9 @@ if ($tgt_file) {
 		// cellの最小サイズ
 		$min_width = 6;
 		$min_height = 10;
+		// cellの最大サイズ
+		$max_width = 18;
+		$max_height = 30;
 
 		// cellのサイズの縦横比が10%以上はエラー
 		$cellaspect_range = 0.1;
@@ -129,10 +132,15 @@ if ($tgt_file) {
 		} else if (($xls->getRowHeight($sn, 0) * ($xls->maxrow[$sn]+1)) != $tblheight) {
 			$xls = null;
 			$errmsg = "セルはすべて同じサイズにしてください";
-		} else if (($xls->maxcell[$sn]+1 <= $min_width || $xls->maxrow[$sn]+1 <= $min_height) || ($xls->maxrow[$sn]+1 <= $min_width || $xls->maxcell[$sn]+1 <= $min_height)) {
+		} else if (($xls->maxcell[$sn]+1 <= $min_width || $xls->maxrow[$sn]+1 <= $min_height) && ($xls->maxrow[$sn]+1 <= $min_width || $xls->maxcell[$sn]+1 <= $min_height)) {
 			// シートサイズチェック
 			$xls = null;
 			$errmsg = "シートのサイズが小さすぎます ".$min_width."x".$min_height."以上にしてください";
+		} else if (($xls->maxcell[$sn]+1 >= $max_width || $xls->maxrow[$sn]+1 >= $max_height) && ($xls->maxrow[$sn]+1 >= $max_width || $xls->maxcell[$sn]+1 >= $max_height)) {
+
+			// シートサイズチェック
+			$xls = null;
+			$errmsg = "シートのサイズが大きすぎます ".$max_width."x".$max_height."以下にしてください";
 		}
 	}
 }
