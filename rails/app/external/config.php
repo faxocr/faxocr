@@ -54,6 +54,13 @@ $link_label = "";
 // マーカー色指定 (マーカーモード用)
 define("COLOR_FILL", 22);
 
+// 調査シートの最大/最小サイズ
+define("MAX_SHEET_WIDTH", 18);
+define("MAX_SHEET_HEIGHT", 30);
+define("MIN_SHEET_WIDTH", 6);
+define("MIN_SHEET_HEIGHT", 10);
+
+
 ///////////////////////////////////////////////////////
 // ディレクトリ設定
 //
