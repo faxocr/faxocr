@@ -204,7 +204,9 @@ function put_excel($xls)
 	// シートウインドウ
 	$scale = get_scaling($tblwidth, $tblheight, 960);
 	$tdwidth = $xls->getColWidth($sn, 0) * $scale;
-	$trheight = $xls->getRowHeight($sn, 0) * $scale;
+	$trheight = $tdwidth;
+	// cellは正方形なのでサイズは幅にあわせる
+	//$trheight = $xls->getRowHeight($sn, 0) * $scale;
 	$tblwidth = $tdwidth * ($xls->maxcell[$sn]+1);
 	$tblheight = $trheight * ($xls->maxrow[$sn]+1);
 	// マーカーウインドウ
