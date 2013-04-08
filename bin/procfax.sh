@@ -24,6 +24,10 @@ LOG=$LOGDIR"/procfax.log"
 TIME=`date +%H%M%S`
 SHEET_COUNT=0
 
+if [ "`ls $MDIR`" = '' ]; then
+    exit
+fi
+
 mkdir $MBACKDIR 2> /dev/null
 mkdir $FBACKDIR 2> /dev/null
 mkdir $LOGDIR 2> /dev/null

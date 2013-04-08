@@ -27,3 +27,8 @@ mkdir $SBACKDIR 2> /dev/null
 #
 $RAILSPATH/script/send_daily_report.rb $DATE $ANALYZEDIR $SBACKDIR \
     $FAX_SEND_FROM $FAX_SEND_TARGET
+
+if [ "`ls $SBACKDIR`" = '' ]; then
+    rm -r $SBACKDIR
+fi
+
