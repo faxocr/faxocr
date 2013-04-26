@@ -251,7 +251,7 @@ function is_next($prev, $next)
 //
 // config出力
 //
-function put_config($file_id, $_REQUEST)
+function put_config($file_id, $REQUEST)
 {
 	global $target;
 	global $sheet_name;
@@ -265,7 +265,7 @@ function put_config($file_id, $_REQUEST)
 	$conf = new FileConf($file_id);
 
 	$list_requests = array();
-	foreach ($_REQUEST as $item => $val) {
+	foreach ($REQUEST as $item => $val) {
 		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
 		if ($loc && $loc[0]) {
 			$location = "${loc[1]}-${loc[2]}-${loc[3]}";
@@ -289,7 +289,7 @@ function put_config($file_id, $_REQUEST)
 
 	// XLSフィールド情報REQUEST取得
 	$conf->array_destroy("field");
-	foreach ($_REQUEST as $item => $val) {
+	foreach ($REQUEST as $item => $val) {
 		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
 		
 		if ($loc && $loc[0]) {

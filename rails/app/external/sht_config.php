@@ -120,7 +120,7 @@ function get_config($file_id)
 //
 // config出力
 //
-function put_config($file_id, $_REQUEST)
+function put_config($file_id, $REQUEST)
 {
 	global $group_id;
 	global $sheet_id;
@@ -136,8 +136,8 @@ function put_config($file_id, $_REQUEST)
 
 	foreach (array("block_width", "block_height", "block_size", "block_offsetx",
 								 "block_offsety", "candidate_code") as $item) {
-		if (isset($_REQUEST[$item])) {
-			$val = $_REQUEST[$item];
+		if (isset($REQUEST[$item])) {
+			$val = $REQUEST[$item];
 			if (strlen($val) != 0) {
 				$conf->set($item, $val);
 			}
