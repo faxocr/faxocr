@@ -179,13 +179,13 @@ function put_excel($xls)
 
 	$sid = sprintf("%05d", $conf->get("sid"));
 	$cid = strtok($conf->get("candidate_code"), "-");
-	$width = $conf->get("block_width");
-	$height = $conf->get("block_height");
-	$size = $conf->get("block_size");
-	$offsetx = $conf->get("block_offsetx");
-	$offsety = $conf->get("block_offsety");
-	$offsetx = $offsetx > 0 ? $offsetx : 0;
-	$offsety = $offsety > 0 ? $offsety : 0;
+	$width_marker_window = $conf->get("block_width");
+	$height_marker_window = $conf->get("block_height");
+	$size_of_marker = $conf->get("block_size");
+	$offsetx_marker_window = $conf->get("block_offsetx");
+	$offsety_marker_window = $conf->get("block_offsety");
+	$offsetx_marker_window = $offsetx_marker_window > 0 ? $offsetx_marker_window : 0;
+	$offsety_marker_window = $offsety_marker_window > 0 ? $offsety_marker_window : 0;
 
 	// シート表示
 	// for ($sn = 0; $sn < 1; $sn++) {
@@ -210,21 +210,21 @@ function put_excel($xls)
 	$tblwidth = $tdwidth * ($xls->maxcell[$sn]+1);
 	$tblheight = $trheight * ($xls->maxrow[$sn]+1);
 	// マーカーウインドウ
-	$scale = get_scaling($width, $height, 960);
-	$width = $width * $scale;
-	$height = $height * $scale;
-	$size = $size * $scale * 0.95;
-	$left = $size * 2;
+	$scale = get_scaling($width_marker_window, $height_marker_window, 960);
+	$width_marker_window = $width_marker_window * $scale;
+	$height_marker_window = $height_marker_window * $scale;
+	$size_of_marker = $size_of_marker * $scale * 0.95;
+	$position_of_sheet_id_from_left_side = $size_of_marker * 2;
 	
 	while ($cid != FALSE) {
 		$cid = sprintf("%05d", $cid);
 
 		$html .= "\n<hr style=\"page-break-after:always; visibility:hidden;\">\n\n";
 		
-		$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"top:{$offsety}px; left:{$offsetx}px; z-index: 3; position: relative; width: {$width}px; height:{$height}px; font-size: 12px; \">\n";
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;left: 0; width: {$size}px;\"><div style=\"position: absolute; left:{$left}px; \"><font style=\"line-height: {$size}px; font-size: {$size}px; font-family: 'OCRB'; \">$cid</font></div>\n";
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;right: 0; width: {$size}px;\">\n";
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: {$size}px;\"><div style=\"position: absolute; left:{$left}px; bottom: 0\"><font style=\"line-height: {$size}px; font-size: {$size}px; font-family: 'OCRB'; \">$sid</font></div>\n";
+		$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"top:{$offsety_marker_window}px; left:{$offsetx_marker_window}px; z-index: 3; position: relative; width: {$width_marker_window}px; height:{$height_marker_window}px; font-size: 12px; \">\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;left: 0; width: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; \"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$cid</font></div>\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;right: 0; width: {$size_of_marker}px;\">\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; bottom: 0\"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$sid</font></div>\n";
 
 		$cid = strtok("-");
 		
