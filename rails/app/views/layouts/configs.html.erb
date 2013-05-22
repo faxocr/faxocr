@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+  <title>Shinsai FaxOCR</title>
+  <%= stylesheet_link_tag 'style' %>
+</head>
+
+<body>
+
+<!-- header STR -->
+<%= render :partial => "layouts/welcome" %>
+<!-- header END -->
+<!-- nav STR -->
+<%= render :partial => "layouts/menu" %>
+<!-- nav END -->
+
+<!-- container STR -->
+<div id="container" class="clearfix">
+
+	<!-- side menu -->
+	<div id="side">
+	  <div class="menu">
+	    <h4>その他の設定</h4>
+	    <ul>
+	      <li><%= link_to "システム設定<br />(etc/faxocr.conf)", configs_url %></li>
+	      <li><%= link_to "データベース設定<br />(rails/config/database.yml)", database_configs_url %></li>
+	    </ul>
+	  </div>
+	</div>
+
+	<!-- contents STR -->
+	<div id="contents">
+
+<p style="color: green"><%= flash[:notice] %></p>
+
+<%= yield %>
+
+	</div>
+	<!-- contents END -->
+<!-- container END -->
+</div>
+
+<!-- footer STR -->
+<div id="footer">
+	<p id="pagetop">
+	  <a href="#">
+	    <img src="/image/pagetop.gif" alt="このページの先頭へ" />
+	</a>
+	</p>
+	<div class="inner">
+	</div>
+</div>
+<!-- footer END -->
+
+</body>
+</html>
