@@ -291,7 +291,7 @@ function put_config($file_id, $REQUEST)
 	$conf->array_destroy("field");
 	foreach ($REQUEST as $item => $val) {
 		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
-		
+
 		if ($loc && $loc[0]) {
 			$xls_fields = array();
 			$xls_fields["sheet_num"] = $loc[1];

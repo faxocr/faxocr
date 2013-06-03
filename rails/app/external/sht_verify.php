@@ -73,9 +73,9 @@ if ($errmsg) {
 	print "<BR>\n";
 //	if (file_exists(DST_DIR . $file_id . ".png")) {
 	if (file_exists(DST_DIR . $group_id . "-" . $sheet_id . ".png")) {
-		print "<img src=\"/external/getimg/" . $group_id . "/" . $sheet_id . 
+		print "<img src=\"/external/getimg/" . $group_id . "/" . $sheet_id .
 		         "\" width=\"500px\"><br>\n";
-		print "<a href=\"/external/download/" . $group_id . "/" . $sheet_id . 
+		print "<a href=\"/external/download/" . $group_id . "/" . $sheet_id .
 		        "\">[PDFプレビュー]</a>\n";
 	} else {
 		print "画像ファイルがありません $file_id<br><br>\n";
@@ -126,7 +126,7 @@ STR;
 	// XXX
 	// action=\"/external\sht_commit/\"
 	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
-	
+
 	print "<form method=\"POST\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
@@ -138,7 +138,7 @@ STR;
 	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_next();\">シート登録</button></div>\n";
 
 	print "</form>\n";
-	print "</div>\n";	
+	print "</div>\n";
 }
 
 ?>

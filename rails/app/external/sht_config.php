@@ -215,19 +215,19 @@ function put_excel($xls)
 	$height_marker_window = $height_marker_window * $scale;
 	$size_of_marker = $size_of_marker * $scale * 0.95;
 	$position_of_sheet_id_from_left_side = $size_of_marker * 2;
-	
+
 	while ($cid != FALSE) {
 		$cid = sprintf("%05d", $cid);
 
 		$html .= "\n<hr style=\"page-break-after:always; visibility:hidden;\">\n\n";
-		
+
 		$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"top:{$offsety_marker_window}px; left:{$offsetx_marker_window}px; z-index: 3; position: relative; width: {$width_marker_window}px; height:{$height_marker_window}px; font-size: 12px; \">\n";
 		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;left: 0; width: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; \"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$cid</font></div>\n";
 		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;right: 0; width: {$size_of_marker}px;\">\n";
 		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; bottom: 0\"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$sid</font></div>\n";
 
 		$cid = strtok("-");
-		
+
 		// シートテーブル表示
 		$html .= "<table class=\"sheet\" border=\"0\" cellpadding=\"0\"";
 		$html .= " cellspacing=\"0\" width=\"" . ${tblwidth} . "\" height=\"" . ${tblheight} . "\"";
@@ -235,9 +235,9 @@ function put_excel($xls)
 		$html .=" bgcolor=\"#FFFFFF\" >\n";
 
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
-			
+
 			$html .= "  <tr height=\"" . $trheight . "\">" . "\n";
-			
+
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
 				$dispval = $xls->dispcell($sn, $r, $i);
@@ -306,7 +306,7 @@ function put_excel($xls)
 		$html .= "</table>\n";
 		$html .= "</div>\n";
 	}  // while ($cid != FALSE)
-	
+
 	return $html;
 }
 
@@ -317,7 +317,7 @@ function put_rails($file_id)
 {
 	global $rails_env;
 	global $conf;
-	
+
 	$tgt_items = "";
 
 	if (!$conf)

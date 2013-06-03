@@ -79,7 +79,7 @@ include( TMP_HTML_DIR . "tpl.header.html" );
 // Excelファイル読み込み処理
 //
 if ($tgt_file) {
-	global $xls;	
+	global $xls;
 	$xls = NEW Excel_Peruser;
 	$xls->setErrorHandling(1);
 	$xls->setInternalCharset($charset);
@@ -99,7 +99,7 @@ if ($tgt_file) {
 	}
 
 	if ($xls) {
-		$sn = 0;		
+		$sn = 0;
 		$tblwidth = 0;
 		$tblheight = 0;
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
@@ -182,7 +182,7 @@ if ($xls) {
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sname\" value=\"" . $sheet_name . "\" />\n";
-	print "<input type=\"hidden\" name=\"target\" value=\"" . $target . "\" />\n";	
+	print "<input type=\"hidden\" name=\"target\" value=\"" . $target . "\" />\n";
 	print "<button type=\"button\" id=\"sbmt\" onclick=\"this.disabled=true; pack_fields();\" {$dirty_label}>保存</button>\n";
 	print "</form>\n";
 }
@@ -203,7 +203,7 @@ function put_excel($xls)
 	global $field_width;
 	global $tblwidth;
 	global $tblheight;
-	
+
 	// タブコントロール表示
 	// print "<div class=\"simpleTabs\">";
 	// print "<ul class=\"simpleTabsNavigation\">";
@@ -220,12 +220,12 @@ function put_excel($xls)
 	$sn = 0;
 	{
 		$scale = get_scaling($tblwidth, $tblheight, 940);
-		$tdwidth = floor($xls->getColWidth($sn, 0) * $scale);		
+		$tdwidth = floor($xls->getColWidth($sn, 0) * $scale);
 		$trheight = $tdwidth;
 		// cellは正方形なのでサイズは幅にあわせる
 		//$trheight = floor($xls->getRowHeight($sn, 0) * $scale);
 		$tblwidth = $tdwidth * ($xls->maxcell[$sn]+1);
-		
+
 		// シートテーブル表示
 		print <<< STR
 		\n<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="${tblwidth}" bgcolor="#FFFFFF" style="table-layout:fixed; border-collapse: collapse;">\n
@@ -233,7 +233,7 @@ STR;
 		if (!isset($xls->maxrow[$sn]))
 			$xls->maxrow[$sn] = 0;
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
-			
+
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
 
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
@@ -416,19 +416,19 @@ function put_status()
 	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
 
 	// XXX
-	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";	
+	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
 	print "<form action=\"/external/sht_marker/\" method=\"post\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
-	
+
 	print "<div ${style["pink"]}><span>フィールド指定</span></div>\n";
 	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; this.form.submit();\" " . $status_label . ">マーカー指定</button></div>\n";
 	print "<div ${style["gray"]}><span>シート確認</span></div>\n";
 	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
-	
+
 	print "</form>\n";
-	print "</div>\n";	
+	print "</div>\n";
 }
 
 ?>

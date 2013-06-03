@@ -74,9 +74,9 @@ if ($errmsg) {
 
 	if (!$conf)
 		$conf = new FileConf($file_id);
-	
+
 	$target = $conf->get("target") == "registered" ? 1 : 0;
-	
+
 	// ステータス表示
 	print "<table width=\"100%\">\n";
 	print "<tr>\n";
@@ -243,7 +243,7 @@ $marker_size = 0;
 function put_excel($xls) {
 
 	global $marker_size;
-	
+
 	// シート表示
 	// for ($sn = 0; $sn < 1; $sn++) {
 
@@ -261,9 +261,9 @@ function put_excel($xls) {
 		$tdwidth = floor($xls->getColWidth($sn, 0) * $scale);
 		$trheight = floor($xls->getRowHeight($sn, 0) * $scale);
 		$tblwidth = $tdwidth * ($xls->maxcell[$sn]+1);
-		
+
 		$marker_size = $tdwidth;
-		
+
 		// シートテーブル表示
 		print "<table class=\"sheet_marker\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
 		print ${tblwidth} . "\" bgcolor=\"#FFFFFF\" style=\"table-layout:fixed; border-collapse: collapse;\">\n";
@@ -273,7 +273,7 @@ function put_excel($xls) {
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
 
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
-			
+
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 
 				$dispval = $xls->dispcell($sn, $r, $i);
@@ -361,7 +361,7 @@ function put_status()
 
 	// XXX
 	print "\n";
-	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";	
+	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
 	print "<form method=\"post\" id=\"form-status\" >\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	// for sht_field
@@ -373,7 +373,7 @@ function put_status()
 	print "<div ${style["pink"]}><span>マーカー指定</span></div>\n";
 	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_next();\" {$status_label}>シート確認</button></div>\n";
 	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
-	
+
 	print "</form>\n";
 	print "</div>\n";
 }
