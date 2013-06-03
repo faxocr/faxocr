@@ -252,15 +252,16 @@ function put_excel($xls) {
 		$tblwidth = 0;
 		$tblheight = 0;
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$tblwidth += $xls->getColWidth($sn, $i);
+			$tblwidth += floor($xls->getColWidth($sn, $i));
 		}
 		for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
-			$tblheight += $xls->getRowHeight($sn, $i);
+			$tblheight += floor($xls->getRowHeight($sn, $i));
 		}
 		$scale = get_scaling($tblwidth, $tblheight, 940);
 		$tdwidth = floor($xls->getColWidth($sn, 0) * $scale);
 		$trheight = floor($xls->getRowHeight($sn, 0) * $scale);
-		$tblwidth = $tdwidth * ($xls->maxcell[$sn]+1);
+		$tblwidth  = floor($tblwidth * $scale);
+		$tblheight = floor($tblheight * $scale);
 
 		$marker_size = $tdwidth;
 
@@ -268,13 +269,22 @@ function put_excel($xls) {
 		print "<table class=\"sheet_marker\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
 		print ${tblwidth} . "\" bgcolor=\"#FFFFFF\" style=\"table-layout:fixed; border-collapse: collapse;\">\n";
 
+		print "<tr>\n";
+		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
+			$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
+			print "<th height=\"0\" width=\"$tdwidth\"></th>";
+		}
+		print "\n</tr>\n";
+
 		if (!isset($xls->maxrow[$sn]))
 			$xls->maxrow[$sn] = 0;
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
 
+			$trheight = $xls->getRowHeight($sn, $r) * $scale;
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
 
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
+				$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);

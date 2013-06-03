@@ -92,6 +92,16 @@ class Survey < ActiveRecord::Base
         srmlstr = srmlstr + "    <id>#{sheet.sheet_code}</id>\n"
         srmlstr = srmlstr + "    <blockWidth>#{sheet.block_width}</blockWidth>\n"
         srmlstr = srmlstr + "    <blockHeight>#{sheet.block_height}</blockHeight>\n"
+        srmlstr = srmlstr + "    <cellWidth>\n"
+        eval(sheet.cell_width).sort.each do |cell_no,cell_width|
+          srmlstr = srmlstr + "      <cellAttribute number=\"#{cell_no}\" length=\"#{cell_width}\"/>\n"
+        end
+        srmlstr = srmlstr + "    </cellWidth>\n"
+        srmlstr = srmlstr + "    <cellHeight>\n"
+        eval(sheet.cell_height).sort.each do |cell_no,cell_height|
+          srmlstr = srmlstr + "      <cellAttribute number=\"#{cell_no}\" length=\"#{cell_height}\"/>\n"
+        end
+        srmlstr = srmlstr + "    </cellHeight>\n"
         srmlstr = srmlstr + "    <properties>\n"
         srmlstr = srmlstr + "      <blockOcr"
         srmlstr = srmlstr + " name=\"echo_request_and_send_analyzed_data\""

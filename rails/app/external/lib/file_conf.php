@@ -117,7 +117,7 @@ class FileConfFile {
 			$lines = file($conf_path);
 
 			for ($cnt = 0; $cnt < count($lines); $cnt++) {
-				$line = explode(",", $lines[$cnt]);
+				$line = explode(",", $lines[$cnt], 2);
 				$this->get_confs[$line[0]] = trim($line[1]);
 			}
 
@@ -166,7 +166,7 @@ class FileConfFile {
 			$bUpdated = false;
 
 			for ($cnt = 0; $cnt < count($lines); $cnt++) {
-				$line = explode(",", $lines[$cnt]);
+				$line = explode(",", $lines[$cnt], 2);
 				if ($conf_key == $line[0]) {
 					$lines[$cnt] = "{$conf_key},{$conf_value}\n";
 					$bUpdated = true;

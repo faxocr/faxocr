@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100301133901) do
+ActiveRecord::Schema.define(:version => 20130517134400) do
 
   create_table "answer_sheet_properties", :force => true do |t|
     t.integer  "answer_sheet_id", :null => false
@@ -89,6 +89,8 @@ ActiveRecord::Schema.define(:version => 20100301133901) do
     t.integer  "status",       :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "cell_width"
+    t.string   "cell_height"
   end
 
   add_index "sheets", ["sheet_code"], :name => "index_sheets_on_sheet_code", :unique => true

@@ -406,6 +406,7 @@ function get_scaling($w, $h, $lside)
 	$a4_width = 0;
 	$a4_height = 0;
 	
+	// A4 横幅が $lside とした時の A4 サイズを求める
 	if ($w > $h) {
 		// 横長シート
 		$a4_width = $lside;

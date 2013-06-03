@@ -43,10 +43,6 @@ if (isset($file_id) && $file_id) {
 	die;
 }
 
-put_config($file_id, $_REQUEST);
-get_config($file_id);
-put_rails($file_id);
-
 // Excelファイル読み込み処理
 if ($tgt_file) {
 
@@ -60,6 +56,10 @@ if ($tgt_file) {
 		$xls = null;
 	}
 }
+
+put_config($file_id, $_REQUEST);
+get_config($file_id);
+put_rails($file_id);
 
 //
 // HTMLファイル作成処理
@@ -125,6 +125,7 @@ function put_config($file_id, $REQUEST)
 	global $group_id;
 	global $sheet_id;
 	global $conf;
+	global $xls;
 
 	$conf = new FileConf($file_id);
 
@@ -144,7 +145,33 @@ function put_config($file_id, $REQUEST)
 		}
 	}
 
+	$sn = 0;
+	$list_of_cell_size = array();
+	foreach (range(0, $xls->maxcell[$sn]) as $i) {
+		array_push($list_of_cell_size, floor($xls->getColWidth($sn, $i)));
+	}
+	$val = var_export_1line($list_of_cell_size);
+	$conf->set("cell_width", $val);
+
+	$list_of_cell_size = array();
+	foreach (range(0, $xls->maxrow[$sn]) as $i) {
+		array_push($list_of_cell_size, floor($xls->getRowHeight($sn, $i)));
+	}
+	$val = var_export_1line($list_of_cell_size);
+	$conf->set("cell_height", $val);
+
 	$conf->commit();
+}
+
+function php_hash_to_ruby_hash($str)
+{
+	$result = preg_replace("/^array\(/", "{", $str);
+	return preg_replace("/,\)$/", "}", $result);
+}
+
+function var_export_1line($val)
+{
+	return preg_replace("/[ \n]/", "", var_export($val, TRUE));
 }
 
 function put_header()
@@ -195,36 +222,45 @@ function put_excel($xls)
 	$tblwidth = 0;
 	$tblheight = 0;
 	for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-		$tblwidth += $xls->getColWidth($sn, $i);
+		$tblwidth += floor($xls->getColWidth($sn, $i));
 	}
 	for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
-		$tblheight += $xls->getRowHeight($sn, $i);
+		$tblheight += floor($xls->getRowHeight($sn, $i));
 	}
+
+	// マーカーウインドウ
+	$scale = get_scaling($width_marker_window, $height_marker_window, 960);
+	$width_marker_window = floor($width_marker_window * $scale);
+	$height_marker_window = floor($height_marker_window * $scale);
+	$size_of_marker = floor($size_of_marker * $scale * 0.95);
+	$position_of_sheet_id_from_left_side = floor($size_of_marker * 2);
 
 	// シートウインドウ
 	$scale = get_scaling($tblwidth, $tblheight, 960);
-	$tdwidth = $xls->getColWidth($sn, 0) * $scale;
-	$trheight = $tdwidth;
-	// cellは正方形なのでサイズは幅にあわせる
-	//$trheight = $xls->getRowHeight($sn, 0) * $scale;
-	$tblwidth = $tdwidth * ($xls->maxcell[$sn]+1);
-	$tblheight = $trheight * ($xls->maxrow[$sn]+1);
-	// マーカーウインドウ
-	$scale = get_scaling($width_marker_window, $height_marker_window, 960);
-	$width_marker_window = $width_marker_window * $scale;
-	$height_marker_window = $height_marker_window * $scale;
-	$size_of_marker = $size_of_marker * $scale * 0.95;
-	$position_of_sheet_id_from_left_side = $size_of_marker * 2;
+	$tblwidth = floor($tblwidth * $scale);
+	$tblheight = floor($tblheight * $scale);
+
+	// Spec is not fixed that assigning position of marker by users from web UI.
+	// the following variable can control which feature is preferred
+	$feature_fixed_marker_window = 1;
+	if ($feature_fixed_marker_window == 1) {
+		// set marker size from the size of A1 cell
+		$size_of_marker = floor($xls->getRowHeight($sn, 0) * $scale) * 0.95 - 1;
+		$position_of_sheet_id_from_left_side = floor($size_of_marker * 2);
+	}
 
 	while ($cid != FALSE) {
 		$cid = sprintf("%05d", $cid);
 
 		$html .= "\n<hr style=\"page-break-after:always; visibility:hidden;\">\n\n";
-
-		$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"top:{$offsety_marker_window}px; left:{$offsetx_marker_window}px; z-index: 3; position: relative; width: {$width_marker_window}px; height:{$height_marker_window}px; font-size: 12px; \">\n";
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;left: 0; width: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; \"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$cid</font></div>\n";
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;right: 0; width: {$size_of_marker}px;\">\n";
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; bottom: 0\"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$sid</font></div>\n";
+		if ($feature_fixed_marker_window == 1) {
+			$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"top: 0px; left: 0px; z-index: 3; position: relative; width: {$tblwidth}px; height:{$tblheight}px; font-size: 12px; padding: 0px; border: 0px; margin: 0px; \">\n";
+		} else {
+			$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"top:{$offsety_marker_window}px; left:{$offsetx_marker_window}px; z-index: 3; position: relative; width: {$width_marker_window}px; height:{$height_marker_window}px; font-size: 12px; padding: 1px; \">\n";
+		}
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;left: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; \"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$cid</font></div>\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;right: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\">\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; bottom: 0\"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$sid</font></div>\n";
 
 		$cid = strtok("-");
 
@@ -234,11 +270,19 @@ function put_excel($xls)
 		$html .= " style=\"table-layout:fixed; border-collapse: collapse;\"";
 		$html .=" bgcolor=\"#FFFFFF\" >\n";
 
-		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
+		$html .= '<tr height="0" margin="0" padding="0">' . "\n";
+		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
+			$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
+			$html .= " <th border=\"0\" height=\"0\" width=\"$tdwidth\"></th>\n";
+		}
+		$html .= "\n</tr>\n";
 
+		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
+			$trheight = floor($xls->getRowHeight($sn, $r) * $scale);
 			$html .= "  <tr height=\"" . $trheight . "\">" . "\n";
 
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
+				$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
@@ -325,8 +369,10 @@ function put_rails($file_id)
 
 	$size = $conf->get("block_size") ? $conf->get("block_size") : 32;
 	$sheet_name = $conf->get("name");
-	$width = $conf->get("block_width") / $size - 2;
-	$height = $conf->get("block_height") / $size - 2;
+	eval('$no_of_columns = count(' . $conf->get("cell_width")  . ') - 2;');
+	eval('$no_of_rows    = count(' . $conf->get("cell_height") . ') - 2;');
+	$cell_width_ruby = php_hash_to_ruby_hash($conf->get("cell_width"));
+	$cell_height_ruby = php_hash_to_ruby_hash($conf->get("cell_height"));
 	$target = $conf->get("target") == "registered" ? 1 : 0;
 
 	//
@@ -487,8 +533,10 @@ end
 @sheet.sheet_code = "%05d" % {$conf->get("sid")}
 @sheet.sheet_name = "自動生成シート" # string
 @sheet.survey_id = survey_id # integer
-@sheet.block_width = {$width} || 0 # XXX
-@sheet.block_height = {$height} || 0 # XXX
+@sheet.block_width = {$no_of_columns} || 0 # XXX
+@sheet.block_height = {$no_of_rows} || 0 # XXX
+@sheet.cell_width = "$cell_width_ruby" || 0 # XXX
+@sheet.cell_height = "$cell_height_ruby" || 0 # XXX
 @sheet.status = 1
 # save
 if @sheet.save

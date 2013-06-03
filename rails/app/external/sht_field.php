@@ -99,33 +99,37 @@ if ($tgt_file) {
 	}
 
 	if ($xls) {
+		// 各 cell のサイズからテーブルの大きさを求める
 		$sn = 0;
 		$tblwidth = 0;
 		$tblheight = 0;
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$tblwidth += $xls->getColWidth($sn, $i);
+			$tblwidth += floor($xls->getColWidth($sn, $i));
 		}
 		for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
-			$tblheight += $xls->getRowHeight($sn, $i);
+			$tblheight += floor($xls->getRowHeight($sn, $i));
 		}
 
-		// cellのサイズの縦横比が10%以上はエラー
-		$cellaspect_range = 0.1;
-		$cellaspect = $xls->getColWidth($sn, 0) / $xls->getRowHeight($sn, 0);
-		if ($cellaspect != 1) {
-			// cellが厳密に正方形ではない場合メッセージのみ表示
-			$errmsg = "";
+		if (0) { // 長方形版では以下のコードは用いない
+			// cellのサイズの縦横比が10%以上はエラー
+			$cellaspect_range = 0.1;
+			$cellaspect = $xls->getColWidth($sn, 0) / $xls->getRowHeight($sn, 0);
+			if ($cellaspect != 1) {
+				// cellが厳密に正方形ではない場合メッセージのみ表示
+				$errmsg = "";
+			}
+			if (($celaspect < 1 - $cellaspect_range) && ($celaspect > 1 + $cellaspect_range)) {
+				$xls = null;
+				$errmsg = "セルが正方形になっていません";
+			} else if (($xls->getColWidth($sn, 0) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
+				$xls = null;
+				$errmsg = "セルはすべて同じサイズにしてください";
+			} else if (($xls->getRowHeight($sn, 0) * ($xls->maxrow[$sn]+1)) != $tblheight) {
+				$xls = null;
+				$errmsg = "セルはすべて同じサイズにしてください";
+			}
 		}
-		if (($celaspect < 1 - $cellaspect_range) && ($celaspect > 1 + $cellaspect_range)) {
-			$xls = null;
-			$errmsg = "セルが正方形になっていません";
-		} else if (($xls->getColWidth($sn, 0) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
-			$xls = null;
-			$errmsg = "セルはすべて同じサイズにしてください";
-		} else if (($xls->getRowHeight($sn, 0) * ($xls->maxrow[$sn]+1)) != $tblheight) {
-			$xls = null;
-			$errmsg = "セルはすべて同じサイズにしてください";
-		} else if (($xls->maxcell[$sn]+1 <= MIN_SHEET_WIDTH || $xls->maxrow[$sn]+1 <= MIN_SHEET_HEIGHT) && ($xls->maxrow[$sn]+1 <= MIN_SHEET_WIDTH || $xls->maxcell[$sn]+1 <= MIN_SHEET_HEIGHT)) {
+		if (($xls->maxcell[$sn]+1 <= MIN_SHEET_WIDTH || $xls->maxrow[$sn]+1 <= MIN_SHEET_HEIGHT) && ($xls->maxrow[$sn]+1 <= MIN_SHEET_WIDTH || $xls->maxcell[$sn]+1 <= MIN_SHEET_HEIGHT)) {
 			// シートサイズチェック
 			$xls = null;
 			$errmsg = "シートのサイズが小さすぎます ".MIN_SHEET_WIDTH."x".MIN_SHEET_HEIGHT."以上にしてください";
@@ -220,23 +224,29 @@ function put_excel($xls)
 	$sn = 0;
 	{
 		$scale = get_scaling($tblwidth, $tblheight, 940);
-		$tdwidth = floor($xls->getColWidth($sn, 0) * $scale);
-		$trheight = $tdwidth;
-		// cellは正方形なのでサイズは幅にあわせる
-		//$trheight = floor($xls->getRowHeight($sn, 0) * $scale);
-		$tblwidth = $tdwidth * ($xls->maxcell[$sn]+1);
+		$tblwidth_scaled = floor($tblwidth * $scale);
+		$tblheight_scaled = floor($tblheight * $scale);
 
 		// シートテーブル表示
 		print <<< STR
-		\n<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="${tblwidth}" bgcolor="#FFFFFF" style="table-layout:fixed; border-collapse: collapse;">\n
+		\n<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="${tblwidth_scaled}" bgcolor="#FFFFFF" style="table-layout:fixed; border-collapse: collapse;">\n
 STR;
+
+		print "<tr>\n";
+		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
+			$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
+			print "<th height=\"0\" width=\"$tdwidth\"></th>";
+		}
+		print "\n</tr>\n";
 		if (!isset($xls->maxrow[$sn]))
 			$xls->maxrow[$sn] = 0;
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
+			$trheight = floor($xls->getRowHeight($sn, $r) * $scale);
 
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
 
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
+				$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
