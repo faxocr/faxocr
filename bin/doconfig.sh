@@ -19,7 +19,7 @@ fi
 #
 if [ "$SERVER_TYPE" = "aws" -a ! -z "$AWS_ADDRESS" ]; then
     EC2USERDATA=/tmp/ec2userdata$$
-    wget -O $EC2USERDATA http://$AWS_ADDRESS/latest/user-data/ >& /dev/null
+    wget -O $EC2USERDATA http://$AWS_ADDRESS/latest/user-data/ >/dev/null 2>&1
     . $EC2USERDATA
     rm $EC2USERDATA
 
