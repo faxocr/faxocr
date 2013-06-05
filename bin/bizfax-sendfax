@@ -1,0 +1,511 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from HTMLParser import HTMLParser
+import urllib
+import urllib2
+import cookielib
+import os
+import time
+import re
+import sys
+from subprocess import Popen, PIPE
+
+BIZ_FAX_WEBPAGE_TABLE = [
+        # 0
+        {   'url': 'https://dotphone.jp/otn/nf/uploadFile.jsf',
+            'params': {
+                'service:uploadFile:_link_hidden_': 'service:uploadFile:_idJsp70',
+            },
+            'parser': 'parseFormToUploadAFile',
+        },
+        # 1
+        {   'url': 'https://dotphone.jp/otn/nf/convertingFax.jsf',
+            'params': {
+            },
+            'parser': 'getHidden',
+        },
+]
+
+COOKIE_FILE_HTTPPOST = 'cookies-bizfax-sendfax-post.txt'
+
+
+class BizFaxHTMLParser(HTMLParser):
+    """HTMLParser for BizFax."""
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.handler = None
+        self.formElements = {}
+        self.currentFormName = ''
+        self.nowParsingP = 0
+        self.handlerTable = {
+            'parseFormToUploadAFile': self.parseFormToUploadAFile,
+            'getHidden': self.getHidden,
+        }
+
+    def handle_starttag(self, tag, attrs):
+        self.handler(tag, attrs)
+
+    def set_handle_starttag_func(self, funcName):
+        self.handler = self.handlerTable[funcName]
+
+    ### private functions
+    def parseFormToUploadAFile(self, tag, attrs):
+        self.parseSpecificForm(tag, attrs, 'service:uploadFile')
+
+    def parseSpecificForm(self, tag, attrs, name):
+        """Parse specified form."""
+        if tag == 'form':
+            d = dict(attrs)
+            if name == d['name']:
+                self.nowParsingP = 1
+            else:
+                self.nowParsingP = 0
+        if self.nowParsingP == 1:
+            self.getHidden(tag, attrs)
+
+    def getHidden(self, tag, attrs):
+        d = dict(attrs)
+        v = ''
+        if tag == 'input':
+            if 'type' in d and 'hidden' == d['type'].lower():
+                if 'name' not in d:
+                    return
+                if d['name'] in self.formElements:
+                    return
+                if 'value' in d:
+                    self.formElements[d['name']] = d['value']
+                else:
+                    self.formElements[d['name']] = ''
+
+
+def getCookieObject():
+    cj = cookielib.LWPCookieJar(filename=COOKIE_FILE_HTTPPOST)
+    if not os.path.exists(COOKIE_FILE_HTTPPOST):
+        cj.save()
+    else:
+        cj.load()
+    return cj
+
+
+def genURLtoPOST(url, params):
+    """generate url"""
+    res = ''
+    for k, v in params.iteritems():
+        res = res + urllib.quote(k) + '=' + urllib.quote_plus(v) + '&'
+    if len(res) == 0:
+        return None
+    elif len(res) > 0 and res[len(res) - 1] == '&':
+        return res[:-1]
+    else:
+        return res
+
+
+def parseForm(contents):
+    """Parse the HTML and set the value of hidden tag to the BIZ_FAX_WEBPAGE_TABLE structure."""
+    hp = BizFaxHTMLParser()
+    hp.set_handle_starttag_func(BIZ_FAX_WEBPAGE_TABLE[0]['parser'])
+    hp.feed(contents)
+    hp.close()
+
+    for (x, y) in hp.formElements.iteritems():
+        if str(x) in BIZ_FAX_WEBPAGE_TABLE[0]['params']:
+            continue
+        BIZ_FAX_WEBPAGE_TABLE[0]['params'][str(x)] = y
+
+
+def accessBizFax(cookieStr, faxDataFileName):
+    cj = getCookieObject()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    opener.addheaders = [
+            #('User-Agent', 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'),
+            ('Cookie', cookieStr)]
+
+    headers = {}
+    i = 0
+    if i == 0:
+        postdata = BIZ_FAX_WEBPAGE_TABLE[i]['params']
+        postdata['service:uploadFile:fileUpload'] = open(faxDataFileName, "r+b")
+
+        if is_multipart(postdata):
+            data, boundary = encode_postdata(postdata)
+            headers = MULTIPART_HEADERS.copy()
+            headers["Content-Type"] = headers["Content-Type"] + boundary
+        else:
+            data = urllib.urlencode(postdata)
+            headers = FORMENCODE_HEADERS
+    else:
+        data = genURLtoPOST(BIZ_FAX_WEBPAGE_TABLE[i]['url'], BIZ_FAX_WEBPAGE_TABLE[i]['params'])
+
+    request = urllib2.Request(BIZ_FAX_WEBPAGE_TABLE[i]['url'], data, headers)
+    contents = opener.open(request).read()
+
+    return
+
+#############################################################################
+# from http://blog.liris.org/2011/10/python-usrbinenv-pythonimport.html
+import mimetypes
+import os.path
+import random
+import sys
+import urllib
+import urllib2
+
+OS_FILESYSTEM_ENCODING = sys.getfilesystemencoding()
+
+FORMENCODE_HEADERS = {
+     "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+     "Accept-Language": "ja",
+     "Accept-Charset": "utf-8"}
+
+MULTIPART_HEADERS = {
+     "Content-Type": 'multipart/form-data; boundary=',
+     "Accept-Language": "ja"}
+
+
+def is_multipart(postdata):
+    for value in postdata.values():
+        if isinstance(value, file):
+            return True
+    return False
+
+
+def encode_postdata(postdata):
+    getRandomChar = lambda: chr(random.choice(range(97, 123)))
+    randomChar = [getRandomChar() for x in xrange(20)]
+    boundary = "----------%s" % ("".join(randomChar))
+    lines = ["--" + boundary]
+    for key, value in postdata.iteritems():
+        header = 'Content-Disposition: form-data; name="%s"' % key
+        if hasattr(value, "name"):
+            name = value.name
+            if isinstance(name, str):
+                name = name.decode(OS_FILESYSTEM_ENCODING)
+            header += '; filename="%s"' % os.path.split(name.encode("utf-8"))[-1]
+            lines.append(header)
+            mtypes = mimetypes.guess_type(value.name)
+            if mtypes:
+                contentType = mtypes[0]
+                header = "Content-Type: %s" % contentType
+                lines.append(header)
+            lines.append("Content-Transfer-Encoding: binary")
+        else:
+            lines.append(header)
+
+        lines.append("")
+        if hasattr(value, "read"):
+            lines.append(value.read())
+        elif isinstance(value, unicode):
+            lines.append(value.encode("utf-8"))
+        else:
+            lines.append(value)
+        lines.append("--" + boundary)
+    lines[-1] += "--"
+
+    return "\r\n".join(lines), boundary
+
+#############################################################################
+
+#############################################################################
+import gtk
+import webkit
+import gobject
+import jswebkit
+import time
+import sys
+import os
+import ctypes
+
+
+class WebBrowser(gtk.Window):
+
+    def __init__(self, bizFaxLoginName, bizFaxPassword, faxDestNumber, faxSize, faxDataFileName, additionalFaxMessageFileName):
+        self.FAXSIZETABLE = {'NONE': '0', 'A3': '1', 'B4': '2', 'A4': '3'}
+
+        self.bizFaxLoginName              = bizFaxLoginName
+        self.bizFaxPassword               = bizFaxPassword
+        self.faxDestNumber                = faxDestNumber
+        self.faxSize                      = self.FAXSIZETABLE[faxSize]
+        self.faxDataFileName              = faxDataFileName
+        self.additionalFaxMessageFileName = additionalFaxMessageFileName
+
+        self.browsingState = -1
+
+        gtk.Window.__init__(self)
+        self._browser = webkit.WebView()
+        self._browser.connect('load-finished', self._cb_load_finished)
+        self.add(self._browser)
+        self.connect('destroy', gtk.main_quit)
+        #self.show_all()
+        self._browser.open('https://apply.050anshin.com/OTNWeb/nf/OTNUSRSYS.aspx')
+
+    def _cb_load_finished(self, view, frame):
+        """Call-back function when the page was loaded."""
+        debug("=> load-finished")
+        gc = frame.get_global_context()
+        self._javascript = jswebkit.JSContext(gc)
+
+        if self.browsingState == -1:
+            debug("now state in " + str(self.browsingState))
+            self._javascript.EvaluateScript("location.href='https://apply.050anshin.com/OTNWeb/nf/USRSYSLGN00.aspx';")
+            self.browsingState = 0
+        elif self.browsingState == 0:
+            debug("now state in " + str(self.browsingState))
+            debug("going to set an account info")
+            self._javascript.EvaluateScript("document.forms['aspnetForm'].elements['ctl00$contPage$txtKojInf'].value='';")
+            self._javascript.EvaluateScript("document.forms['aspnetForm'].elements['ctl00$contPage$btnLogin'].value='繝ｭ繧ｰ繧ï??繝ｳ';")
+            self._javascript.EvaluateScript("document.forms['aspnetForm'].elements['ctl00$contPage$txtUsrIPBng'].value='" + str(self.bizFaxLoginName) + "';")
+            self._javascript.EvaluateScript("document.forms['aspnetForm'].elements['ctl00$contPage$txtUsrPwd'].value='" + self.bizFaxPassword + "'; ")
+            self._javascript.EvaluateScript("document.all.item('ctl00_contPage_btnLogin').click();")
+            self.browsingState = 1
+        elif self.browsingState == 1:
+            debug("now state in " + str(self.browsingState))
+            debug("going to insert new items for a clickable image")
+            self._javascript.EvaluateScript("""var e1=document.createElement('input');
+                 e1.setAttribute('name', 'ctl00$contPage$btnCWebCas.x');
+                 e1.setAttribute('type','hidden');
+                 e1.setAttribute('id', 'ctl00_contPage_btnCWebCas.x');
+                 e1.setAttribute('value', '44');
+            """)
+            self._javascript.EvaluateScript("""var e2=document.createElement('input');
+                 e2.setAttribute('name', 'ctl00$contPage$btnCWebCas.y');
+                 e2.setAttribute('type','hidden');
+                 e2.setAttribute('id', 'ctl00_contPage_btnCWebCas.y');
+                 e2.setAttribute('value', '15');
+            """)
+            self._javascript.EvaluateScript("var f1=document.getElementById('aspnetForm'); f1.appendChild(e1); f1.appendChild(e2); ")
+            self._javascript.EvaluateScript("document.forms['aspnetForm'].submit();")
+            debug("going to open a new window and move to a new site")
+            self._javascript.EvaluateScript("location.href='https://apply.050anshin.com/OTNWeb/Form/USR/USRWBCRDR.aspx';")
+            self.browsingState = 2
+        elif self.browsingState == 2:
+            debug("now state in " + str(self.browsingState))
+            debug("waiting for finishing the loading")
+            self.browsingState = 4
+        elif self.browsingState == 4:
+            debug("now state in " + str(self.browsingState))
+            debug("going to click the button of 'sending a fax'")
+            self._javascript.EvaluateScript("document.all.item('menu:_idJsp2:_idJsp12').click();")
+            self.browsingState = 5
+        elif self.browsingState == 5:
+            debug("now state in " + str(self.browsingState))
+            debug("going to fill out all information to send a fax")
+            self._javascript.EvaluateScript("document.forms['service:sendFaxForm'].elements['service:sendFaxForm:dist'].value='" + self.faxDestNumber + "';")
+            self._javascript.EvaluateScript("document.forms['service:sendFaxForm'].elements['service:sendFaxForm:paperSize'].value='" + self.faxSize + "';")
+            self._javascript.EvaluateScript("""function set_radiobutton_to_add_a_fax_message(val) {
+                        obj1 = document.forms['service:sendFaxForm'].elements['service:sendFaxForm:attachTransmittalSheet'];
+                        if (obj1.length) {
+                            for (i = 0; i < obj1.length; i++) {
+                                // clear all checked flag
+                                if (obj1[i].checked) {
+                                    obj1[i].checked = false;
+                                }
+                                // set checked flag
+                                if (obj1[i].value == val) {
+                                    obj1[i].checked = true;
+                                }
+                            }
+                        }
+                    }
+                    """)
+            if self.additionalFaxMessageFileName is None:
+                self._javascript.EvaluateScript("set_radiobutton_to_add_a_fax_message('2');")
+                self._javascript.EvaluateScript("document.forms['service:sendFaxForm'].elements['service:sendFaxForm:messageArea'].value='';")
+            else:
+                self._javascript.EvaluateScript("set_radiobutton_to_add_a_fax_message('1');")
+                additionalFaxMessage = open(self.additionalFaxMessageFileName, "r+b").read().replace("\n", "\\n\\\n")
+                self._javascript.EvaluateScript("document.forms['service:sendFaxForm'].elements['service:sendFaxForm:messageArea'].value='" + additionalFaxMessage + "';")
+            debug("going to click the button of 'select a file from PC'")
+            self._javascript.EvaluateScript("document.all.item('service:sendFaxForm:_idJsp150').click();")
+            self.browsingState = 6
+        elif self.browsingState == 6:
+            debug("now state in " + str(self.browsingState))
+            debug("going to post fax data to server")
+            cookieStr = self._javascript.EvaluateScript("document.cookie;")
+            webContents = self._javascript.EvaluateScript("document.body.innerHTML;")
+            parseForm(webContents)
+            accessBizFax(cookieStr, self.faxDataFileName)
+            debug("going back to a previous page")
+            self._javascript.EvaluateScript("document.all.item('service:uploadFile:_idJsp72').click();")
+            self.browsingState = 7
+        elif self.browsingState == 7:
+            debug("now state in " + str(self.browsingState))
+            debug("going to click the button of 'confirmation for sendind a fax'")
+            self._javascript.EvaluateScript("document.all.item('service:sendFaxForm:_idJsp186').click();")
+            self.browsingState = 8
+        elif self.browsingState == 8:
+            debug("now state in " + str(self.browsingState))
+            self.browsingState = 9
+        elif self.browsingState == 9:
+            debug("now state in " + str(self.browsingState))
+            debug("going to click the button of 'send a fax'")
+            self._javascript.EvaluateScript("document.all.item('service:_idJsp133:_idJsp134').click();")
+            self.browsingState = 80
+        elif self.browsingState == 10:
+            debug("now state in " + str(self.browsingState))
+            self.browsingState = 80
+
+        elif self.browsingState == 20:
+            debug("now state in " + str(self.browsingState))
+            debug("going to click 'a history of sent faxes' buttun")
+            self._javascript.EvaluateScript("document.all.item('menu:_idJsp2:_idJsp16').click();")
+            self.browsingState = 21
+        elif self.browsingState == 21:
+            debug("now state in " + str(self.browsingState))
+            debug("going to click a selection buttun")
+            # XXX: need to click a selection button
+            # here
+            debug("going to click a resending buttun")
+            # click the resending button
+            self._javascript.EvaluateScript("document.forms['service:sendHistoryForm'].elements['service:sendHistoryForm:_link_hidden_'].value='service:sendHistoryForm:TransferButton';")
+            self._javascript.EvaluateScript("document.forms['service:sendHistoryForm'].submit();")
+            #self._javascript.EvaluateScript("document.all.item('service:sendHistoryForm:TransferButton').click();")
+            self.browsingState = 80
+
+        elif self.browsingState == 80:
+            debug("now state in " + str(self.browsingState))
+            debug("going to logout")
+            self._javascript.EvaluateScript("document.forms['__logout_submit__'].submit();")
+            self.browsingState = 100
+
+        elif self.browsingState >= 90 and self.browsingState < 100:
+            debug("now state in " + str(self.browsingState))
+            self.browsingState = self.browsingState + 1
+        elif self.browsingState >= 100:
+            debug("now state in " + str(self.browsingState))
+            debug("now quitting")
+            gtk.main_quit()
+
+#############################################################################
+
+#############################################################################
+class LibraryFinder:
+    def __init__(self):
+        # libwrap.so.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libwrap.so.0
+        self.ldconfigRegex = re.compile(r'([\w\.-]+)\s+\(([\w\.]+)(,([\w-]+))?\)\s+=>\s+([\w\./-]+)')
+        self.libraries = self.getAlistOfLibraries()
+        self.arch = self.getSystemArchitecture()
+
+    def getPathName(self, libname):
+        archs = ['i686']
+        if self.arch == 'x86_64':
+            archs.append(self.arch)
+        archs.reverse()
+        for arch in archs:
+            libnamePlusArch = libname + ':' + arch
+            if libnamePlusArch in self.libraries:
+                return self.libraries[libnamePlusArch]
+        raise
+
+    def show(self):
+        print self.arch
+        print self.libraries
+
+
+    ### private functions
+    def getAlistOfLibraries(self):
+        libs = dict()
+        p = Popen(['ldconfig', '-p'], stdout=PIPE)
+        while True:
+            line = p.stdout.readline().rstrip("\n")
+            if not line:
+                break
+            m = self.ldconfigRegex.search(line)
+            if m is None:
+                continue
+            if m.group(4) == 'x86-64':
+                libname = m.group(1) + ':' + 'x86_64'
+            else:
+                libname = m.group(1) + ':' + 'i686'
+            libs[libname] = m.group(5)
+
+        return libs
+
+    def getSystemArchitecture(self):
+        return os.uname()[4]
+
+
+def testLibraryFinder():
+    """test for LibraryFinder"""
+    lf = LibraryFinder()
+    print lf.getPathName('libgobject-2.0.so.0')
+    print lf.getPathName('libsoup-2.4.so')
+    print lf.getPathName('libwebkitgtk-1.0.so.0')
+
+
+#############################################################################
+
+
+DEBUG = 0
+
+def debug(msg):
+    if DEBUG == 1:
+        sys.stderr.write(msg + "\n")
+
+
+def usage():
+    """Print usage and exit.
+
+    引数:
+        loginNameOfBizFax: BizFax のログイン名(電話番号)
+        faxDestNumber: 宛先 Fax 番号
+        faxSize: Fax 用紙サイズ。指定なしの場合は、NONE を用いること
+        faxData.ext: 送信する Fax のファイル名。ファイルの内容を反映する拡張子をもったファイル名指定すること。
+        additionalMessageFile.txt: Fax に添付する送信者からのメッセージが入っているファイル名
+            UTF-8 または ASCII で記述されていなくてはならない
+    パスワード入力:
+        BizFax ログインのためのパスワードは、標準入力から受け付ける。
+        最後に改行が含まれていてもよく、それは無視される。一行のみ受け付ける。
+    """
+    sys.stderr.write("usage: " + sys.argv[0] + " loginNameOfBizFax faxDestNumber faxSize faxData.ext [additionalMessageFile.txt]")
+    sys.stderr.write("""
+        faxSize: (NONE|A4|B5|A5)
+        faxData.ext: must be have a proper file extension
+        additionalMessageFile.txt: contents must be written in UTF-8 or ASCII
+""")
+    sys.exit(1)
+
+
+def main():
+    if len(sys.argv) < 5:
+        usage()
+
+    # a trick to use a cookie feature in webkit
+    #
+    # Change the following path to fit your environment
+    lf = LibraryFinder()
+    libgobject = ctypes.CDLL(lf.getPathName('libgobject-2.0.so.0'))
+    #libwebkit = ctypes.CDLL('/usr/lib/libsoup-2.4.so.1')
+    libsoup = ctypes.CDLL(lf.getPathName('libsoup-2.4.so'))
+    libwebkit = ctypes.CDLL(lf.getPathName('libwebkitgtk-1.0.so.0'))
+
+    #proxy_uri = libsoup.soup_uri_new('http://tcdproxy.tcd.ie:8080') #proxy urli
+
+    session = libwebkit.webkit_get_default_session()
+    #libgobject.g_object_set(session, "proxy-uri", proxy_uri, None)
+
+    gobject.threads_init()
+    # Read a password from STDIN due to security consideration.
+    # It is dangerous to specify the password in the command line.
+    password = sys.stdin.readline().replace("\n", "")
+    webbrowser = WebBrowser(sys.argv[1], password, sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5] if len(sys.argv) >= 6 else None)
+    gtk.main()
+
+    #remove all cookiejars
+    generic_cookiejar_type = libgobject.g_type_from_name('SoupCookieJar')
+    libsoup.soup_session_remove_feature_by_type(session, generic_cookiejar_type)
+
+    COOKIE_FILE = 'cookies-bizfax-sendfax.txt'
+    #and replace with a new persistent jar
+    cookiejar = libsoup.soup_cookie_jar_text_new(COOKIE_FILE, False)
+    libsoup.soup_session_add_feature(session, cookiejar)
+
+    #add a new persistent cookie jar
+    cookiejar = libsoup.soup_cookie_jar_text_new(COOKIE_FILE, False)
+    libsoup.soup_session_add_feature(session, cookiejar)
+
+if __name__ == '__main__':
+    #testLibraryFinder()
+    main()
+
+# vim:set expandtab shiftwidth=4 tabstop=4 softtabstop=4:
