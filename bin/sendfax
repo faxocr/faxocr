@@ -30,19 +30,19 @@ if [ "$FAX_SEND_TYPE" = "bizfax" ] ; then
 elif [ "$FAX_SEND_TYPE" = "faximo" ] ; then
 
     if [ "$SMTP_HOST" = "no" ] ; then
-	sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null
+        sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null
     else
-	sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null \
-	    -o tls=$SMTP_SSL -s $SMTP_HOST:$SMTP_PORT -xu $SMTP_USER -xp $SMTP_PASSWORD
+        sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null \
+            -o tls=$SMTP_SSL -s $SMTP_HOST:$SMTP_PORT -xu $SMTP_USER -xp $SMTP_PASSWORD
     fi
 
 elif [ "$FAX_SEND_TYPE" = "messageplus" ] ; then
 
     if [ "$SMTP_HOST" = "no" ] ; then
-	sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null
+        sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null
     else
-	sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null \
-	    -o tls=$SMTP_SSL -s $SMTP_HOST:$SMTP_PORT -xu $SMTP_USER -xp $SMTP_PASSWORD
+        sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null \
+            -o tls=$SMTP_SSL -s $SMTP_HOST:$SMTP_PORT -xu $SMTP_USER -xp $SMTP_PASSWORD
     fi
 fi
 
