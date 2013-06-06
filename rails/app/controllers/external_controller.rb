@@ -153,10 +153,17 @@ class ExternalController < ApplicationController
     if @target == "registered" && @candidates.size == 0 then
         flash[:notice] = "設定済み調査対象がありません"
         redirect_to :controller => 'faxocr'
-    elsif 0 < @size && @size <= @@size_limit && /\.xls$/ =~ @filename then
-      File.open("#{RAILS_ROOT}/files/#{@tname}" + ".xls", "wb") {
+    elsif 0 < @size && @size <= @@size_limit && /(\.xlsx?)$/ =~ @filename then
+      ext = $1
+      outputFileName = "#{RAILS_ROOT}/files/#{@tname}"
+      outputFileNameWithExt = outputFileName + ext
+      File.open(outputFileNameWithExt, "wb") {
         |f| f.write(params[:file]['upfile'].read)
       }
+      if ext == ".xlsx" then
+        xlsFileNameWithExt = outputFileName + ".xls"
+        `python ~/Downloads/DocumentConverter.py #{outputFileNameWithExt} #{xlsFileNameWithExt}`
+      end
       # @html = "GID: " + @gid + "\n<BR>" +
       #  "Filename: " + @filename + " (" + @size.to_s + ")\n<BR>" +
       #  "Temp file: " + @tname
