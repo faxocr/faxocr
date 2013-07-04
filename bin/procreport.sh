@@ -25,8 +25,8 @@ mkdir $SBACKDIR 2> /dev/null
 #
 # generate the report and send it (NEEDS CHECK)
 #
-(cd $RAILSPATH; bundle exec ./script/send_daily_report.rb $DATE $ANALYZEDIR $SBACKDIR \
-	$FAX_SEND_FROM $FAX_SEND_TARGET)
+$RAILSPATH/script/send_daily_report.rb $DATE $ANALYZEDIR $SBACKDIR \
+    $FAX_SEND_FROM $FAX_SEND_TARGET
 
 if [ "`ls $SBACKDIR`" = '' ]; then
     rm -r $SBACKDIR
