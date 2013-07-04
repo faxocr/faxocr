@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # export PATH=/usr/local/bin:/usr/sbin:$PATH
 export PATH=/usr/local/bin:/usr/sbin:/home/faxocr/bin/:$PATH
