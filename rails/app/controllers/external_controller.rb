@@ -161,8 +161,7 @@ class ExternalController < ApplicationController
         |f| f.write(params[:file]['upfile'].read)
       }
       if ext == ".xlsx" then
-        xlsFileNameWithExt = outputFileName + ".xls"
-        `python ~/Downloads/DocumentConverter.py #{outputFileNameWithExt} #{xlsFileNameWithExt}`
+        `unoconv -f xls #{outputFileNameWithExt}`
       end
       # @html = "GID: " + @gid + "\n<BR>" +
       #  "Filename: " + @filename + " (" + @size.to_s + ")\n<BR>" +
