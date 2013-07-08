@@ -1,0 +1,54 @@
+[submodule "setup/chef-solo/cookbooks/apache2"]
+	path = setup/chef-solo/cookbooks/apache2
+	url = git://github.com/opscode-cookbooks/apache2.git
+[submodule "setup/chef-solo/cookbooks/apt"]
+	path = setup/chef-solo/cookbooks/apt
+	url = git://github.com/opscode-cookbooks/apt.git
+[submodule "setup/chef-solo/cookbooks/build-essential"]
+	path = setup/chef-solo/cookbooks/build-essential
+	url = git://github.com/opscode-cookbooks/build-essential.git
+[submodule "setup/chef-solo/cookbooks/chef_handler"]
+	path = setup/chef-solo/cookbooks/chef_handler
+	url = git://github.com/opscode-cookbooks/chef_handler.git
+[submodule "setup/chef-solo/cookbooks/chocolatey-cookbook"]
+	path = setup/chef-solo/cookbooks/chocolatey-cookbook
+	url = git://github.com/Youscribe/chocolatey-cookbook.git
+[submodule "setup/chef-solo/cookbooks/imagemagick"]
+	path = setup/chef-solo/cookbooks/imagemagick
+	url = git://github.com/opscode-cookbooks/imagemagick.git
+[submodule "setup/chef-solo/cookbooks/java"]
+	path = setup/chef-solo/cookbooks/java
+	url = git://github.com/opscode-cookbooks/java.git
+[submodule "setup/chef-solo/cookbooks/mysql"]
+	path = setup/chef-solo/cookbooks/mysql
+	url = git://github.com/opscode-cookbooks/mysql.git
+[submodule "setup/chef-solo/cookbooks/opencv-cookbook"]
+	path = setup/chef-solo/cookbooks/opencv-cookbook
+	url = git://github.com/Youscribe/opencv-cookbook.git
+[submodule "setup/chef-solo/cookbooks/openssl"]
+	path = setup/chef-solo/cookbooks/openssl
+	url = git://github.com/opscode-cookbooks/openssl.git
+[submodule "setup/chef-solo/cookbooks/passenger_apache2"]
+	path = setup/chef-solo/cookbooks/passenger_apache2
+	url = git://github.com/opscode-cookbooks/passenger_apache2.git
+[submodule "setup/chef-solo/cookbooks/php"]
+	path = setup/chef-solo/cookbooks/php
+	url = git://github.com/opscode-cookbooks/php.git
+[submodule "setup/chef-solo/cookbooks/postfix"]
+	path = setup/chef-solo/cookbooks/postfix
+	url = git://github.com/opscode-cookbooks/postfix.git
+[submodule "setup/chef-solo/cookbooks/powershell"]
+	path = setup/chef-solo/cookbooks/powershell
+	url = git://github.com/opscode-cookbooks/powershell.git
+[submodule "setup/chef-solo/cookbooks/python"]
+	path = setup/chef-solo/cookbooks/python
+	url = git://github.com/opscode-cookbooks/python.git
+[submodule "setup/chef-solo/cookbooks/windows"]
+	path = setup/chef-solo/cookbooks/windows
+	url = git://github.com/opscode-cookbooks/windows.git
+[submodule "setup/chef-solo/cookbooks/xml"]
+	path = setup/chef-solo/cookbooks/xml
+	url = git://github.com/opscode-cookbooks/xml.git
+[submodule "setup/chef-solo/cookbooks/yum"]
+	path = setup/chef-solo/cookbooks/yum
+	url = git://github.com/opscode-cookbooks/yum.git
