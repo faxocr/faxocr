@@ -1,5 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
 
+  map.resources :configs, :collection => { :index => :get, :database => :get }
+
   map.resources :role_mappings
 
   map.resources :groups, :member => { :report => :get } do |group|
