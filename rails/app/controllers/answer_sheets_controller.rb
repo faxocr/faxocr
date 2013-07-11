@@ -115,6 +115,27 @@ class AnswerSheetsController < ApplicationController
 #    render :text => image, :layout => false
   end
 
+  def image_thumb
+    @answer_sheet = AnswerSheet.find(params[:id])
+    @answer_sheet_properties = @answer_sheet.answer_sheet_properties
+    @group = Group.find(params[:group_id])
+    @survey = @group.surveys.find(params[:survey_id])
+    sheets = @survey.sheets
+    sheet = sheets.find(@answer_sheet.sheet_id)
+    if sheet == nil
+      redirect_to(group_survey_answer_sheets_url(@group, @survey))
+    end
+
+    @filename = "#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}".gsub('.png', '_thumb.png')
+    if !File.exists?(@filename)
+      @filename = "#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}"
+    end
+
+    send_file(@filename,
+              :type => 'image/png',
+              :disposition => 'inline')
+  end
+
   # GET /answer_sheets/new
   # GET /answer_sheets/new.xml
   def new

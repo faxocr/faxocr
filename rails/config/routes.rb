@@ -11,7 +11,7 @@ ActionController::Routing::Routes.draw do |map|
       end
       survey.resources :survey_properties
       survey.resources :survey_candidates
-      survey.resources :answer_sheets, :member => { :image => :get, :edit_recognize => :get, :update_recognize => :put } do |answer_sheet|
+      survey.resources :answer_sheets, :member => { :image => :get, :image_thumb => :get, :edit_recognize => :get, :update_recognize => :put } do |answer_sheet|
         answer_sheet.resources :answer_sheet_properties, :member => { :image => :get }
       end
       survey.connect "report/:year/:month/:day",
