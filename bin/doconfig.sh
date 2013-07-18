@@ -11,7 +11,7 @@ if [ -z "$SERVER_TYPE" ]; then
 fi
 
 if [ "$OCR_ENGINE" = "kocr" ]; then
-    OCR_DIR="-l ~faxocr/etc/"
+    OCR_DIR="-l ./etc/"
 fi
 
 #
