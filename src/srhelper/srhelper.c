@@ -59,38 +59,38 @@ int main(int argc, char *argv[])
 			result = -1;
 			break;
 		}
-	    /* */
+		/* */
 		if (service_cstr != NULL) {
 			if (strcmp(service_cstr, "faximo") == 0)
 			{
-			    regcomp(&reg, number_tag, REG_EXTENDED);
-			    reg_cmp = 1;
+				regcomp(&reg, number_tag, REG_EXTENDED);
+				reg_cmp = 1;
 				service = SRHELPER_SERVICE_FAXIMO;
 			}
 			else if (strcmp(service_cstr, "bizfax") == 0)
 			{
-			    regcomp(&reg, number_tag, REG_EXTENDED);
-			    reg_cmp = 1;
+				regcomp(&reg, number_tag, REG_EXTENDED);
+				reg_cmp = 1;
 				service = SRHELPER_SERVICE_BIZFAX;
 			}
 			else if (strcmp(service_cstr, "messageplus") == 0)
 			{
-			    regcomp(&reg, messageplus_tag, REG_EXTENDED);
-			    reg_cmp = 1;
-			    regcomp(&reg_target, number_tag, REG_EXTENDED);
-			    reg_target_cmp = 1;
+				regcomp(&reg, messageplus_tag, REG_EXTENDED);
+				reg_cmp = 1;
+				regcomp(&reg_target, number_tag, REG_EXTENDED);
+				reg_target_cmp = 1;
 				service = SRHELPER_SERVICE_MESSAGEPLUS;
 			}
 			else if (strcmp(service_cstr, "telcl") == 0)
 			{
-			    regcomp(&reg, number_tag, REG_EXTENDED);
-			    reg_cmp = 1;
+				regcomp(&reg, number_tag, REG_EXTENDED);
+				reg_cmp = 1;
 				service = SRHELPER_SERVICE_MKI_TELCL;
 			}
 		} else {
 			break;
 		}
-	    /* */
+		/* */
 		if (mode_cstr != NULL) {
 			if (strcmp(mode_cstr, "from") == 0)
 			{
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 				mode = SRHELPER_MODE_TO;
 			}
 		}
-	    /* */
+		/* */
 		fp = fopen(argv[optind], "r");
 		while (fgets(cstrbuff, sizeof(cstrbuff), fp) && searching_data == 1)
 		{
@@ -114,59 +114,59 @@ int main(int argc, char *argv[])
 				}
 			}
 			//printf("%s\n", cstrbuff);
-		    status = regexec(&reg, cstrbuff, 1, pmatch, 0);
-		    if (status != 0) continue;
-		    /* */
+			status = regexec(&reg, cstrbuff, 1, pmatch, 0);
+			if (status != 0) continue;
+			/* */
 			//printf("so:%d eo:%d len:%d\n", pmatch[0].rm_so, pmatch[0].rm_eo, strlen(cstrbuff));
-		    switch(service)
-		    {
-		    case SRHELPER_SERVICE_FAXIMO:
-		    	if (mode == SRHELPER_MODE_FROM) {
+			switch(service)
+			{
+			case SRHELPER_SERVICE_FAXIMO:
+				if (mode == SRHELPER_MODE_FROM) {
 					if (strlen(cstrbuff) == 42) {
 						cstrbuff[pmatch[0].rm_eo] = 0;
 						printf("%s", cstrbuff + pmatch[0].rm_so);
 						searching_data = 0;
 					}
-		    	} else {
+				} else {
 					if (strlen(cstrbuff) == 78) {
 						cstrbuff[pmatch[0].rm_eo] = 0;
 						printf("%s", cstrbuff + pmatch[0].rm_so);
 						searching_data = 0;
 					}
-		    	}
-		    	break;
-		    case SRHELPER_SERVICE_MESSAGEPLUS:
-		    	if (mode == SRHELPER_MODE_FROM) {
+				}
+				break;
+			case SRHELPER_SERVICE_MESSAGEPLUS:
+				if (mode == SRHELPER_MODE_FROM) {
 					cstrbuff[pmatch[0].rm_eo] = 0;
-		    		strncpy(tstrbuff, cstrbuff + pmatch[0].rm_so, sizeof(tstrbuff));
-				    status = regexec(&reg_target, tstrbuff, 1, pmatch, 0);
-				    if (status == 0) {
-				    	tstrbuff[pmatch[0].rm_eo] = 0;
+					strncpy(tstrbuff, cstrbuff + pmatch[0].rm_so, sizeof(tstrbuff));
+					status = regexec(&reg_target, tstrbuff, 1, pmatch, 0);
+					if (status == 0) {
+						tstrbuff[pmatch[0].rm_eo] = 0;
 						printf("%s", tstrbuff + pmatch[0].rm_so);
 						searching_data = 0;
 					}
-		    	} else {
+				} else {
 					searching_data = 0;
-		    	}
-		    	break;
-		    case SRHELPER_SERVICE_BIZFAX:
-		    	if (mode == SRHELPER_MODE_FROM) {
+				}
+				break;
+			case SRHELPER_SERVICE_BIZFAX:
+				if (mode == SRHELPER_MODE_FROM) {
 					if (strlen(cstrbuff) == 27) {
 						cstrbuff[pmatch[0].rm_eo] = 0;
 						printf("%s", cstrbuff + pmatch[0].rm_so);
 						searching_data = 0;
 					}
-		    	} else {
+				} else {
 					if (strlen(cstrbuff) == 39) {
 						cstrbuff[pmatch[0].rm_eo] = 0;
 						printf("%s", cstrbuff + pmatch[0].rm_so);
 						searching_data = 0;
 					}
-		    	}
-		    	break;
-		    default:
-		    	break;
-		    }
+				}
+				break;
+			default:
+				break;
+			}
 		}
 		fclose(fp);
 	} while (0);
