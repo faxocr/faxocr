@@ -149,6 +149,21 @@ int main(int argc, char *argv[])
 					searching_data = 0;
 		    	}
 		    	break;
+		    case SRHELPER_SERVICE_BIZFAX:
+		    	if (mode == SRHELPER_MODE_FROM) {
+					if (strlen(cstrbuff) == 27) {
+						cstrbuff[pmatch[0].rm_eo] = 0;
+						printf("%s", cstrbuff + pmatch[0].rm_so);
+						searching_data = 0;
+					}
+		    	} else {
+					if (strlen(cstrbuff) == 39) {
+						cstrbuff[pmatch[0].rm_eo] = 0;
+						printf("%s", cstrbuff + pmatch[0].rm_so);
+						searching_data = 0;
+					}
+		    	}
+		    	break;
 		    default:
 		    	break;
 		    }

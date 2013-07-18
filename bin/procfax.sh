@@ -57,12 +57,16 @@ do
 	#
 	ISFAXIMO=`grep "faximo.jp" $MDIR/$MFILE | head -1`
 	ISMESSAGEPLUS=`grep "everynet.jp" $MDIR/$MFILE | head -1`
+	ISBIZFAX=`grep "050fax.jp" $MDIR/$MFILE | head -1`
 	SRHMODE="faximo"
 	if [ "$ISFAXIMO" != "" ]; then
 		SRHMODE="faximo"
 	fi
 	if [ "$ISMESSAGEPLUS" != "" ]; then
 		SRHMODE="messageplus"
+	fi
+	if [ "$ISBIZFAX" != "" ]; then
+		SRHMODE="bizfax"
 	fi
 	FFROM=`srhelper -m from -s $SRHMODE $MDIR/$MFILE`
 	if [ "$FFROM" = "" ]; then
