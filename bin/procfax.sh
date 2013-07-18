@@ -13,7 +13,7 @@ CONF_PROC=~faxocr/bin/doconfig.sh
 
 # receive fax
 if [ "$FAX_RECV_SETTING" = "pop3" ]; then
-    getfax
+	getfax
 fi
 
 # temp files
@@ -25,7 +25,7 @@ TIME=`date +%H%M%S`
 SHEET_COUNT=0
 
 if [ "`ls $MDIR`" = '' ]; then
-    exit
+	exit
 fi
 
 mkdir $MBACKDIR 2> /dev/null
@@ -92,7 +92,7 @@ do
 
 	UNTMPDIR_FILES=`ls $UNTMPDIR/* | wc -l`
 	if [ "$UNTMPDIR_FILES" -gt "0" ]; then
-	    ATTACHED_TIFF=`ls $UNTMPDIR/* | grep -ie TIF$ 2>> $LOG |head -1`
+		ATTACHED_TIFF=`ls $UNTMPDIR/* | grep -ie TIF$ 2>> $LOG |head -1`
 	fi
 	if [ "$ATTACHED_TIFF" != "" ]; then
 		# When a tiff file has only one page, old version of converter
@@ -125,7 +125,7 @@ do
 
 		convert -resample 200 $TIFFILE $BACKTIFF
 		sheetreader -m rails -c $SHEETREADERCONF $OCR_DIR -r $FTO -s $FFROM -p $ANALYZEDIR \
-		    $BACKTIFF 2>> $LOG 1> $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb"
+			$BACKTIFF 2>> $LOG 1> $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb"
 		SRRESULT=$?
 		if [ $SRRESULT -ne 0 ];then
 			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT >&2
@@ -153,21 +153,21 @@ do
 		# Error file processing
 		#
 		if [ "$FFROM" != "UNNUMBER" -a "$SRRESULT" != "0" ]; then
-		    echo SEND ERROR MAIL
-		    sendfax $FFROM errorreport $ERRORPDF
+			echo SEND ERROR MAIL
+			sendfax $FFROM errorreport $ERRORPDF
 		fi
 
 		#
 		# Echo file processing
 		#
 		ruby $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb" $RAILSPATH $ANALYZEDIR \
-		    $ECHOFILE
+			$ECHOFILE
 		RUBYRESULT=$?
 		if [ "$RUBYRESULT" = "1" ]; then
-		    echo SEND ECHO MAIL
-		    sendfax $FFROM echoreport $ECHOFILE.pdf
-		    rm $ECHOFILE.pdf
-		    rm $ECHOFILE.html
+			echo SEND ECHO MAIL
+			sendfax $FFROM echoreport $ECHOFILE.pdf
+			rm $ECHOFILE.pdf
+			rm $ECHOFILE.html
 		fi
 	done
 	rm $UNTMPDIR/* 2>> $LOG
