@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
 	int help = 0;
 	int optval;
 	int result = 0;
+	int line_len_without_phone_no;
 	FILE *fp = NULL;
 	char cstrbuff[1024];
 	char tstrbuff[1024];
@@ -34,7 +35,7 @@ int main(int argc, char *argv[])
 	int searching_data = 1;
 	SRHELPER_SERVICE service = SRHELPER_SERVICE_FAXIMO;
 	SRHELPER_MODE mode = SRHELPER_MODE_FROM;
-	char *number_tag = "[0-9][1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]";
+	char *number_tag = "[0-9][1-9][0-9]{7,9}";	/* XXX: is it enough? */
 	char *messageplus_tag = "_[0-9][1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].tif";
 
 	do {
@@ -118,17 +119,18 @@ int main(int argc, char *argv[])
 			if (status != 0) continue;
 			/* */
 			//printf("so:%d eo:%d len:%d\n", pmatch[0].rm_so, pmatch[0].rm_eo, strlen(cstrbuff));
+			line_len_without_phone_no = strlen(cstrbuff) - (pmatch[0].rm_eo - pmatch[0].rm_so);
 			switch(service)
 			{
 			case SRHELPER_SERVICE_FAXIMO:
 				if (mode == SRHELPER_MODE_FROM) {
-					if (strlen(cstrbuff) == 42) {
+					if (line_len_without_phone_no == 32) {
 						cstrbuff[pmatch[0].rm_eo] = 0;
 						printf("%s", cstrbuff + pmatch[0].rm_so);
 						searching_data = 0;
 					}
 				} else {
-					if (strlen(cstrbuff) == 78) {
+					if (line_len_without_phone_no == 68) {
 						cstrbuff[pmatch[0].rm_eo] = 0;
 						printf("%s", cstrbuff + pmatch[0].rm_so);
 						searching_data = 0;
@@ -151,13 +153,13 @@ int main(int argc, char *argv[])
 				break;
 			case SRHELPER_SERVICE_BIZFAX:
 				if (mode == SRHELPER_MODE_FROM) {
-					if (strlen(cstrbuff) == 27) {
+					if (line_len_without_phone_no == 17) {
 						cstrbuff[pmatch[0].rm_eo] = 0;
 						printf("%s", cstrbuff + pmatch[0].rm_so);
 						searching_data = 0;
 					}
 				} else {
-					if (strlen(cstrbuff) == 39) {
+					if (line_len_without_phone_no == 28) {
 						cstrbuff[pmatch[0].rm_eo] = 0;
 						printf("%s", cstrbuff + pmatch[0].rm_so);
 						searching_data = 0;
