@@ -68,6 +68,11 @@ do
 	if [ "$ISBIZFAX" != "" ]; then
 		SRHMODE="bizfax"
 	fi
+	if [ x"$ISFAXIMO" = x"" -a x"$ISMESSAGEPLUS" = x"" -a x"$ISBIZFAX" = x"" ]; then
+		echo FAX: ERROR: cannot recognize a fax service from Mail >&2
+		echo FAX: ERROR: cannot recognize a fax service from Mail
+		echo FAX: ERROR: cannot recognize a fax service from Mail >> $LOG
+	fi
 	FFROM=`srhelper -m from -s $SRHMODE $MDIR/$MFILE`
 	if [ "$FFROM" = "" ]; then
 		FFROM="UNNUMBER"
@@ -122,12 +127,27 @@ do
 		sheetreader -m rails -c $SHEETREADERCONF $OCR_DIR -r $FTO -s $FFROM -p $ANALYZEDIR \
 		    $BACKTIFF 2>> $LOG 1> $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb"
 		SRRESULT=$?
+		if [ $SRRESULT -ne 0 ];then
+			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT >&2
+			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT
+			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT >> $LOG
+		else
+			echo SHEETREADER: $SRRESULT
+			echo SHEETREADER: $SRRESULT >> $LOG
+		fi
 
-		IMAGEDIR=`ls -d ${ANALYZEDIR}RUNNUMBER/SUNNUMBER/${DATE}*`
+		    
+		SRDATE=`grep answer_sheet.date $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb" | cut -d\" -f2`
+		if [ x"${SRDATE}" != x"" ]; then
+			echo SHEETREADER: date used in sheetreader: ERROR: result is empty
+			echo SHEETREADER: date used in sheetreader: ERROR: result is empty >&2
+			echo SHEETREADER: date used in sheetreader: ERROR: result is empty >> $LOG
+		else
+			echo SHEETREADER: date used in sheetreader: $SRDATE
+			echo SHEETREADER: date used in sheetreader: $SRDATE >> $LOG
+		fi
+		IMAGEDIR=${ANALYZEDIR}R${FFROM}/S${FTO}/${SRDATE}
 		convert -geometry 500 ${IMAGEDIR}/image.png ${IMAGEDIR}/image_thumb.png
-
-		echo SHEETREADER: $SRRESULT
-		echo SHEETREADER: $SRRESULT >> $LOG
 
 		#
 		# Error file processing
