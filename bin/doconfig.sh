@@ -80,7 +80,7 @@ DIR_FAX="./Faxsystem"
 DATE=`date +%Y%m%d%H%M`
 MDIR=$DIR_MAIL
 
-RAILSPATH=$DIR_RAILS 
+RAILSPATH=$DIR_RAILS
 SHEETREADERCONF=$DIR_RAILS"/faxocr_config/receive_sheetreader"
 ANALYZEDIR=$DIR_FAX"/analyzedimage/"
 
