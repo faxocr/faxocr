@@ -127,7 +127,7 @@ do
 		sheetreader -m rails -c $SHEETREADERCONF $OCR_DIR -r $FTO -s $FFROM -p $ANALYZEDIR \
 			$BACKTIFF 2>> $LOG 1> $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb"
 		SRRESULT=$?
-		if [ $SRRESULT -ne 0 ];then
+		if [ $SRRESULT -ne 0 ]; then
 			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT >&2
 			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT
 			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT >> $LOG
@@ -138,7 +138,7 @@ do
 
 
 		SRDATE=`grep answer_sheet.date $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb" | cut -d\" -f2`
-		if [ x"${SRDATE}" != x"" ]; then
+		if [ x"${SRDATE}" = x"" ]; then
 			echo SHEETREADER: date used in sheetreader: ERROR: result is empty
 			echo SHEETREADER: date used in sheetreader: ERROR: result is empty >&2
 			echo SHEETREADER: date used in sheetreader: ERROR: result is empty >> $LOG
