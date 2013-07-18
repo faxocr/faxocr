@@ -90,8 +90,14 @@ do
 	    ATTACHED_TIFF=`ls $UNTMPDIR/* | grep -ie TIF$ 2>> $LOG |head -1`
 	fi
 	if [ "$ATTACHED_TIFF" != "" ]; then
+		# When a tiff file has only one page, old version of converter
+		# command generates "single%d.tif" instead of "single0.tif".
+		# On the other hand a newer version of converter command
+		# generates "single0.tif".
 		convert $ATTACHED_TIFF $UNTMPDIR/single%d.tif
-		mv $UNTMPDIR/single%d.tif $UNTMPDIR/single.tif 
+		if [ -e $UNTMPDIR/single%d.tif ]; then
+			mv $UNTMPDIR/single%d.tif $UNTMPDIR/single.tif
+		fi
 	fi
 
 	# XXX
