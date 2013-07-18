@@ -136,7 +136,7 @@ do
 			echo SHEETREADER: $SRRESULT >> $LOG
 		fi
 
-		    
+
 		SRDATE=`grep answer_sheet.date $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb" | cut -d\" -f2`
 		if [ x"${SRDATE}" != x"" ]; then
 			echo SHEETREADER: date used in sheetreader: ERROR: result is empty
