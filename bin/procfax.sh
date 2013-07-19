@@ -139,7 +139,7 @@ do
 		#
 		# generate thumbnail image
 		#
-		SRDATE=`grep answer_sheet.date $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb" | cut -d\" -f2`
+		SRDATE=`grep answer_sheet.date $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb" | head -1 | cut -d\" -f2`
 		if [ x"${SRDATE}" = x"" ]; then
 			echo SHEETREADER: date used in sheetreader: ERROR: result is empty
 			echo SHEETREADER: date used in sheetreader: ERROR: result is empty >&2
