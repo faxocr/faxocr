@@ -1,0 +1,13 @@
+<h1>procfax実行ログ</h1>
+<div><%= link_to "戻る", procfax_configs_path %></div>
+<p>実行結果: 
+<% if (@result) %>
+成功
+<% else %>
+失敗
+<% end %>
+</p>
+<p>File Path: <%= @log_file_path %></p>
+<textarea readonly style="width: 100%; height: 400px;">
+<%= @raw_config %>
+</textarea>

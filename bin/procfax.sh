@@ -24,8 +24,12 @@ LOG=$LOGDIR"/procfax.log"
 TIME=`date +%H%M%S`
 SHEET_COUNT=0
 
+# move to home directory
+cd ~faxocr
+
 if [ "`ls $MDIR`" = '' ]; then
-	exit
+    echo "NOT FOUND: not found new email"
+    exit
 fi
 
 mkdir $MBACKDIR 2> /dev/null
