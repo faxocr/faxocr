@@ -1,9 +1,21 @@
+# -*- coding: utf-8 -*-
 class ConfigsController < ApplicationController
   before_filter :administrator_only
 
   def index
     @config_file_path = "#{Rails.root}/../etc/faxocr.conf"
     @raw_config = File.read(@config_file_path)
+  end
+
+  def update
+    @body = params[:body].to_s.gsub("\r\n", "\n")
+
+    @config_file_path = "#{Rails.root}/../etc/faxocr.conf"
+    File.open(@config_file_path, "w") do |f|
+      f.write(@body)
+    end
+
+    redirect_to configs_path
   end
 
   def database

@@ -1,5 +1,7 @@
 <h1>システム設定</h1>
 <p>File Path: <%= @config_file_path %></p>
-<textarea readonly style="width: 100%; height: 400px;">
-<%= @raw_config %>
-</textarea>
+
+<% form_tag('/configs/update', {:method => 'post'}) do %>
+  <%= submit_tag '変更' %>
+  <%= text_area :body, '', :style => 'width: 100%; height: 400px;', :value => @raw_config %>
+<% end %>
