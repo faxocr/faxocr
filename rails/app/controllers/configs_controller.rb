@@ -38,7 +38,7 @@ class ConfigsController < ApplicationController
 
 private
   def administrator_only
-    unless @current_group.is_administrator?
+    unless @current_user.login_name == 'admin'
       access_violation
     end
   end
