@@ -42,6 +42,27 @@ class ConfigsController < ApplicationController
     @raw_config = `crontab -u faxocr -l`
   end
 
+  def note
+    @config_file_path = "#{Rails.root}/../etc/note.txt"
+
+    if File.exist?(@config_file_path)
+      @raw_config = File.read(@config_file_path)
+    end
+  end
+
+  def note_update
+    @body = params[:body].to_s.gsub("\r\n", "\n")
+
+    @config_file_path = "#{Rails.root}/../etc/note.txt"
+    File.open(@config_file_path, "w") do |f|
+      f.write(@body)
+    end
+
+    flash[:notice] = '更新しました'
+
+    redirect_to note_configs_path
+  end
+
 private
   def administrator_only
     unless @current_user.login_name == 'admin'
