@@ -36,6 +36,10 @@ class ConfigsController < ApplicationController
     @raw_config = File.read(@log_file_path)
   end
 
+  def cron
+    @raw_config = `crontab -u faxocr -l`
+  end
+
 private
   def administrator_only
     unless @current_user.login_name == 'admin'
