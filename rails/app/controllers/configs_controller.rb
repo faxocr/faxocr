@@ -15,6 +15,8 @@ class ConfigsController < ApplicationController
       f.write(@body)
     end
 
+    flash[:notice] = '設定を更新しました'
+
     redirect_to configs_path
   end
 
