@@ -1,0 +1,36 @@
+# Sample localization file for English. Add more files in this directory for other locales.
+# See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+ja:
+  activerecord:
+    models:
+      user: "ユーザー"
+    attributes:
+      user:
+        login_name: "ログイン名"
+        full_name: "担当者名"
+        password: "ログインパスワード"
+    errors:
+      template:
+        header: "{{model}}でエラーが発生しました"
+        body: "以下のメッセージを確認してください:"
+      messages:
+        inclusion: "はリストに含まれていません"
+        exclusion: "は有効な値ではありません"
+        invalid: "は妥当な値ではありません"
+        confirmation: "が一致していません"
+        accepted: "を入力してください"
+        empty: "を入力してください"
+        blank: "を入力してください"
+        too_long: "は{{count}}文字以下で入力してください"
+        too_short: "は{{count}}文字以上で入力してください"
+        wrong_length: "は、桁数が合っていません({{count}}桁必要です)"
+        taken: "はすでに存在します"
+        not_a_number: "は数字ではありません"
+        greater_than: "は{{count}}文字を超えて入力されています"
+        greater_than_or_equal_to: "は、{{count}}文字以上入力されています"
+        equal_to: "は、{{count}}と同値です"
+        less_than: "は、{{count}}文字未満です"
+        less_than_or_equal_to: "は、{{count}}文字以下で入力されています"
+        odd: "は、端数が入力されています"
+        even: "は、偶数が入力されています"
