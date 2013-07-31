@@ -11,6 +11,19 @@ CONF_PROC=~faxocr/bin/doconfig.sh
 . $CONF_FILE
 . $CONF_PROC
 
+# move to home directory
+cd ~faxocr
+
+# cannot run multiple instance
+LOCKFILE=${DIR_FAX}"/"`basename $0`.lock
+trap 'echo "trapped."; rm -f ${LOCKFILE}; exit 1' 1 2 3 15
+
+if [ -e ${LOCKFILE} ]; then
+    echo 'Cannot run multiple instance.'
+    exit 1
+fi
+touch ${LOCKFILE}
+
 # receive fax
 if [ "$FAX_RECV_SETTING" = "pop3" ]; then
 	getfax
@@ -24,11 +37,9 @@ LOG=$LOGDIR"/procfax.log"
 TIME=`date +%H%M%S`
 SHEET_COUNT=0
 
-# move to home directory
-cd ~faxocr
-
 if [ "`ls $MDIR`" = '' ]; then
     echo "NOT FOUND: not found new email"
+#    rm ${LOCKFILE}
     exit
 fi
 
@@ -179,3 +190,5 @@ do
 	rm $UNTMPDIR/* 2>> $LOG
 done
 rmdir $UNTMPDIR 2>> $LOG
+
+rm ${LOCKFILE}
