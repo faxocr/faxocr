@@ -39,7 +39,7 @@ SHEET_COUNT=0
 
 if [ "`ls $MDIR`" = '' ]; then
     echo "NOT FOUND: not found new email"
-#    rm ${LOCKFILE}
+    rm ${LOCKFILE}
     exit
 fi
 
