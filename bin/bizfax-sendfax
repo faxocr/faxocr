@@ -13,7 +13,7 @@ from subprocess import Popen, PIPE
 
 BIZ_FAX_WEBPAGE_TABLE = [
         # 0
-        {   'url': 'https://dotphone.jp/otn/nf/uploadFile.jsf',
+        {   'url': 'https://dotphone.jp/otn/nf/uploadFile.jsf?cstkid=',
             'params': {
                 'service:uploadFile:_link_hidden_': 'service:uploadFile:_idJsp70',
             },
@@ -52,6 +52,20 @@ class BizFaxHTMLParser(HTMLParser):
     ### private functions
     def parseFormToUploadAFile(self, tag, attrs):
         self.parseSpecificForm(tag, attrs, 'service:uploadFile')
+        action = self.getAction(tag, attrs, 'service:uploadFile')
+        if action is None:
+            return
+        m = re.match('.+\?(.+)=(.+)', action)
+        if m is not None:
+            self.formElements[m.group(1)] = m.group(2)
+
+    def getAction(self, tag, attrs, name):
+        """Parse specified form and returns action."""
+        if tag == 'form':
+            d = dict(attrs)
+            if name == d['name']:
+                return d['action']
+        return None
 
     def parseSpecificForm(self, tag, attrs, name):
         """Parse specified form."""
@@ -81,11 +95,11 @@ class BizFaxHTMLParser(HTMLParser):
 
 def getCookieObject():
     cj = cookielib.LWPCookieJar(filename=COOKIE_FILE_HTTPPOST)
+    return cj
     if not os.path.exists(COOKIE_FILE_HTTPPOST):
         cj.save()
     else:
         cj.load()
-    return cj
 
 
 def genURLtoPOST(url, params):
@@ -114,18 +128,20 @@ def parseForm(contents):
         BIZ_FAX_WEBPAGE_TABLE[0]['params'][str(x)] = y
 
 
-def accessBizFax(cookieStr, faxDataFileName):
+def accessBizFax(cookieStr, faxDataFileName, cstkid):
     cj = getCookieObject()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     opener.addheaders = [
             #('User-Agent', 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'),
+            ('Referer', 'https://dotphone.jp/otn/nf/sendFax.jsf?cstkid=' + cstkid),
             ('Cookie', cookieStr)]
 
     headers = {}
     i = 0
     if i == 0:
+        BIZ_FAX_WEBPAGE_TABLE[i]['url'] += cstkid
         postdata = BIZ_FAX_WEBPAGE_TABLE[i]['params']
-        postdata['service:uploadFile:fileUpload'] = open(faxDataFileName, "r+b")
+        postdata['service:uploadFile:fileUpload'] = open(faxDataFileName, "rb")
 
         if is_multipart(postdata):
             data, boundary = encode_postdata(postdata)
@@ -137,7 +153,7 @@ def accessBizFax(cookieStr, faxDataFileName):
     else:
         data = genURLtoPOST(BIZ_FAX_WEBPAGE_TABLE[i]['url'], BIZ_FAX_WEBPAGE_TABLE[i]['params'])
 
-    request = urllib2.Request(BIZ_FAX_WEBPAGE_TABLE[i]['url'], data, headers)
+    request = urllib2.Request(BIZ_FAX_WEBPAGE_TABLE[i]['url'].encode('utf-8'), data, headers)
     contents = opener.open(request).read()
 
     return
@@ -238,6 +254,7 @@ class WebBrowser(gtk.Window):
         self.connect('destroy', gtk.main_quit)
         #self.show_all()
         self._browser.open('https://apply.050anshin.com/OTNWeb/nf/OTNUSRSYS.aspx')
+        self.cstkid = None
 
     def _cb_load_finished(self, view, frame):
         """Call-back function when the page was loaded."""
@@ -320,13 +337,29 @@ class WebBrowser(gtk.Window):
             self.browsingState = 6
         elif self.browsingState == 6:
             debug("now state in " + str(self.browsingState))
-            debug("going to post fax data to server")
+            debug("going to upload a fax image file to bizfax")
             cookieStr = self._javascript.EvaluateScript("document.cookie;")
             webContents = self._javascript.EvaluateScript("document.body.innerHTML;")
             parseForm(webContents)
-            accessBizFax(cookieStr, self.faxDataFileName)
+            self.cstkid = BIZ_FAX_WEBPAGE_TABLE[0]['params']['cstkid']
+            accessBizFax(cookieStr, self.faxDataFileName, self.cstkid)
+            debug("going back to a previous page")
+            debug("redirection to https://dotphone.jp/otn/nf/sendFaxRedirect.jsf?cstkid=" + self.cstkid)
+            self._javascript.EvaluateScript("location.href='https://dotphone.jp/otn/nf/sendFaxRedirect.jsf?cstkid=" + self.cstkid + "';")
+            self.browsingState = 7
+        elif self.browsingState == 64:
+            """broken:donot use: try to upload by web clicking. This way is not allowed"""
+            debug("now state in " + str(self.browsingState))
+            debug("going to upload a fax image file to server")
+            self._javascript.EvaluateScript("document.forms['service:uploadFile'].elements['service:uploadFile:fileUpload'].value='" + urllib.quote(open(self.faxDataFileName, "rb").read()) + "';")
             debug("going back to a previous page")
             self._javascript.EvaluateScript("document.all.item('service:uploadFile:_idJsp72').click();")
+            self.browsingState = 7
+        elif self.browsingState == 65:
+            debug("now state in " + str(self.browsingState))
+            debug("redirection to https://dotphone.jp/otn/nf/sendFax.jsf?cstkid=" + self.cstkid)
+            #self._javascript.EvaluateScript("document.all.item('service:sendFaxForm:_idJsp186').click();")
+            self._javascript.EvaluateScript("location.href='https://dotphone.jp/otn/nf/sendFax.jsf?cstkid=" + self.cstkid + "';")
             self.browsingState = 7
         elif self.browsingState == 7:
             debug("now state in " + str(self.browsingState))
