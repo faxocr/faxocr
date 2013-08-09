@@ -69,6 +69,13 @@ class ConfigsController < ApplicationController
     @log_file_path = "#{Rails.root}/../Faxsystem/Log/rails_sendtestfax.log"
     @dest_fax_num = params[:dest_fax_num].to_s
 
+    if /[^0-9-]/ =~ @dest_fax_num
+      flash[:notice] = '電話番号には、半角数値と「-」のみをお使いください'
+      redirect_to sendtestfax_configs_path
+      return
+    end
+
+    @dest_fax_num = @dest_fax_num.gsub("-", "")
     @result = system("sh " + @script_path + " #{@dest_fax_num} testOfSedingAfax #{@fax_data_pdf} >> " + @log_file_path)
 
     if @result == true
