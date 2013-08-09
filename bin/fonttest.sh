@@ -1455,5 +1455,9 @@ vertical-align: middle;
 " > $TMPNAME.html
 
 xvfb-run -a wkhtmltopdf --page-size A4 -O Landscape $TMPNAME.html $TMPNAME.pdf
+if [ `strings $TMPNAME.pdf | grep OCRB |wc -l ` -ge 1 ]; then
+        echo found OCRB font
+else
+        echo NOT found OCRB font
+fi
 rm -f $TMPNAME.html
-
