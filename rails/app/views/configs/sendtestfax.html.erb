@@ -1,7 +1,6 @@
 <h1>テストファックス送信</h1>
 
 <% form_tag('/configs/sendtestfax_exec', {:method => 'post'}) do %>
-  <%= submit_tag '送信' %><br>
   <blockquote>
   <br>
   <center>
@@ -11,5 +10,8 @@
   </span>
   </center>
   <br>
+  <div align="right">
+  <%= submit_tag '送信' %><br>
   </blockquote>
+  </div>
 <% end %>
