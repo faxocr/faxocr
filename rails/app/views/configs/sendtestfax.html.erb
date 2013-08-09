@@ -1,0 +1,7 @@
+<h1>テストファックス送信</h1>
+
+<% form_tag('/configs/sendtestfax_exec', {:method => 'post'}) do %>
+  <%= submit_tag '送信' %><br>
+  送信先FAX番号
+  <%= text_field :dest_fax_num, '' %> (数字のみを入力してください)
+<% end %>

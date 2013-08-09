@@ -63,6 +63,24 @@ class ConfigsController < ApplicationController
     redirect_to note_configs_path
   end
 
+ def sendtestfax_exec
+   @script_path = "#{Rails.root}/../bin/sendfax"
+   @fax_data_pdf = "#{Rails.root}/../etc/test.pdf"
+   @log_file_path = "#{Rails.root}/../Faxsystem/Log/rails_sendtestfax.log"
+   @dest_fax_num = params[:dest_fax_num].to_s
+
+   @result = system("sh " + @script_path + " #{@dest_fax_num} testOfSedingAfax #{@fax_data_pdf} >> " + @log_file_path)
+
+   if @result == true
+     flash[:notice] = '送信しました'
+   else
+     flash[:notice] = '送信に失敗しました' + "(エラーコード #{$?})"
+   end
+
+   redirect_to sendtestfax_configs_path
+ end
+
+
 private
   def administrator_only
     unless @current_user.login_name == 'admin'
