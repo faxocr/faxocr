@@ -23,27 +23,19 @@ FAX_SUBJ=$2
 FAX_IMG=$3
 FAX_TO=$FAX_NO"@"$FAX_SEND_TARGET
 
-if [ "$FAX_SEND_TYPE" = "bizfax" ] ; then
-
+case "$FAX_SEND_TYPE" in
+bizfax)
     echo $BIZFAX_LOGIN_PASS | xvfb-run -a $BIZFAX_PROGRAM "$BIZFAX_LOGIN_USER" "$FAX_NO" "$BIZFAX_FAX_SIZE" "$FAX_IMG"
+    ;;
 
-elif [ "$FAX_SEND_TYPE" = "faximo" ] ; then
-
+faximo|messageplus)
     if [ "$SMTP_HOST" = "no" ] ; then
         sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null
     else
         sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null \
             -o tls=$SMTP_SSL -s $SMTP_HOST:$SMTP_PORT -xu $SMTP_USER -xp $SMTP_PASSWORD
     fi
-
-elif [ "$FAX_SEND_TYPE" = "messageplus" ] ; then
-
-    if [ "$SMTP_HOST" = "no" ] ; then
-        sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null
-    else
-        sendemail -t $FAX_TO -u $FAX_SUBJ -a $FAX_IMG -f $FAX_SEND_FROM -o message-file=/dev/null \
-            -o tls=$SMTP_SSL -s $SMTP_HOST:$SMTP_PORT -xu $SMTP_USER -xp $SMTP_PASSWORD
-    fi
-fi
+    ;;
+esac
 
 # vim: set et fenc=utf-8 ff=unix sts=4 sw=4 ts=4 :
