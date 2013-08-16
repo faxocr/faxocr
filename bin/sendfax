@@ -25,7 +25,7 @@ FAX_TO=$FAX_NO"@"$FAX_SEND_TARGET
 
 case "$FAX_SEND_TYPE" in
 bizfax)
-    echo $BIZFAX_LOGIN_PASS | xvfb-run -a $BIZFAX_PROGRAM "$BIZFAX_LOGIN_USER" "$FAX_NO" "$BIZFAX_FAX_SIZE" "$FAX_IMG"
+    echo $BIZFAX_LOGIN_PASSWORD | xvfb-run -a $BIZFAX_PROGRAM "$BIZFAX_LOGIN_USER" "$FAX_NO" "$BIZFAX_FAX_SIZE" "$FAX_IMG"
     ;;
 
 faximo|messageplus)
