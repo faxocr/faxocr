@@ -61,6 +61,17 @@ int main(int argc, char *argv[])
 			break;
 		}
 		/* */
+		if (mode_cstr != NULL) {
+			if (strcmp(mode_cstr, "from") == 0)
+			{
+				mode = SRHELPER_MODE_FROM;
+			}
+			else if (strcmp(mode_cstr, "to") == 0)
+			{
+				mode = SRHELPER_MODE_TO;
+			}
+		}
+		/* */
 		if (service_cstr != NULL) {
 			if (strcmp(service_cstr, "faximo") == 0)
 			{
@@ -76,10 +87,15 @@ int main(int argc, char *argv[])
 			}
 			else if (strcmp(service_cstr, "messageplus") == 0)
 			{
-				regcomp(&reg, messageplus_tag, REG_EXTENDED);
-				reg_cmp = 1;
-				regcomp(&reg_target, number_tag, REG_EXTENDED);
-				reg_target_cmp = 1;
+				if (mode == SRHELPER_MODE_FROM) {
+					regcomp(&reg, messageplus_tag, REG_EXTENDED);
+					reg_cmp = 1;
+					regcomp(&reg_target, number_tag, REG_EXTENDED);
+					reg_target_cmp = 1;
+				} else {
+					regcomp(&reg, number_tag, REG_EXTENDED);
+					reg_cmp = 1;
+				}
 				service = SRHELPER_SERVICE_MESSAGEPLUS;
 			}
 			else if (strcmp(service_cstr, "telcl") == 0)
@@ -90,17 +106,6 @@ int main(int argc, char *argv[])
 			}
 		} else {
 			break;
-		}
-		/* */
-		if (mode_cstr != NULL) {
-			if (strcmp(mode_cstr, "from") == 0)
-			{
-				mode = SRHELPER_MODE_FROM;
-			}
-			else if (strcmp(mode_cstr, "to") == 0)
-			{
-				mode = SRHELPER_MODE_TO;
-			}
 		}
 		/* */
 		fp = fopen(argv[optind], "r");
@@ -148,7 +153,11 @@ int main(int argc, char *argv[])
 						searching_data = 0;
 					}
 				} else {
-					searching_data = 0;
+					if (line_len_without_phone_no == 21) {
+						cstrbuff[pmatch[0].rm_eo] = 0;
+						printf("%s", cstrbuff + pmatch[0].rm_so);
+						searching_data = 0;
+					}
 				}
 				break;
 			case SRHELPER_SERVICE_BIZFAX:
