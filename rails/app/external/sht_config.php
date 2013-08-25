@@ -252,14 +252,20 @@ function put_excel($xls)
 	while ($cid != FALSE) {
 		$cid = sprintf("%05d", $cid);
 
+		$innerheight = 0;
+		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
+			$innerheight += floor($xls->getRowHeight($sn, $r) * $scale);
+		}
+		$topheight = $tblheight - $innerheight;
+
 		$html .= "\n<hr style=\"page-break-after:always; visibility:hidden;\">\n\n";
 		if ($feature_fixed_marker_window == 1) {
 			$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"top: 0px; left: 0px; z-index: 3; position: relative; width: {$tblwidth}px; height:{$tblheight}px; font-size: 12px; padding: 0px; border: 0px; margin: 0px; \">\n";
 		} else {
 			$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"top:{$offsety_marker_window}px; left:{$offsetx_marker_window}px; z-index: 3; position: relative; width: {$width_marker_window}px; height:{$height_marker_window}px; font-size: 12px; padding: 1px; \">\n";
 		}
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;left: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; \"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$cid</font></div>\n";
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;right: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\">\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $topheight . "px;left: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\"><div style=\"position: absolute; top:{$topheight}px; left:{$position_of_sheet_id_from_left_side}px; \"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$cid</font></div>\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $topheight . "px;right: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\">\n";
 		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; bottom: 0\"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$sid</font></div>\n";
 
 		$cid = strtok("-");
@@ -270,7 +276,7 @@ function put_excel($xls)
 		$html .= " style=\"table-layout:fixed; border-collapse: collapse;\"";
 		$html .=" bgcolor=\"#FFFFFF\" >\n";
 
-		$html .= '<tr height="0" margin="0" padding="0">' . "\n";
+		$html .= '<tr height="' . $topheight . 'px" margin="0" padding="0">' . "\n";
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 			$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
 			$html .= " <th border=\"0\" height=\"0\" width=\"$tdwidth\"></th>\n";
