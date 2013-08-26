@@ -222,10 +222,10 @@ function put_excel($xls)
 	$tblwidth = 0;
 	$tblheight = 0;
 	for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-		$tblwidth += floor($xls->getColWidth($sn, $i));
+		$tblwidth += $xls->getColWidth($sn, $i);
 	}
 	for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
-		$tblheight += floor($xls->getRowHeight($sn, $i));
+		$tblheight += $xls->getRowHeight($sn, $i);
 	}
 
 	// マーカーウインドウ
@@ -256,7 +256,9 @@ function put_excel($xls)
 		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
 			$innerheight += floor($xls->getRowHeight($sn, $r) * $scale);
 		}
-		$topheight = $tblheight - $innerheight;
+
+		$topheight = 0;
+		if ($tblheight > $innerheight) $topheight = $tblheight - $innerheight;
 
 		$html .= "\n<hr style=\"page-break-after:always; visibility:hidden;\">\n\n";
 		if ($feature_fixed_marker_window == 1) {
