@@ -183,17 +183,27 @@ $().ready(function() {
 var last_size = $marker_size;
 
 function size_up() {
+	var w = parseInt($("#ex3").css("width"));
+	var block = w / last_size;
+
 	last_size = last_size + 1;
 	$(".mark-img").each( function () {
 		$(this).css("width", last_size);
 	});
+
+	$("#ex3").css("width", (block * last_size) + "px");
 }
 
 function size_down() {
+	var w = parseInt($("#ex3").css("width"));
+	var block = w / last_size;
+
 	last_size = last_size > 17 ? (last_size - 1) : 16;
 	$(".mark-img").each( function () {
 		$(this).css("width", last_size);
 	});
+
+	$("#ex3").css("width", (block * last_size) + "px");
 }
 
 function go_prev() {

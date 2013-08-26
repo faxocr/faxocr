@@ -232,7 +232,7 @@ function put_excel($xls)
 	$scale = get_scaling($width_marker_window, $height_marker_window, 960);
 	$width_marker_window = floor($width_marker_window * $scale);
 	$height_marker_window = floor($height_marker_window * $scale);
-	$size_of_marker = floor($size_of_marker * $scale * 0.95);
+	$size_of_marker = floor($size_of_marker * $scale);
 	$position_of_sheet_id_from_left_side = floor($size_of_marker * 2);
 
 	// シートウインドウ
@@ -242,10 +242,10 @@ function put_excel($xls)
 
 	// Spec is not fixed that assigning position of marker by users from web UI.
 	// the following variable can control which feature is preferred
-	$feature_fixed_marker_window = 1;
+	$feature_fixed_marker_window = 0;
 	if ($feature_fixed_marker_window == 1) {
 		// set marker size from the size of A1 cell
-		$size_of_marker = floor($xls->getRowHeight($sn, 0) * $scale) * 0.95 - 1;
+		$size_of_marker = floor($xls->getRowHeight($sn, 0) * $scale);
 		$position_of_sheet_id_from_left_side = floor($size_of_marker * 2);
 	}
 
