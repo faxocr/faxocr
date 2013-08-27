@@ -4,7 +4,16 @@
 <ul>
   <% @files.each do |file| %>
     <% if File.ftype(file) == "directory" %>
-    <li><%= File.basename(file).gsub(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/, '\1/\2/\3-\4:\5') %></li>
+    <li><%= File.basename(file).gsub(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/, '\1/\2/\3-\4:\5') %>
+    <% contents = IO.readlines("#{file}/procfax.log") %>
+    <% count = contents.map{|l| l if l.include?("INFO: Number of fax processed:")}.join.split(':')[2] %>
+    処理済みFax <%= count %>件
+    <% count = contents.map{|l| l if l.include?("INFO: Number of error occured processing fax:")}.join.split(':')[2] %>
+    (失敗 <%= count %>件)
+    <% count = contents.map{|l| l if l.include?("INFO: Number of sheet processed:")}.join.split(':')[2] %>
+    処理済みシート <%= count %>件
+    <% count = contents.map{|l| l if l.include?("INFO: Number of error occured processing sheet:")}.join.split(':')[2] %>
+    (失敗 <%= count %>件)</li>
     <% end %>
   <% end %>
 </ul>
