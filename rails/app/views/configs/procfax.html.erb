@@ -1,6 +1,6 @@
 <h1>procfaxログ</h1>
 <p>Log Directory Path: <%= @logdir_path %></p>
-<p><%= link_to "procfax.sh実行", procfax_exec_configs_path %></p>
+<p><%= button_to "procfax.sh実行", procfax_exec_configs_path %></p>
 <ul>
   <% @files.each do |file| %>
     <% if File.ftype(file) == "directory" %>
