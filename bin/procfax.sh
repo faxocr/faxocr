@@ -35,7 +35,10 @@ ECHOFILE="/tmp/echofile"$$
 ECHOMAIL="/tmp/echofile"$$".eml"
 LOG=$LOGDIR"/procfax.log"
 TIME=`date +%H%M%S`
+FAX_COUNT=0
+FAX_ERROR_COUNT=0
 SHEET_COUNT=0
+SHEET_ERROR_COUNT=0
 
 if [ "`ls $MDIR`" = '' ]; then
     echo "NOT FOUND: not found new email"
@@ -51,6 +54,11 @@ mkdir $UNTMPDIR 2> /dev/null
 ruby rails/script/getsrml.rb > $SHEETREADERCONF/srml/faxocr.xml
 for MFILE in `ls $MDIR`
 do
+	# initialize local variable
+	FAX_ERROR_HAPPENS_FLAG=0
+
+	FAX_COUNT=`expr $FAX_COUNT + 1`
+
 	#
 	# directory setting / preprocessing
 	#
@@ -87,6 +95,7 @@ do
 		echo FAX: ERROR: cannot recognize a fax service from Mail >&2
 		echo FAX: ERROR: cannot recognize a fax service from Mail
 		echo FAX: ERROR: cannot recognize a fax service from Mail >> $LOG
+		FAX_ERROR_HAPPENS_FLAG=1
 	fi
 	FFROM=`srhelper -m from -s $SRHMODE $MDIR/$MFILE`
 	if [ "$FFROM" = "" ]; then
@@ -128,6 +137,9 @@ do
 
 	for TIFFILE in `ls $UNTMPDIR/single*`
 	do
+		# initialize local variable
+		SHEET_ERROR_HAPPENS_FLAG=0
+
 		#
 		# Sheetreader processing
 		#
@@ -146,6 +158,7 @@ do
 			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT >&2
 			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT
 			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT >> $LOG
+			SHEET_ERROR_HAPPENS_FLAG=1
 		else
 			echo SHEETREADER: $SRRESULT
 			echo SHEETREADER: $SRRESULT >> $LOG
@@ -159,6 +172,7 @@ do
 			echo SHEETREADER: date used in sheetreader: ERROR: result is empty
 			echo SHEETREADER: date used in sheetreader: ERROR: result is empty >&2
 			echo SHEETREADER: date used in sheetreader: ERROR: result is empty >> $LOG
+			SHEET_ERROR_HAPPENS_FLAG=1
 		else
 			echo SHEETREADER: date used in sheetreader: $SRDATE
 			echo SHEETREADER: date used in sheetreader: $SRDATE >> $LOG
@@ -185,10 +199,22 @@ do
 			sendfax $FFROM echoreport $ECHOFILE.pdf
 			rm $ECHOFILE.pdf
 			rm $ECHOFILE.html
+			SHEET_ERROR_HAPPENS_FLAG=1
+		fi
+		if [ $SHEET_ERROR_HAPPENS_FLAG -eq 1 ]; then
+			SHEET_ERROR_COUNT=`expr $SHEET_ERROR_COUNT + 1`
+			FAX_ERROR_HAPPENS_FLAG=1
 		fi
 	done
 	rm $UNTMPDIR/* 2>> $LOG
+	if [ $FAX_ERROR_HAPPENS_FLAG -eq 1 ]; then
+		FAX_ERROR_COUNT=`expr $FAX_ERROR_COUNT + 1`
+	fi
 done
+echo "INFO: Number of fax processed:$FAX_COUNT" >> $LOG
+echo "INFO: Number of sheet processed:$SHEET_COUNT" >> $LOG
+echo "INFO: Number of error occured processing fax:$FAX_ERROR_COUNT" >> $LOG
+echo "INFO: Number of error occured processing sheet:$SHEET_ERROR_COUNT" >> $LOG
 rmdir $UNTMPDIR 2>> $LOG
 
 rm ${LOCKFILE}
