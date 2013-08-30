@@ -242,7 +242,7 @@ function put_excel($xls)
 
 	// Spec is not fixed that assigning position of marker by users from web UI.
 	// the following variable can control which feature is preferred
-	$feature_fixed_marker_window = 0;
+	$feature_fixed_marker_window = 1;
 	if ($feature_fixed_marker_window == 1) {
 		// set marker size from the size of A1 cell
 		$size_of_marker = floor($xls->getRowHeight($sn, 0) * $scale);
