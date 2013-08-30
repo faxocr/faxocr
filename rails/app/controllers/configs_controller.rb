@@ -87,6 +87,10 @@ class ConfigsController < ApplicationController
     redirect_to sendtestfax_configs_path
   end
 
+  def viewmaildir
+    @raw_config = `ls -lt #{Rails.root}/../Maildir/new`
+  end
+
 
 private
   def administrator_only
