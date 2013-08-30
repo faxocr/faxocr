@@ -3,6 +3,10 @@ class ConfigsController < ApplicationController
   before_filter :administrator_only
 
   def index
+    redirect_to note_configs_path
+  end
+
+  def view_system_config
     @config_file_path = "#{Rails.root}/../etc/faxocr.conf"
     @raw_config = File.read(@config_file_path)
   end
