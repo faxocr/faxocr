@@ -29,13 +29,16 @@
 	  <div class="menu">
 	    <h4>システム管理</h4>
 	    <ul>
-	      <li><%= link_to "設定メモ", note_configs_path %></li>
-	      <li><%= link_to "procfaxログ", procfax_configs_path %></li>
-	      <li><%= link_to "メールディレクトリチェック", viewmaildir_configs_path %></li>
-	      <li><%= link_to "テストファックス送信", sendtestfax_configs_path %></li>
-	      <li><%= link_to "システム設定<br />(etc/faxocr.conf)", view_system_config_configs_path %></li>
-	      <li><%= link_to "データベース設定<br />(rails/config/database.yml)", database_configs_url %></li>
-	      <li><%= link_to "cron設定", cron_configs_path %></li>
+	      <li><%= link_to "システム管理メモ", note_configs_path %></li>
+	      <hr>
+	      <li><%= link_to "宛先不明Fax一覧", "/groups/1/surveys/1/answer_sheets" %></li>
+	      <li><%= link_to "Fax処理履歴", procfax_configs_path %></li>
+	      <li><%= link_to "処理待ちFaxメール一覧", viewmaildir_configs_path %></li>
+	      <li><%= link_to "Faxテスト送信", sendtestfax_configs_path %></li>
+	      <hr>
+	      <li><%= link_to "FaxOCR設定", view_system_config_configs_path %></li>
+	      <li><%= link_to "データベース設定 (閲覧)", database_configs_url %></li>
+	      <li><%= link_to "cron設定 (閲覧)", cron_configs_path %></li>
 	    </ul>
 	  </div>
 	</div>
