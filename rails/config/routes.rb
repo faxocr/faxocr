@@ -1,6 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
 
-  map.resources :configs, :collection => { :index => :get, :view_system_config => :get, :update => :post, :database => :get, :procfax => :get, :procfax_exec => :post, :cron => :get, :note => :get, :note_update => :post, :sendtestfax => :get, :sendtestfax_exec => :post, :viewmaildir => :get }
+  map.resources :configs, :collection => { :index => :get, :view_system_config => :get, :update => :post, :database => :get, :procfax => :get, :procfax_exec => :post, :getfax_exec => :post, :cron => :get, :note => :get, :note_update => :post, :sendtestfax => :get, :sendtestfax_exec => :post, :viewmaildir => :get }
 
   map.resources :role_mappings
 

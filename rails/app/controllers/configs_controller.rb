@@ -42,6 +42,19 @@ class ConfigsController < ApplicationController
     @raw_config = File.read(@log_file_path)
   end
 
+  def getfax_exec
+    @script_path = "#{Rails.root}/../bin/getfax"
+    @log_file_path = "#{Rails.root}/../Faxsystem/Log/rails_procfax.log"
+
+    @result = system("sh " + @script_path + " >> " + @log_file_path)
+    if @result == true
+      flash[:notice] = 'Faxを取得(fetchmail)しました'
+    else
+      flash[:notice] = 'Faxの取得(fetchmail)に失敗しました' + "(エラーコード #{$?})"
+    end
+    redirect_to procfax_configs_path
+  end
+
   def cron
     @raw_config = `crontab -u faxocr -l`
   end
@@ -93,6 +106,18 @@ class ConfigsController < ApplicationController
 
   def viewmaildir
     @raw_config = `ls -lt #{Rails.root}/../Maildir/new`
+
+    @config_file_path = "#{Rails.root}/../etc/faxocr.conf"
+    @result = system("sh -c '. " + @config_file_path + '; test "$FAX_RECV_SETTING" = "pop3" && exit 0; exit 1 \'')
+    case @result
+    when true
+      @fetchmail_enabled = 1
+    when false
+      @fetchmail_enabled = 0
+    when nil
+      @fetchmail_enabled = 0
+      flash[:notice] = "設定ファイルからFax受信方法の取得に失敗しました(エラーコード #{$?})"
+    end
   end
 
 
