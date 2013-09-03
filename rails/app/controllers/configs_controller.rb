@@ -52,7 +52,7 @@ class ConfigsController < ApplicationController
     else
       flash[:notice] = 'Faxの取得(fetchmail)に失敗しました' + "(エラーコード #{$?})"
     end
-    redirect_to procfax_configs_path
+    redirect_to viewmaildir_configs_path
   end
 
   def cron
