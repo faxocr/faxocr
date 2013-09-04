@@ -23,9 +23,28 @@ if [ ! -e $FETCHMAILDATA -o $CONF_FILE -nt $FETCHMAILDATA ] ; then
 	POP3_SSL=""
     fi
 
-    echo poll $POP3_HOST port $POP3_PORT protocol pop3 user \"$POP3_USER\" password \"$POP3_PASSWORD\" mda "/usr/bin/procmail" $POP3_SSL > $FETCHMAILDATA
+    cat <<_EOL > $FETCHMAILDATA
+set nobouncemail
+set logfile "Maildir/fetchmail.log"
+set postmaster root
+
+
+defaults
+        no mimedecode
+        mda "/usr/bin/procmail"
+
+poll $POP3_HOST
+        proto pop3
+        port $POP3_PORT
+        user $POP3_USER
+        password $POP3_PASSWORD
+        flush
+        $POP3_SSL
+_EOL
+
     chmod 600 $FETCHMAILDATA
 fi
 
-# do fetch fax
+# Rails uses the exit status of the fetchmail command.
+# So the fetchmail command must be placed at the bottom of this script.
 fetchmail
