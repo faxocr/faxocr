@@ -47,10 +47,21 @@ class ConfigsController < ApplicationController
     @log_file_path = "#{Rails.root}/../Faxsystem/Log/rails_procfax.log"
 
     @result = system("sh " + @script_path + " >> " + @log_file_path)
-    if @result == true
+    case @result
+    when true
       flash[:notice] = 'Faxを取得(fetchmail)しました'
-    else
-      flash[:notice] = 'Faxの取得(fetchmail)に失敗しました' + "(エラーコード #{$?})"
+    when false
+      exit_status = $?.to_i / 256
+      case exit_status
+      when 1
+        flash[:notice] = '新着Faxはありませんでした'
+      when 3
+        flash[:notice] = 'fetchmailでのユーザ認証に失敗しました。faxocr.confの設定を見直してください。'
+      else
+        flash[:notice] = 'fetchmailがエラーを返しました' + "(エラーコード #{exit_status})"
+      end
+    when nil
+      flash[:notice] = 'getfaxコマンドの実行に失敗しました' + "(エラーコード #{$?})"
     end
     redirect_to viewmaildir_configs_path
   end
