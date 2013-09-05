@@ -21,7 +21,7 @@ class ConfigsController < ApplicationController
 
     flash[:notice] = '設定を更新しました'
 
-    redirect_to configs_path
+    redirect_to view_system_config_configs_path
   end
 
   def database
