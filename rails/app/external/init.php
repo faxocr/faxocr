@@ -73,6 +73,10 @@ if (isset($_REQUEST["rails_env"])) {
 	$rails_env = $_REQUEST["rails_env"];
 }
 
+if (isset($_REQUEST["debug_mode"])) {
+	$debug_mode = $_REQUEST["debug_mode"];
+}
+
 if (isset($_REQUEST["msg"])) {
 	$errmsg = $_REQUEST["msg"];
 }

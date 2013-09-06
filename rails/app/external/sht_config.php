@@ -203,6 +203,7 @@ function put_excel($xls)
 {
 	global $field_index;
 	global $conf;
+	global $debug_mode;
 
 	$sid = sprintf("%05d", $conf->get("sid"));
 	$cid = strtok($conf->get("candidate_code"), "-");
@@ -242,7 +243,10 @@ function put_excel($xls)
 
 	// Spec is not fixed that assigning position of marker by users from web UI.
 	// the following variable can control which feature is preferred
-	$feature_fixed_marker_window = 1;
+	$feature_fixed_marker_window = 0;
+	if ($debug_mode === 'true') {
+		$feature_fixed_marker_window = 1;
+	}
 	if ($feature_fixed_marker_window == 1) {
 		// set marker size from the size of A1 cell
 		$size_of_marker = floor($xls->getRowHeight($sn, 0) * $scale);

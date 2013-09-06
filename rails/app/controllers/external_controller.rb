@@ -260,7 +260,8 @@ class ExternalController < ApplicationController
       @ret = `rm -f #{@file_prefix}-*.pdf`
       @ret = `rm -f doc_data.txt`
     else
-      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{RAILS_ENV}\"`
+      @debug_mode = `. #{Rails.root}/../etc/faxocr.conf; echo $DEBUG_MODE`
+      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{RAILS_ENV}\" debug_mode=\"#{@debug_mode}\"`
       # flash[:notice] = @errmsg
       # flash[:notice] = "セーブしました"
     end
