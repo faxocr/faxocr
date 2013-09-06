@@ -91,6 +91,11 @@ class ConfigsController < ApplicationController
     redirect_to note_configs_path
   end
 
+  def sendtestfax
+    @log_file_path = "#{Rails.root}/../Faxsystem/Log/sendfax.log"
+    @raw_config = `tail -10 #{@log_file_path}`
+  end
+
   def sendtestfax_exec
     @script_path = "#{Rails.root}/../bin/sendfax"
     @fax_data_pdf = "#{Rails.root}/../etc/test.pdf"

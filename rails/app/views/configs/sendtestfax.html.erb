@@ -1,6 +1,9 @@
-<h1>Faxテスト送信</h1>
+<h1>Fax送信履歴(直近10件)</h1>
 
 <% form_tag('/configs/sendtestfax_exec', {:method => 'post'}) do %>
+  <textarea readonly style="width: 100%; height: 200px;">
+  <%= @raw_config %>
+  </textarea>
   <blockquote>
   <br>
   <center>
