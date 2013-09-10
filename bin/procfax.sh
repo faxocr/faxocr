@@ -199,7 +199,6 @@ do
 			sendfax $FFROM echoreport $ECHOFILE.pdf
 			rm $ECHOFILE.pdf
 			rm $ECHOFILE.html
-			SHEET_ERROR_HAPPENS_FLAG=1
 		fi
 		if [ $SHEET_ERROR_HAPPENS_FLAG -eq 1 ]; then
 			SHEET_ERROR_COUNT=`expr $SHEET_ERROR_COUNT + 1`
