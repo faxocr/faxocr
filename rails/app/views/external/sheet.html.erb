@@ -37,6 +37,10 @@
 
 <h1>調査シート登録</h1>
 
+<% if @debug_mode == "true" %>
+<div class="debug">デバッグモード</div>
+<% end %>
+
 <br>
 <form action="<%= @action %>" method="post" enctype="multipart/form-data" name="upfm">
 <center>

@@ -19,7 +19,7 @@ class ExternalController < ApplicationController
 
     # PHP CLI SAPIの呼び出しとなるため、HTML出力が無い
     @html = "<PRE>\n"
-    @html += `cd ./app/external; php contrib/test.php`
+    @html += `cd ./app/external; php contrib/test.php debug_mode=\"#{debug_mode}\"`
     @html += "<PRE>\n"
 
     render :dummy
@@ -87,7 +87,7 @@ class ExternalController < ApplicationController
       #  "Temp file: " + @tname
       # @html = `cd ./app/external; php reg_upload.php`
       # @html = `echo php reg_upload.php file=\"#{@tname}\"`
-      @html = `cd ./app/external; php reg_upload.php gid=\"#{@gid}\" file=\"#{@tname}\" rails_env=\"#{RAILS_ENV}\"`
+      @html = `cd ./app/external; php reg_upload.php gid=\"#{@gid}\" file=\"#{@tname}\" rails_env=\"#{RAILS_ENV}\" debug_mode=\"#{debug_mode}\"`
       render :dummy
     else
       # @html = "GID: " + @gid + "\n<BR>"
@@ -117,6 +117,8 @@ class ExternalController < ApplicationController
 
     @limit = (@@size_limit / 1024).to_s + "K"
 
+    @debug_mode = debug_mode;
+
     @action = "/external/sht_field/"
 
     # @html = "GID: " + @gid + "\n<BR>"
@@ -136,7 +138,7 @@ class ExternalController < ApplicationController
     @msg = flash[:notice]
 
     if not @tname.nil? then
-      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" msg=\"#{@msg}\" target=\"#{@target}\"`
+      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" msg=\"#{@msg}\" target=\"#{@target}\" debug_mode=\"#{debug_mode}\"`
       render :dummy
       return
     else
@@ -169,7 +171,7 @@ class ExternalController < ApplicationController
       # @html = `cd ./app/external; php reg_upload.php`
       # @html = `echo php reg_upload.php file=\"#{@tname}\"`
       @filename.slice!(/\.\w+$/)
-      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" target=\"#{@target}\" sname=\"#{@filename}\"`
+      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" target=\"#{@target}\" sname=\"#{@filename}\" debug_mode=\"#{debug_mode}\"`
       render :dummy
     else
       flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
@@ -188,7 +190,7 @@ class ExternalController < ApplicationController
     params.each {|key, value|
       @param_str += key + "=\"" + value + "\" "
     }
-    @errmsg = `cd ./app/external; php sht_script.php #{@param_str} file_id=#{@fileid}`
+    @errmsg = `cd ./app/external; php sht_script.php #{@param_str} file_id=#{@fileid} debug_mode=\"#{debug_mode}\"`
     # flash[:notice] = @errmsg
     # flash[:notice] = "セーブしました"
 
@@ -210,7 +212,7 @@ class ExternalController < ApplicationController
     @file = @file.nil? ? params[:file_id] : @file
     # @group = Group.find(params[:gid])
 
-    @html = `cd ./app/external; php sht_marker.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\"`
+    @html = `cd ./app/external; php sht_marker.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\"`
     render :dummy
   end
 
@@ -260,8 +262,7 @@ class ExternalController < ApplicationController
       @ret = `rm -f #{@file_prefix}-*.pdf`
       @ret = `rm -f doc_data.txt`
     else
-      @debug_mode = `. #{Rails.root}/../etc/faxocr.conf; echo $DEBUG_MODE`
-      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{RAILS_ENV}\" debug_mode=\"#{@debug_mode}\"`
+      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{RAILS_ENV}\" debug_mode=\"#{debug_mode}\"`
       # flash[:notice] = @errmsg
       # flash[:notice] = "セーブしました"
     end
@@ -276,7 +277,7 @@ class ExternalController < ApplicationController
     @file = params[:fileid]
     @msg = flash[:notice]
 
-    @html = `cd ./app/external; php sht_verify.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\"`
+    @html = `cd ./app/external; php sht_verify.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\"`
     render :dummy
   end
 

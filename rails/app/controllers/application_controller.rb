@@ -168,4 +168,9 @@ protected
     send_data("Permission denied.", :status => "403 Forbidden")
   end
 
+  def debug_mode
+    value = `. #{Rails.root}/../etc/faxocr.conf; echo $DEBUG_MODE`
+    value.chomp
+  end
+
 end

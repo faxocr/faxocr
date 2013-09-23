@@ -573,3 +573,15 @@ tr.surveysobject_dark {
 td.surveysobject_manage {
 	text-align: center;
 }
+
+.debug {
+    background-color: #F2DEDE;
+    border: 1px solid #EED3D7;
+    margin: 5px 0;
+    padding: 10px;
+    color: #B94A48;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
+}
