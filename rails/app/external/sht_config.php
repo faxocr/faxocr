@@ -417,6 +417,10 @@ function put_rails($file_id)
 			      	         "{$cspan}]\n";
 	}
 
+	// カラム数補正
+	$tmp_no_of_columns = $no_of_columns + 1;
+	$tmp_no_of_rows = $no_of_rows + 1;
+
 	$tgt_script = <<< "STR"
 #!/usr/bin/ruby
 # -*- coding: utf-8 -*-
@@ -545,8 +549,8 @@ end
 @sheet.sheet_code = "%05d" % {$conf->get("sid")}
 @sheet.sheet_name = "自動生成シート" # string
 @sheet.survey_id = survey_id # integer
-@sheet.block_width = {$no_of_columns} || 0 # XXX
-@sheet.block_height = {$no_of_rows} || 0 # XXX
+@sheet.block_width = {$tmp_no_of_columns} || 0 # XXX
+@sheet.block_height = {$tmp_no_of_rows} || 0 # XXX
 @sheet.cell_width = "$cell_width_ruby" || 0 # XXX
 @sheet.cell_height = "$cell_height_ruby" || 0 # XXX
 @sheet.status = 1
