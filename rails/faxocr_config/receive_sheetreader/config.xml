@@ -47,7 +47,7 @@
 				#PROPERTIES#
 				echo_request = 0
 				props.each do |prop|
-				  if prop[0] == "echo_request_and_send_analyzed_data" && prop[1] == "○"
+				  if prop[0] == "echo_request_and_send_analyzed_data" && prop[1] == "×"
 				  echo_request = 1
 				  end
 				end
