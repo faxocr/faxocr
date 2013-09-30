@@ -575,11 +575,11 @@ td.surveysobject_manage {
 }
 
 .rotate90 {
-    transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
     /* for ie */
-    filter: progid: DXImageTransform.Microsoft.BasicImage(rotation=1, mirror=1);
+    filter: progid: DXImageTransform.Microsoft.BasicImage(rotation=3, mirror=1);
     transform-origin: 250px 250px;
     -webkit-transform-origin: 250px 250px;
     -moz-transform-origin: 250px 250px;
