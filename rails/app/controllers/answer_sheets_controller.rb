@@ -29,6 +29,7 @@ class AnswerSheetsController < ApplicationController
     rescue
       sheet = nil
     end
+    @sheet_orientation = (sheet.block_width > sheet.block_height) ? :landscape : :portrait 
 
     #
     # Finds prev and next
