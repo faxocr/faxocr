@@ -576,8 +576,8 @@ survey_properties.each do |@survey_property|
   sheet_property = SheetProperty.new
   sheet_property.sheet_id = @sheet.object_id
   sheet_property.survey_property_id = @survey_property.id
-  sheet_property.position_x = prop[0] - 1
-  sheet_property.position_y = prop[1] - 1
+  sheet_property.position_x = prop[0]
+  sheet_property.position_y = prop[1]
   sheet_property.colspan = prop[2]
   @sheet.sheet_properties << sheet_property
 
