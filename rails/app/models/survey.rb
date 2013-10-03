@@ -91,8 +91,8 @@ class Survey < ActiveRecord::Base
       sheets.each do |sheet|
         srmlstr = srmlstr + "  <sheet>\n"
         srmlstr = srmlstr + "    <id>#{sheet.sheet_code}</id>\n"
-        srmlstr = srmlstr + "    <blockWidth>#{sheet.block_width -1}</blockWidth>\n"
-        srmlstr = srmlstr + "    <blockHeight>#{sheet.block_height -1}</blockHeight>\n"
+        srmlstr = srmlstr + "    <blockWidth>" + (sheet.block_width - 1).to_s + "</blockWidth>\n"
+        srmlstr = srmlstr + "    <blockHeight>" + (sheet.block_height - 1).to_s + "</blockHeight>\n"
         srmlstr = srmlstr + "    <cellWidth>\n"
         eval(sheet.cell_width).sort.each do |cell_no,cell_width|
           srmlstr = srmlstr + "      <cellAttribute number=\"#{cell_no}\" length=\"#{cell_width}\"/>\n"
@@ -106,8 +106,8 @@ class Survey < ActiveRecord::Base
         srmlstr = srmlstr + "    <properties>\n"
         srmlstr = srmlstr + "      <blockOcr"
         srmlstr = srmlstr + " name=\"echo_request_and_send_analyzed_data\""
-        srmlstr = srmlstr + " x=\"#{sheet.block_width -1}\""
-        srmlstr = srmlstr + " y=\"#{sheet.block_height -1}\""
+        srmlstr = srmlstr + " x=\"" + (sheet.block_width -1).to_s + "\""
+        srmlstr = srmlstr + " y=\"" + (sheet.block_height -1).to_s + "\""
         srmlstr = srmlstr + " colspan=\"1\""
         srmlstr = srmlstr + " option=\"rating\""
         srmlstr = srmlstr + "/>\n"
