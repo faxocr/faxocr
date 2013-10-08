@@ -194,7 +194,7 @@ do
 		ruby $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb" $RAILSPATH $ANALYZEDIR \
 			$ECHOFILE
 		RUBYRESULT=$?
-		if [ "$RUBYRESULT" = "1" ]; then
+		if [ "$RUBYRESULT" = "8" ]; then
 			echo SEND ECHO MAIL
 			sendfax $FFROM echoreport $ECHOFILE.pdf
 			rm $ECHOFILE.pdf
