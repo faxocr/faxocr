@@ -210,6 +210,10 @@ function put_excel($xls)
 		$tblwidth_scaled = floor($tblwidth * $scale);
 		$tblheight_scaled = floor($tblheight * $scale);
 
+		// ファイル名表示
+		global $sheet_name;
+		global $file_id;
+		print "<p>" . $sheet_name . "(" . $file_id . ")</p>";
 		print "<p style='color: #888888;'>()内は縮小前のサイズ</p>";
 
 		print "<table>";
