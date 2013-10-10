@@ -210,14 +210,16 @@ function put_excel($xls)
 		$tblwidth_scaled = floor($tblwidth * $scale);
 		$tblheight_scaled = floor($tblheight * $scale);
 
+		print "<p style='color: #888888;'>()内は縮小前のサイズ</p>";
+
 		print "<table>";
 		print "<tr>";
-		print "<td>幅: " . $tblwidth . "</td>";
-		print "<td>高さ: " . $tblheight . "</td>";
+		print "<td>幅: " . $tblwidth_scaled . "(" . $tblwidth . ")</td>";
+		print "<td>高さ: " . $tblheight_scaled . "(" . $tblheight . ")</td>";
 		print "</tr>";
 		print "<tr>";
-		print "<td>行: " . $xls->maxcell[0] . "</td>";
-		print "<td>列: " . $xls->maxrow[0] . "</td>";
+		print "<td>行: " . ($xls->maxrow[0] + 1) . "</td>";
+		print "<td>列: " . ($xls->maxcell[0] + 1) . "</td>";
 		print "</tr>";
 		print "</table>";
 
@@ -232,7 +234,7 @@ STR;
 
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 			$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
-			print "<td width=\"$tdwidth\" style=\"text-align:center;\">" . floor($xls->getColWidth($sn, $i) * $scale) . "</td>";
+			print "<td width=\"$tdwidth\" style=\"text-align:center;\">" . floor($xls->getColWidth($sn, $i) * $scale) . "<br />(" . $xls->getColWidth($sn, $i) . ")</td>";
 		}
 		print "\n</tr>\n";
 
@@ -245,7 +247,7 @@ STR;
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
 
 			// 行サイズ表示
-			print " <td style=\"text-align:center;\">". $trheight . "</td>\n";
+			print " <td style=\"text-align:center;\">" . $trheight . "<br />(". $xls->getRowHeight($sn, $r) . ")</td>\n";
 
 			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 				$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);

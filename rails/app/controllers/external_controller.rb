@@ -126,10 +126,6 @@ class ExternalController < ApplicationController
 
     if not @tname.nil? then
       @html = `cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\"`
-
-      puts "#####"
-      puts "cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\""
-
       render :dummy
       return
     else
@@ -155,9 +151,6 @@ class ExternalController < ApplicationController
       end
       @filename.slice!(/\.\w+$/)
       @html = `cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" sname=\"#{@filename}\" debug_mode=\"#{debug_mode}\"`
-
-      puts "#####"
-      puts "cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" sname=\"#{@filename}\" debug_mode=\"#{debug_mode}\""
       render :dummy
     else
       flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
