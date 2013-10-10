@@ -56,6 +56,15 @@ ActionController::Routing::Routes.draw do |map|
     :controller => 'external',
     :action => 'reg_exec'
 
+  # PHP driver (Sheet registration Debug)
+  map.connect 'external/sheet_checker',
+    :controller => 'external',
+    :action => 'sheet_checker'
+
+  map.connect 'external/sht_field_checker',
+    :controller => 'external',
+    :action => 'sht_field_checker'
+
   #
   # PHP driver (Sheet registration)
   #

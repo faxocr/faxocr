@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+  <title>Shinsai FaxOCR</title>
+  <%= stylesheet_link_tag 'style' %>
+</head>
+
+<body>
+
+<!-- header STR -->
+<%= render :partial => "layouts/welcome" %>
+<!-- header END -->
+
+<!-- nav STR -->
+<div id="nav">
+	<ul class="clearfix">
+		<li><a href="/faxocr/">戻る</a></li>
+</ul>
+</div>
+<!-- nav END -->
+
+<!-- container STR -->
+<div id="container" class="clearfix">
+
+	<!-- contents STR -->
+	<div id="contents_1c">
+<br>
+<p style="color: green"><%= flash[:notice] %></p>
+
+
+<h1>調査シートチェッカー</h1>
+
+<% if @debug_mode == "true" %>
+<div class="debug">デバッグモード</div>
+<% end %>
+
+<br>
+<form action="<%= @action %>" method="post" enctype="multipart/form-data" name="upfm">
+<center>
+<table width="700px" border="0" cellpadding="3" cellspacing="0" class="srcTable1">
+	<tbody><tr> 
+		<th>
+		  <div align="center"><b>ファイル登録</b></div>
+		</th> 
+		<td> <br><br>
+<center><%= file_field "file", "upfile", "size" => "60" %></center>
+<br>
+<div align="left">
+<ul>
+  <li> アップロード可能なファイルサイズは、<b><%= @limit %></b>バイトまでです。</li>
+<br>
+</ul>
+</div>
+		</td> 
+	</tr> 
+
+	<tr>
+		<td colspan="2"><center><br>
+<a href="#" onclick="document.upfm.submit()"><img src="/image/submit.gif" alt="アップロード" border="0"></a>
+<br><br>
+</center>
+		</td> 
+	</tr> 
+</tbody></table> 
+</center>
+</form>
+
+	</div>
+	<!-- contents END -->
+<!-- container END -->
+</div>
+
+<!-- footer STR -->
+<div id="footer">
+	<p id="pagetop">
+	  <a href="#">
+	    <img src="/image/pagetop.gif" alt="このページの先頭へ" />
+	</a>
+	</p>
+	<div class="inner">
+	</div>
+</div>
+<!-- footer END -->
+
+</body>
+</html>

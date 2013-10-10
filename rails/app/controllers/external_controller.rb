@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 class ExternalController < ApplicationController
 
-  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec, :sht_field, :sht_script, :sht_marker, :sht_config, :sht_verify, :sht_commit]
+  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec, :sht_field, :sht_script, :sht_marker, :sht_config, :sht_verify, :sht_commit, :sht_field_checker]
 
   # file size limit
   # @@size_limit = 60000
@@ -105,6 +105,64 @@ class ExternalController < ApplicationController
 
     flash[:notice] = "調査対象を一括登録しました"
     redirect_to group_candidates_url(@group)
+  end
+
+  # Debug
+  # http://server_addr:3000/external/sheet_checker
+  def sheet_checker
+    # 生成したpdfは、public/external/pdfに入れる方針で
+    @limit = (@@size_limit / 1024).to_s + "K"
+
+    @debug_mode = debug_mode;
+
+    @action = "/external/sht_field_checker/"
+  end
+
+  # Debug
+  def sht_field_checker
+    @tname = params[:file_id]
+
+    @msg = flash[:notice]
+
+    if not @tname.nil? then
+      @html = `cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\"`
+
+      puts "#####"
+      puts "cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\""
+
+      render :dummy
+      return
+    else
+      if params[:file].nil? then
+        redirect_to :controller => 'external', :action => 'sheet_checker'
+        return
+      else
+        @filename = params[:file]['upfile'].original_filename
+        @size = params[:file]['upfile'].size
+        @tname = "Debug-" + Time.now().strftime("%Y%m%d%H%M")
+      end
+    end
+
+    if 0 < @size && @size <= @@size_limit && /(\.xlsx?)$/ =~ @filename then
+      ext = $1
+      outputFileName = "#{RAILS_ROOT}/files/#{@tname}"
+      outputFileNameWithExt = outputFileName + ext
+      File.open(outputFileNameWithExt, "wb") {
+        |f| f.write(params[:file]['upfile'].read)
+      }
+      if ext == ".xlsx" then
+        `unoconv -f xls #{outputFileNameWithExt}`
+      end
+      @filename.slice!(/\.\w+$/)
+      @html = `cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" sname=\"#{@filename}\" debug_mode=\"#{debug_mode}\"`
+
+      puts "#####"
+      puts "cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" sname=\"#{@filename}\" debug_mode=\"#{debug_mode}\""
+      render :dummy
+    else
+      flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
+      redirect_to :controller => 'faxocr'
+    end
   end
 
   # http://server_addr:3000/external/sheet/1234/5678
