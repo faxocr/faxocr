@@ -94,7 +94,7 @@
 					f.write "</table></body></html>\n"
 					f.close
 					system("wkhtmltopdf --page-size A4 --encoding utf-8 #{echo_prefix}.html #{echo_prefix}.pdf")
-					exit(1)
+					exit(8)
 				end
 				]]>
 			</code>
