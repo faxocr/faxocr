@@ -270,9 +270,9 @@ function put_excel($xls)
 		} else {
 			$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"top:{$offsety_marker_window}px; left:{$offsetx_marker_window}px; z-index: 3; position: relative; width: {$width_marker_window}px; height:{$height_marker_window}px; font-size: 12px; padding: 1px; \">\n";
 		}
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $topheight . "px;left: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\"><div style=\"position: absolute; top:{$topheight}px; left:{$position_of_sheet_id_from_left_side}px; \"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$cid</font></div>\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $topheight . "px;left: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\"><div style=\"position: absolute; top:{$topheight}px; left:{$position_of_sheet_id_from_left_side}px; \"><font style=\"line-height: " . $size_of_marker * 0.9 . "px; font-size: " . $size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">$cid</font></div>\n";
 		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $topheight . "px;right: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\">\n";
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; bottom: 0\"><font style=\"line-height: {$size_of_marker}px; font-size: {$size_of_marker}px; font-family: 'OCRB'; \">$sid</font></div>\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: {$size_of_marker}px; height: {$size_of_marker}px;\"><div style=\"position: absolute; left:{$position_of_sheet_id_from_left_side}px; bottom: 0\"><font style=\"line-height: " . $size_of_marker * 0.9 . "px; font-size: " . $size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">$sid</font></div>\n";
 
 		$cid = strtok("-");
 
