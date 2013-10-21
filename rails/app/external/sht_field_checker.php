@@ -96,12 +96,23 @@ if ($tgt_file) {
 		$sn = 0;
 		$tblwidth = 0;
 		$tblheight = 0;
+		// 最小のセルのサイズ
+		$min_cell_width = 0;
+		$min_cell_height = 0;
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 			$tblwidth += floor($xls->getColWidth($sn, $i));
+			if ($min_cell_width == 0 || $min_cell_width > $xls->getColWidth($sn, $i)) {
+				$min_cell_width = $xls->getColWidth($sn, $i);
+			}
 		}
 		for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
 			$tblheight += floor($xls->getRowHeight($sn, $i));
+			if ($min_cell_height == 0 || $min_cell_height > $xls->getRowHeight($sn, $i)) {
+				$min_cell_height = $xls->getRowHeight($sn, $i);
+			}
 		}
+
+		$scale = get_scaling($tblwidth, $tblheight, 940);
 
 		if (0) { // 長方形版では以下のコードは用いない
 			// cellのサイズの縦横比が10%以上はエラー
@@ -131,6 +142,11 @@ if ($tgt_file) {
 			// シートサイズチェック
 			$xls = null;
 			$errmsg = "シートのサイズが大きすぎます ".MAX_SHEET_WIDTH."x".MAX_SHEET_HEIGHT."以下にしてください";
+		}
+		// セルサイズチェック
+		if ( ($min_cell_width != 0 && ($min_cell_width * $scale) <= MIN_CELL_WIDTH) || ($min_cell_height != 0 &&($min_cell_height * $scale) <= MIN_CELL_HEIGHT) ) {
+			// 厳密にはマーカー指定時のサイズによって決まる
+			$errmsg = "セルのサイズが小さすぎます ".MIN_CELL_WIDTH."px x ".MIN_CELL_HEIGHT."px以下にしてください";
 		}
 	}
 }
