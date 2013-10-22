@@ -18,11 +18,10 @@ cd ~faxocr
 LOCKFILE=${DIR_FAX}"/"`basename $0`.lock
 trap 'echo "trapped."; rm -f ${LOCKFILE}; exit 1' 1 2 3 15
 
-if [ -e ${LOCKFILE} ]; then
+if ! ln -s $$ ${LOCKFILE}; then
     echo 'Cannot run multiple instance.'
     exit 1
 fi
-touch ${LOCKFILE}
 
 # receive fax
 if [ "$FAX_RECV_SETTING" = "pop3" ]; then
