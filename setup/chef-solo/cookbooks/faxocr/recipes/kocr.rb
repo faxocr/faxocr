@@ -42,7 +42,6 @@ bash "replacing kocr's num DB with numocrb DB" do
     install -c -m 444 -o faxocr -g faxocr list-numocrb.db  #{node[:faxocr][:home_dir]}/etc/list-num.db
     install -c -m 444 -o faxocr -g faxocr list-numocrb.xml #{node[:faxocr][:home_dir]}/etc/list-num.xml
     EOH
-  not_if { ::File.exists?("#{node[:faxocr][:home_dir]}/etc/list-num.xml") and ::File.mtime("#{node[:faxocr][:home_dir]}/etc/list-num.xml") >= ::File.mtime("#{node[:faxocr][:home_dir]}/src/kocr/databases/list-numocrb.xml") }
 end
 
 # vim:set expandtab shiftwidth=2 tabstop=2 softtabstop=2:
