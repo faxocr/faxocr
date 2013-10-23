@@ -121,7 +121,7 @@ class ConfigsController < ApplicationController
   end
 
   def viewmaildir
-    @raw_config = `ls -lt #{Rails.root}/../Maildir/new`
+    @raw_config = `ls -lt #{Rails.root}/../Maildir/new | tail -n +2 | cat -n`
 
     @config_file_path = "#{Rails.root}/../etc/faxocr.conf"
     @result = system("sh -c '. " + @config_file_path + '; test "$FAX_RECV_SETTING" = "pop3" && exit 0; exit 1 \'')
