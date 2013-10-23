@@ -24,7 +24,7 @@ FAX_IMG=$3
 FAX_TO=$FAX_NO"@"$FAX_SEND_TARGET
 
 cd ~faxocr
-echo "`date +%Y/%m/%d\ %H:%M` to=$FAX_NO subject=$FAX_SUBJ" >> $DIR_FAX/Log/sendfax.log
+echo "`date +%Y/%m/%d\ %H:%M:%S` to=$FAX_NO subject=$FAX_SUBJ" >> $DIR_FAX/Log/sendfax.log
 
 case "$FAX_SEND_TYPE" in
 bizfax)
