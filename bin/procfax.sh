@@ -28,6 +28,14 @@ show_info_message()
 	echo $_header Info: "$@" >> $LOG
 }
 
+show_message_to_console()
+{
+	_header=`date +%Y/%m/%d\ %H:%M:%S`
+
+	echo $_header Info: "$@"
+	echo $_header Info: "$@" >&2
+}
+
 # move to home directory
 cd ~faxocr
 
@@ -36,7 +44,7 @@ LOCKFILE=${DIR_FAX}"/"`basename $0`.lock
 trap 'echo "trapped."; rm -f ${LOCKFILE}; exit 1' 1 2 3 15
 
 if ! ln -s $$ ${LOCKFILE}; then
-    show_info_message 'Cannot run multiple instance.'
+    show_message_to_console 'Cannot run multiple instances.'
     exit 1
 fi
 
@@ -57,7 +65,7 @@ SHEET_COUNT=0
 SHEET_ERROR_COUNT=0
 
 if [ "`ls $MDIR`" = '' ]; then
-    show_info_message "NOT FOUND: not found new email"
+    echo `date +%Y/%m/%d\ %H:%M:%S` "NOT FOUND: not found new email"
     rm ${LOCKFILE}
     exit
 fi
