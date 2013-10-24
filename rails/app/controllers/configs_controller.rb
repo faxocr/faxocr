@@ -29,7 +29,7 @@ class ConfigsController < ApplicationController
     @raw_config = File.read(@config_file_path)
   end
 
-  def procfax
+  def view_procfax_log
     @logdir_path = "#{Rails.root}/../Faxsystem/Log/*"
     @files = Dir.glob(@logdir_path).sort.reverse
   end
@@ -63,7 +63,7 @@ class ConfigsController < ApplicationController
     when nil
       flash[:notice] = 'getfaxコマンドの実行に失敗しました' + "(エラーコード #{$?})"
     end
-    redirect_to viewmaildir_configs_path
+    redirect_to view_faxmail_queue_configs_path
   end
 
   def cron
@@ -91,7 +91,7 @@ class ConfigsController < ApplicationController
     redirect_to note_configs_path
   end
 
-  def sendtestfax
+  def view_sendfax_log
     @log_file_path = "#{Rails.root}/../Faxsystem/Log/sendfax.log"
     @raw_config = `tail -10 #{@log_file_path}`
   end
@@ -104,7 +104,7 @@ class ConfigsController < ApplicationController
 
     if /[^0-9-]/ =~ @dest_fax_num
       flash[:notice] = '電話番号には、半角数値と「-」のみをお使いください'
-      redirect_to sendtestfax_configs_path
+      redirect_to view_sendfax_log_configs_path
       return
     end
 
@@ -117,10 +117,10 @@ class ConfigsController < ApplicationController
       flash[:notice] = '送信に失敗しました' + "(エラーコード #{$?})"
     end
 
-    redirect_to sendtestfax_configs_path
+    redirect_to view_sendfax_log_configs_path
   end
 
-  def viewmaildir
+  def view_faxmail_queue
     @raw_config = `ls -lt #{Rails.root}/../Maildir/new | tail -n +2 | cat -n`
 
     if @raw_config.length == 0
