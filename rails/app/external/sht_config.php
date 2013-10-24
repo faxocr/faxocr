@@ -436,6 +436,8 @@ function put_excel($xls)
 					$dispval = "";
 				}
 
+				$celattr =  $xls->getAttribute($sn, $r, $i);
+				$fontsize =  $celattr["font"]["height"] * $scale * $scale_table / 16;
 				if (isset($xls->celmergeinfo[$sn][$r][$i]['cond'])) {
 					if ($xls->celmergeinfo[$sn][$r][$i]['cond'] == 1) {
 						$colspan = $xls->celmergeinfo[$sn][$r][$i]['cspan'];
@@ -450,12 +452,12 @@ function put_excel($xls)
 							$rcspan .= " rowspan=\"" . $rowspan . "\"";
 						$class = " class=\"XFs" . $sn . "r" . $r . "c" . $i . "\"";
 						$id = " id=\"". $sn . "-" . $r ."-" . $i . "\"";
-						$html .= " <td $class $rcspan $align>$dispval</td>\n";
+						$html .= " <td $class $rcspan $align style=\"font-size: " . $fontsize . "px;\">$dispval</td>\n";
 					}
 				} else {
 					$class = " class=\"XF" . $xfno . "\" ";
 					$id = " id=\"". $sn . "-" . $r . "-" . $i . "\"";
-					$html .= " <td nowrap=\"nowrap\" $class $align>$dispval</td>\n";
+					$html .= " <td nowrap=\"nowrap\" $class $align style=\"font-size: " . $fontsize . "px;\">$dispval</td>\n";
 				}
 			}
 			$html .= "</tr>\n";
