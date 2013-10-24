@@ -1,6 +1,6 @@
 <h1>Fax処理履歴</h1>
 <p>Log Directory Path: <%= @logdir_path %></p>
-<p><%= button_to "procfax.sh実行", procfax_exec_configs_path %></p>
+<p><%= button_to "procfax.sh実行", procfax_exec_configs_path, :onclick => "DisableButton(this);" %></p>
 <ul>
   <% @files.each do |file| %>
     <% if File.ftype(file) == "directory" %>

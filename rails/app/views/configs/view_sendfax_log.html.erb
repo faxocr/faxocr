@@ -10,7 +10,7 @@
     <%= text_field :dest_fax_num, '' %>
   <!-- (数字のみを入力してください)-->
   </span>
-  <%= submit_tag '送信' %><br>
+  <%= submit_tag '送信', :onclick => "DisableButton(this);" %><br>
   </div>
   </blockquote>
 <% end %>
