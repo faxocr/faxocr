@@ -11,6 +11,23 @@ CONF_PROC=~faxocr/bin/doconfig.sh
 . $CONF_FILE
 . $CONF_PROC
 
+show_error_message()
+{
+	_header=`date +%Y/%m/%d\ %H:%M:%S`
+
+	echo $_header Error: "$@"
+	echo $_header Error: "$@" >> $LOG
+	echo $_header Error: "$@" >&2
+}
+
+show_info_message()
+{
+	_header=`date +%Y/%m/%d\ %H:%M:%S`
+
+	echo $_header Info: "$@"
+	echo $_header Info: "$@" >> $LOG
+}
+
 # move to home directory
 cd ~faxocr
 
@@ -19,7 +36,7 @@ LOCKFILE=${DIR_FAX}"/"`basename $0`.lock
 trap 'echo "trapped."; rm -f ${LOCKFILE}; exit 1' 1 2 3 15
 
 if ! ln -s $$ ${LOCKFILE}; then
-    echo 'Cannot run multiple instance.'
+    show_info_message 'Cannot run multiple instance.'
     exit 1
 fi
 
@@ -40,7 +57,7 @@ SHEET_COUNT=0
 SHEET_ERROR_COUNT=0
 
 if [ "`ls $MDIR`" = '' ]; then
-    echo "NOT FOUND: not found new email"
+    show_info_message "NOT FOUND: not found new email"
     rm ${LOCKFILE}
     exit
 fi
@@ -61,10 +78,8 @@ do
 	#
 	# directory setting / preprocessing
 	#
-	echo FOUND: $MDIR/$MFILE
-	echo FOUND: $MDIR/$MFILE >> $LOG
-	echo BACKUP MAIL: $MBACKDIR/$MFILE
-	echo BACKUP MAIL: $MBACKDIR/$MFILE >> $LOG
+	show_info_message FOUND: $MDIR/$MFILE
+	show_info_message BACKUP MAIL: $MBACKDIR/$MFILE
 	cp $MDIR/$MFILE $MBACKDIR
 
 	# removes messages from root
@@ -91,9 +106,7 @@ do
 		SRHMODE="bizfax"
 	fi
 	if [ x"$ISFAXIMO" = x"" -a x"$ISMESSAGEPLUS" = x"" -a x"$ISBIZFAX" = x"" ]; then
-		echo FAX: ERROR: cannot recognize a fax service from Mail >&2
-		echo FAX: ERROR: cannot recognize a fax service from Mail
-		echo FAX: ERROR: cannot recognize a fax service from Mail >> $LOG
+		show_error_message FAX: ERROR: cannot recognize a fax service from Mail
 		FAX_ERROR_HAPPENS_FLAG=1
 	fi
 	FFROM=`srhelper -m from -s $SRHMODE $MDIR/$MFILE`
@@ -104,8 +117,8 @@ do
 	if [ "$FTO" = "" ]; then
 		FTO="UNNUMBER"
 	fi
-	echo FAX: from:$FFROM to:$FTO
-	echo FAX: from:$FFROM to:$FTO >> $LOG
+	show_info_message FAX: from:$FFROM to:$FTO
+
 
 	#
 	# unpack the fax image file
@@ -146,21 +159,17 @@ do
 		#echo BACKUP TIF: $MBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME.TIF >> $LOG
 		SHEET_COUNT=`expr $SHEET_COUNT + 1`
 		BACKTIFF=$FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT.TIF
-		echo BACKUP TIF: $BACKTIFF
-		echo BACKUP TIF: $BACKTIFF >> $LOG
+		show_info_message BACKUP TIF: $BACKTIFF
 
 		convert -resample 200 $TIFFILE $BACKTIFF
 		sheetreader -m rails -c $SHEETREADERCONF $OCR_DIR -r $FTO -s $FFROM -p $ANALYZEDIR \
 			$BACKTIFF 2>> $LOG 1> $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb"
 		SRRESULT=$?
 		if [ $SRRESULT -ne 0 ]; then
-			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT >&2
-			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT
-			echo SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT >> $LOG
+			show_error_message SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT
 			SHEET_ERROR_HAPPENS_FLAG=1
 		else
-			echo SHEETREADER: $SRRESULT
-			echo SHEETREADER: $SRRESULT >> $LOG
+			show_info_message SHEETREADER: $SRRESULT
 		fi
 
 		#
@@ -168,13 +177,10 @@ do
 		#
 		SRDATE=`grep answer_sheet.date $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb" | head -1 | cut -d\" -f2`
 		if [ x"${SRDATE}" = x"" ]; then
-			echo SHEETREADER: date used in sheetreader: ERROR: result is empty
-			echo SHEETREADER: date used in sheetreader: ERROR: result is empty >&2
-			echo SHEETREADER: date used in sheetreader: ERROR: result is empty >> $LOG
+			show_error_message SHEETREADER: date used in sheetreader: ERROR: result is empty
 			SHEET_ERROR_HAPPENS_FLAG=1
 		else
-			echo SHEETREADER: date used in sheetreader: $SRDATE
-			echo SHEETREADER: date used in sheetreader: $SRDATE >> $LOG
+			show_info_message SHEETREADER: date used in sheetreader: $SRDATE
 		fi
 		IMAGEDIR=${ANALYZEDIR}R${FFROM}/S${FTO}/${SRDATE}
 		convert -geometry 500 ${IMAGEDIR}/image.png ${IMAGEDIR}/image_thumb.png
@@ -183,7 +189,7 @@ do
 		# Error file processing
 		#
 		if [ "$FFROM" != "UNNUMBER" -a "$SRRESULT" != "0" ]; then
-			echo SEND ERROR MAIL
+			show_info_message SEND ERROR MAIL
 			sendfax $FFROM errorreport $ERRORPDF
 		fi
 
@@ -194,7 +200,7 @@ do
 			$ECHOFILE
 		RUBYRESULT=$?
 		if [ "$RUBYRESULT" = "8" ]; then
-			echo SEND ECHO MAIL
+			show_info_message SEND ECHO MAIL
 			sendfax $FFROM echoreport $ECHOFILE.pdf
 			rm $ECHOFILE.pdf
 			rm $ECHOFILE.html
@@ -209,10 +215,10 @@ do
 		FAX_ERROR_COUNT=`expr $FAX_ERROR_COUNT + 1`
 	fi
 done
-echo "INFO: Number of fax processed:$FAX_COUNT" >> $LOG
-echo "INFO: Number of sheet processed:$SHEET_COUNT" >> $LOG
-echo "INFO: Number of error occured processing fax:$FAX_ERROR_COUNT" >> $LOG
-echo "INFO: Number of error occured processing sheet:$SHEET_ERROR_COUNT" >> $LOG
+show_info_message "INFO: Number of fax processed:$FAX_COUNT"
+show_info_message "INFO: Number of sheet processed:$SHEET_COUNT"
+show_info_message "INFO: Number of error occured processing fax:$FAX_ERROR_COUNT"
+show_info_message "INFO: Number of error occured processing sheet:$SHEET_ERROR_COUNT"
 rmdir $UNTMPDIR 2>> $LOG
 
 rm ${LOCKFILE}
