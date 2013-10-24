@@ -44,8 +44,8 @@ LOCKFILE=${DIR_FAX}"/"`basename $0`.lock
 trap 'echo "trapped."; rm -f ${LOCKFILE}; exit 1' 1 2 3 15
 
 if ! ln -s $$ ${LOCKFILE}; then
-    show_message_to_console 'Cannot run multiple instances.'
-    exit 1
+	show_message_to_console 'Cannot run multiple instances.'
+	exit 1
 fi
 
 # receive fax
@@ -65,9 +65,9 @@ SHEET_COUNT=0
 SHEET_ERROR_COUNT=0
 
 if [ "`ls $MDIR`" = '' ]; then
-    echo `date +%Y/%m/%d\ %H:%M:%S` "NOT FOUND: not found new email"
-    rm ${LOCKFILE}
-    exit
+	echo `date +%Y/%m/%d\ %H:%M:%S` "NOT FOUND: not found new email"
+	rm ${LOCKFILE}
+	exit
 fi
 
 mkdir $MBACKDIR 2> /dev/null
@@ -131,7 +131,7 @@ do
 	#
 	# unpack the fax image file
 	#
- 	cat $MDIR/$MFILE | munpack -C $UNTMPDIR 2>> $LOG 1>> $LOG
+	cat $MDIR/$MFILE | munpack -C $UNTMPDIR 2>> $LOG 1>> $LOG
 	rm $MDIR/$MFILE
 
 	UNTMPDIR_FILES=`ls $UNTMPDIR/* | wc -l`
