@@ -3,7 +3,7 @@
   <%= f.hidden_field :survey_id %>
   <h2 class="surveysobject">調査対象</h2>
   <div class="surveysobject">
-  	サーベイの調査対象を選択してください。
+  	調査対象を選択してください。
   </div>
   <p class="surveysobject">
     <%= f.collection_select :candidate_id, @group.candidates.find(:all), :id, :candidate_name %>

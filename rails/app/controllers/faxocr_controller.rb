@@ -20,7 +20,7 @@ class FaxocrController < ApplicationController
         flash[:notice] = "ログインしました"
         redirect_to(return_uri || {:action => 'index'})
       else
-        flash[:notice] = "ユーザー名、あるいは、パスワードが違います"
+        flash[:notice] = "ユーザ名、あるいは、パスワードが違います"
       end
     end
 
@@ -63,7 +63,7 @@ class FaxocrController < ApplicationController
     if request.post?
       masq_to_user = User.find_by_id(params[:id])
       unless masq_to_user
-        flash[:notice] = "ユーザーID #{params[:id]} は存在しません"
+        flash[:notice] = "ユーザID #{params[:id]} は存在しません"
         redirect_to :action => 'index'
         return
       end
@@ -105,7 +105,7 @@ class FaxocrController < ApplicationController
     if @current_group.is_administrator? || has_role('m', :group_id => @authorized_group.id, :user_id => @current_user.id)
       masq_to_user = User.find_by_id(params[:id])
       unless masq_to_user
-        flash[:notice] = "ユーザーID #{params[:id]} は存在しません"
+        flash[:notice] = "ユーザID #{params[:id]} は存在しません"
         redirect_to :action => 'index'
         return
       end

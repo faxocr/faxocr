@@ -1,7 +1,7 @@
 <div class="surveysobject_new">
 <% if params[:controller] == "surveys" %>
 <% if @current_user.has_survey_role(@group.id) %>
-<%= link_to 'サーベイの新規作成', new_group_survey_path(@group) %>
+<%= link_to '調査の新規作成', new_group_survey_path(@group) %>
 <% end %>
 <% end %>
 </div>

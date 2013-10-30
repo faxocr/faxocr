@@ -20,7 +20,7 @@
 	<% end %>
 
 	<% if /^(surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties|report)$/ =~ params[:controller] %>
-	  &gt;&nbsp;<%= link_to 'サーベイ一覧', group_surveys_path(@group) %>
+	  &gt;&nbsp;<%= link_to '調査一覧', group_surveys_path(@group) %>
 	  <% if !(/^(surveys)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action]) %>
 	  &gt;&nbsp;<%= link_to @survey.survey_name, group_survey_path(@group, @survey) %>
 	  <% end %>

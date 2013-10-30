@@ -110,7 +110,7 @@ class SurveysController < ApplicationController
     survey_candidate = SurveyCandidate.find_by_survey_id(params[:id])
     survey_property = SurveyProperty.find_by_survey_id(params[:id])
     if sheet != nil || survey_candidate != nil || survey_property != nil
-      flash[:notice] = "このサーベイは使用されているため削除できません"
+      flash[:notice] = "この調査は使用されているため削除できません"
     else
       @survey.destroy
     end

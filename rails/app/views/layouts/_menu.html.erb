@@ -4,9 +4,9 @@
 		<li><%= link_to "調査対象", group_candidates_path(@selected_group.id)%></li>
 
 	<% if @group.nil? %>
-		<li><%= link_to "サーベイ", groups_url %></li>
+		<li><%= link_to "調査", groups_url %></li>
 	<% else %>
-		<li><%= link_to "サーベイ", group_surveys_path(@group) %></li>
+		<li><%= link_to "調査", group_surveys_path(@group) %></li>
 	<% end %>
 		<li><%= link_to "ダウンロード", report_group_path(@selected_group) %></li>
 		<% if @current_user.has_administrator_group %>

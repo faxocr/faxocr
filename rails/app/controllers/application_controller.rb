@@ -45,7 +45,7 @@ protected
       elsif @authorized_groups.length > 1
         session[:wait_group_selection] = true
         #session[:return_uri] = request.request_uri
-        flash[:notice] = "ユーザー #{@current_user.full_name} は、複数のグループに属しています。一つを選択して下さい。"
+        flash[:notice] = "ユーザ #{@current_user.full_name} は、複数のグループに属しています。一つを選択して下さい。"
         redirect_to :controller => 'faxocr', :action => 'group_select'
         return
       else

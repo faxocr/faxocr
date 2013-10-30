@@ -74,7 +74,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.update_attributes(user_attr)
-        flash[:notice] = "ユーザー #{@user.login_name} の情報を更新しました"
+        flash[:notice] = "ユーザ #{@user.login_name} の情報を更新しました"
         format.html { redirect_to group_users_url(@group) }
         format.xml  { head :ok }
       else
@@ -97,7 +97,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save && @role_mapping.save
-        flash[:notice] = "ユーザー #{@user.login_name} を作成しました"
+        flash[:notice] = "ユーザ #{@user.login_name} を作成しました"
         format.html { redirect_to group_users_url(@group) }
         format.xml  { render :xml => @user, :status => :created, :location => @user }
       else
@@ -128,7 +128,7 @@ class UsersController < ApplicationController
         result = @user.update_attributes(params[:user])
       end
       if result
-        flash[:notice] = "ユーザー #{@user.login_name} の情報を更新しました"
+        flash[:notice] = "ユーザ #{@user.login_name} の情報を更新しました"
         format.html { redirect_to group_users_url(@group) }
         format.xml  { head :ok }
       else

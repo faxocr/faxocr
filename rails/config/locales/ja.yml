@@ -4,10 +4,10 @@
 ja:
   activerecord:
     models:
-      user: "ユーザー"
+      user: "ユーザ"
     attributes:
       user:
-        login_name: "ログイン名"
+        login_name: "ユーザ名"
         full_name: "担当者名"
         password: "ログインパスワード"
     errors:

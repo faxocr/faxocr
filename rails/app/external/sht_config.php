@@ -534,7 +534,7 @@ require "yaml"
 
 rails_prefix = ARGV[0] || "./"
 group = ARGV[1] || exit(0)
-filename = "{$sheet_name}" || "自動生成サーベイ" # XXX
+filename = "{$sheet_name}" || "自動生成調査" # XXX
 
 config_db = rails_prefix + "/config/database.yml"
 db_env = "{$rails_env}" || "development" # XXX

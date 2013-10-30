@@ -1,9 +1,9 @@
 <% form_for([@group,@user]) do |f| %>
   <%= f.error_messages %>
 
-  <h2 class="surveysobject">ログイン名</h2>
+  <h2 class="surveysobject">ユーザ名</h2>
   <div class="surveysobject">
-  	本Webシステムへのログイン名を入力してください。
+  	本Webシステムへのユーザ名を入力してください。
   </div>
   <p class="surveysobject">
     <%= f.text_field :login_name %>

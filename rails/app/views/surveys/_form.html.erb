@@ -4,14 +4,14 @@
 
   <h2 class="surveysobject">名称</h2>
   <div class="surveysobject">
-  	サーベイの名称を入力してください。
+  	調査の名称を入力してください。
   </div>
   <p class="surveysobject">
     <%= f.text_field :survey_name %>
   </p>
   <h2 class="surveysobject">ステータス</h2>
   <div class="surveysobject">
-  	サーベイのステータスを選択してください。
+  	調査のステータスを選択してください。
   </div>
   <p class="surveysobject">
     <%= f.select(:status, Survey::STATUS) %>

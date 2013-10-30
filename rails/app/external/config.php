@@ -156,7 +156,7 @@ define("MYSQL_DB_SERVER_NAME", "localhost");
 // データベース名
 define("MYSQL_DB_NAME", "ezcloud");
 
-// アクセスユーザー名
+// アクセスユーザ名
 define("MYSQL_DB_USER_NAME", "cloud");
 
 // アクセスパスワード

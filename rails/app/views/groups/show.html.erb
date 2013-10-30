@@ -1,9 +1,9 @@
-<h1 class="surveysobject"><%=h @group.group_name %> の実施中サーベイ一覧</h1>
+<h1 class="surveysobject"><%=h @group.group_name %> の実施中調査一覧</h1>
 
-<!-- <%= link_to '[サーベイ一覧]', group_surveys_path(@group) %>-->
+<!-- <%= link_to '[調査一覧]', group_surveys_path(@group) %>-->
 
 <p>
-<!-- <h2 class="surveysobject_title">実施中サーベイ一覧</h2> -->
+<!-- <h2 class="surveysobject_title">実施中調査一覧</h2> -->
 <%= render :partial => "surveys/list" %>
 <div align="right">
 <% if @current_user.has_survey_role(@current_group.id) %>
