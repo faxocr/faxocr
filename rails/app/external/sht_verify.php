@@ -58,13 +58,7 @@ if ($errmsg) {
 
 {
 	// ステータス表示
-	print "<table width=\"100%\">\n";
-	print "<td align=\"right\"></td>\n";
-	print "<td align=\"right\"\"  width=\"450px\">";
 	put_status();
-	print "</td>\n";
-	print "</tr></table>\n";
-	print "<br />\n";
 }
 
 // サンプルファイル表示処理
@@ -125,13 +119,14 @@ STR;
 
 	// XXX
 	// action=\"/external\sht_commit/\"
-	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
+	print "<div style=\"padding:10px;\" class=\"statusMenu\">\n";
 
 	print "<form method=\"POST\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
+	print "<div ${style["gray"]}><span>再読み込み</span></div>\n";
 	print "<div ${style["gray"]}><span>フィールド指定</span></div>\n";
 	print "<div ${style["gray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_prev();\">マーカー指定</button></div>\n";
 	print "<div ${style["pink"]}><span>シート確認</span></div>\n";

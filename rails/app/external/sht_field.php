@@ -167,36 +167,17 @@ if ($errmsg) {
 
 {
 	// ステータス表示
-	print "<table width=\"100%\">\n";
-	print "<tr>\n";
-
-	print "<td>\n";
-	print "<form enctype=\"multipart/form-data\" method=\"post\" " . "action=\"/external/sht_field/\">\n";
-	print "対象ファイル： <input id=\"file_upfile\" type=\"file\" name=\"file[upfile]\" size=\"60\" />\n";
-	print "<input id=\"gid\" name=\"gid\" type=\"hidden\" value=\"" . $group_id . "\" />\n";
-	print "<input id=\"sid\" name=\"sid\" type=\"hidden\" value=\"" . $sheet_id . "\" />\n";
-	print "<input type=\"submit\" value=\"再読み込み\" />\n";
-	print "</form>\n";
-	print "</td>\n";
-
-	print "<td align=\"right\" width=\"450\">\n";
 	put_status();
-	print "</td>\n";
-	print "</tr></table>\n";
-	print "<br />\n";
 }
 
 // Excelファイル表示処理
 if ($xls) {
 	put_css($xls);
-	put_excel($xls);
-	if ($conf_sw) {
-		$dirty_label = " disabled";
-	} else {
-		$dirty_label = count($field_list) > 0 ? "" : "disabled=\"disabled\"";
-	}
+
+	// 集計フィールド
 	put_fields();
 
+	print "<div class=\"clearfix\" style=\"padding: 10px 0; margin-bottom: 30px;\">\n";
 	print "<form action=\"/external/sht_script/\" method=\"post\" id=\"form-save\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
@@ -205,6 +186,14 @@ if ($xls) {
 	print "<input type=\"hidden\" name=\"target\" value=\"" . $target . "\" />\n";
 	print "<button type=\"button\" id=\"sbmt\" onclick=\"this.disabled=true; pack_fields();\" {$dirty_label}>保存</button>\n";
 	print "</form>\n";
+	print "</div>\n";
+
+	put_excel($xls);
+	if ($conf_sw) {
+		$dirty_label = " disabled";
+	} else {
+		$dirty_label = count($field_list) > 0 ? "" : "disabled=\"disabled\"";
+	}
 }
 
 //
@@ -444,12 +433,13 @@ function put_status()
 	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
 
 	// XXX
-	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
+	print "<div style=\"padding:10px;\" class=\"statusMenu\">\n";
 	print "<form action=\"/external/sht_marker/\" method=\"post\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
+	print "<div ${style["lgray"]}><button type=\"button\" id=\"\" onclick=\"this.disabled=false; go_sheet_upload(); return false;\" >再読み込み</button></div>\n";
 	print "<div ${style["pink"]}><span>フィールド指定</span></div>\n";
 	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; this.form.submit();\" " . $status_label . ">マーカー指定</button></div>\n";
 	print "<div ${style["gray"]}><span>シート確認</span></div>\n";
