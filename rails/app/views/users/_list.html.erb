@@ -1,10 +1,10 @@
 <% if params[:controller] == "users" %>
 <% if @current_group.is_administrator? && !session[:masq_from_user] %>
 
-<h3>組織基本情報</h3>
+<h3>グループ基本情報</h3>
 <table class="surveysobject">
   <tr class="surveysobject">
-    <th class="surveysobject" align="left">組織名</th>
+    <th class="surveysobject" align="left">グループ名</th>
     <th class="surveysobject" align="left">操作</th>
   </tr>
   <tr class="surveysobject">
@@ -19,11 +19,11 @@
 <% end %>
 <% end %>
 
-<h3>ユーザアカウント一覧</h3>
+<h3>ユーザ一覧</h3>
 <div class="surveysobject_new">
 <% if params[:controller] == "users" %>
 <% if @current_user.has_user_role(@group.id) %>
-<%= link_to '[アカウントの新規作成]', new_group_user_path(@group) %>
+<%= link_to '[ユーザ新規作成]', new_group_user_path(@group) %>
 <% end %>
 <% end %>
 </div>
