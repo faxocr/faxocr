@@ -1,17 +1,20 @@
 <table id="header">
   <tr>
     <td width="50px" rowspan="2"><img src="/image/logo.png" alt="Shinsai FaxOCR System" /></td>
+    <% if @current_user != nil %>
     <td>Shinsai FaxOCRシステム</td>
+    <% else %>
+    <td rowspan="2"><font size=+1>Shinsai FaxOCRシステム</font></td>
+    <% end %>
     <td>
     </td>
   </tr>
+  <% if @current_user != nil %>
   <tr>
     <td class="welcome_user">
       <font size="-1">
 	<% if @current_user != nil %>
 	ようこそ <%= @current_group ? @current_group.group_name + ' の ': nil %><%=h @current_user.full_name %> さん。
-	<% else %>
-	ようこそ ゲスト さん。
 	<% end %>
 	<% if @masq_from_user != nil %>
 	<font color="red">
@@ -30,4 +33,5 @@
       <% end %>
     </td>
   </tr>
+  <% end %>
 </table>
