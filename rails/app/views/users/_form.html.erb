@@ -3,21 +3,21 @@
 
   <h2 class="surveysobject">ユーザ名</h2>
   <div class="surveysobject">
-  	本Webシステムへのユーザ名を入力してください。
+	本Webシステムで使用するユーザ名を入力してください。
   </div>
   <p class="surveysobject">
     <%= f.text_field :login_name %>
   </p>
   <h2 class="surveysobject">ログインパスワード</h2>
   <div class="surveysobject">
-  	本Webシステムへログインパスワードを入力してください。
+	本Webシステムへログインするパスワードを入力してください。
   </div>
   <p class="surveysobject">
     <%= f.password_field :password %>
   </p>
   <h2 class="surveysobject">ログインパスワード（確認）</h2>
   <div class="surveysobject">
-  	確認のため、もう一度本Webシステムへログインパスワードを入力してください。
+	確認のため、もう一度本Webシステムへログインするパスワードを入力してください。
   </div>
   <p class="surveysobject">
     <%= f.password_field :password_confirmation %>
@@ -64,9 +64,9 @@
   <p class="surveysobject">
     <%= f.text_field :email %>
   </p>
-  <h2 class="surveysobject">役割</h2>
+  <h2 class="surveysobject">役割(権限)</h2>
   <div class="surveysobject">
-  	役割を入力してください。
+	本Webシステムで使用する役割を入力してください。
   </div>
   <p class="surveysobject">
     <%
