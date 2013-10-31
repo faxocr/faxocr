@@ -3,12 +3,12 @@
 <% if @current_user.has_candidate_role(@group.id) %>
 <%= link_to '[調査対象の新規作成]', new_group_candidate_path(@group) %>
 <% end %>
-<a href=<%="\"/external/register/" + @group.id.to_s + "\""%> >[一括取込]</a>
+<a href=<%="\"/external/register/" + @group.id.to_s + "\""%> >[新規一括取込]</a>
 <% end %>
 </div>
 <table class="surveysobject">
   <tr class="surveysobject">
-    <th class="surveysobject">コード</th>
+    <th class="surveysobject">調査対象コード</th>
     <th class="surveysobject">名称</th>
     <th class="surveysobject">TEL番号</th>
     <th class="surveysobject">FAX番号</th>
