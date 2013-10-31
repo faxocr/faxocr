@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class RoleMapping < ActiveRecord::Base
   belongs_to :group
   belongs_to :user
@@ -9,16 +10,16 @@ class RoleMapping < ActiveRecord::Base
     role = self.role
     string = ""
     if /u/ =~ role
-      string += "[ユーザ]"
+      string += "[ユーザ管理]"
     end
     if /s/ =~ role
-      string += "[サーベイ]"
+      string += "[調査管理]"
     end
     if /c/ =~ role
-      string += "[調査対象]"
+      string += "[調査対象管理]"
     end
     if /m/ =~ role
-      string += "[代理]"
+      string += "[代理ログイン]"
     end
     return string
   end

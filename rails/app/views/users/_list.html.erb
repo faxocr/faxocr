@@ -33,9 +33,6 @@
     <th class="surveysobject">担当者名</th>
     <th class="surveysobject">組織名</th>
     <th class="surveysobject">部署名</th>
-    <th class="surveysobject">TEL番号</th>
-    <th class="surveysobject">FAX番号</th>
-    <th class="surveysobject">メールアドレス</th>
     <th class="surveysobject">役割</th>
 	<% if params[:controller] == "users" %>
     <th class="surveysobject">操作</th>
@@ -54,9 +51,6 @@
     <td class="surveysobject"><%=h user.full_name %></td>
     <td class="surveysobject"><%=h user.organization %></td>
     <td class="surveysobject"><%=h user.section %></td>
-    <td class="surveysobject"><%=h user.tel_number %></td>
-    <td class="surveysobject"><%=h user.fax_number %></td>
-    <td class="surveysobject"><%=h user.email %></td>
     <td class="surveysobject"><%=h role_mapping ? role_mapping.printable_role : "&nbsp;" %></td>
 	<% if params[:controller] == "users" %>
     <% if @current_user.has_user_role(@group.id) %>
