@@ -46,7 +46,7 @@
 	      &gt;&nbsp;<%= link_to @survey_candidate.candidate_id, group_survey_survey_candidate_path(@group, @survey, @survey_candidate) %>
 	    <% end %>
 	  <% elsif /^(answer_sheets|answer_sheet_properties)$/ =~ params[:controller] %>
-	    &gt;&nbsp;<%= link_to 'FAX受信調査シート', group_survey_answer_sheets_path(@group, @survey) %>
+	    &gt;&nbsp;<%= link_to 'FAX受信調査シート一覧', group_survey_answer_sheets_path(@group, @survey) %>
 	    <% if !(/^(answer_sheets)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
 	    &gt;&nbsp;<%= link_to @answer_sheet.date.to_s(:datetime_jp), group_survey_answer_sheet_path(@group, @survey, @answer_sheet) %>
 	    <% end %>
