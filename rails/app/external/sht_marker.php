@@ -78,11 +78,15 @@ if ($errmsg) {
 	$target = $conf->get("target") == "registered" ? 1 : 0;
 
 	// ステータス表示
-	print "<table width=\"100%\">\n";
-	print "<tr>\n";
-	print "<td>\n";
+	put_status();
 
-	print "<button onclick=\"show_marker();\" style=\"z-index:10;\">位置指定</button>\n";
+	// アクションボタン表示
+	$label_marker = "位置指定";
+	if (file_exists(DST_DIR . $file_id . ".rb")) {
+		$label_marker = "位置再指定";
+	}
+	print "<div class=\"clearfix\" style=\"padding: 10px 0; margin-bottom: 30px;\">\n";
+	print "<button onclick=\"show_marker();\" style=\"z-index:10; float: left; margin-right: 10px;\">" . $label_marker . "</button>\n";
 	print "<form action=\"/external/sht_config/\" method=\"post\" id=\"form-save\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
@@ -99,16 +103,9 @@ if ($errmsg) {
 		print "<input type=\"hidden\" name=\"func\" value=\"generate\" />\n";
 		print "<input type=\"hidden\" name=\"orient\" value=\"" . $orientation . "\" />\n";
 		print "<input id=\"sbmt\" type=\"submit\" value=\"PDF生成\" />\n";
-		print " (時間が掛かります)";
 		print "</form>";
 	}
-
-	print "</td>\n";
-	print "<td align=\"right\" width=\"450px\">";
-	put_status();
-	print "</td>\n";
-	print "</tr></table>\n";
-	print "<br />\n";
+	print "</div>\n";
 }
 
 //
@@ -383,7 +380,7 @@ function put_status()
 
 	// XXX
 	print "\n";
-	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
+	print "<div style=\"padding:10px;\" class=\"statusMenu\">\n";
 	print "<form method=\"post\" id=\"form-status\" >\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	// for sht_field
@@ -391,6 +388,7 @@ function put_status()
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
+	print "<div ${style["gray"]}><span>再読み込み</span></div>\n";
 	print "<div ${style["gray"]}><button type=\"button\" id=\"prev\" onclick=\"this.disabled=true; go_prev();\" >フィールド指定</button></div>\n";
 	print "<div ${style["pink"]}><span>マーカー指定</span></div>\n";
 	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_next();\" {$status_label}>シート確認</button></div>\n";

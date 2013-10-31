@@ -54,6 +54,13 @@ function isset(data) {
 	};
 })(jQuery);
 
+function go_sheet_upload() {
+	gid = $("#form-status input[name=gid]").val();
+	sid = $("#form-status input[name=sid]").val();
+	location.href = "/external/sheet/" + gid + "/" + sid + "/";
+}
+
+
 // initialization
 jQuery(document).ready(function($) {
 
