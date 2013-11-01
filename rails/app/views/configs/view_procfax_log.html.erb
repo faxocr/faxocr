@@ -1,19 +1,33 @@
-<h1>Fax処理履歴</h1>
-<p>Log Directory Path: <%= @logdir_path %></p>
-<p><%= button_to "procfax.sh実行", procfax_exec_configs_path, :onclick => "DisableButton(this);" %></p>
-<ul>
-  <% @files.each do |file| %>
-    <% if File.ftype(file) == "directory" %>
-    <li><%= File.basename(file).gsub(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/, '\1/\2/\3-\4:\5') %>
+<h1>Fax処理履歴 (直近<%= @page_size %>件)</h1>
+
+    <% str = ""; cnt = 0 %>
+    <% @files.each do |file| %>
+    <% if File.ftype(file) == "directory" && cnt < @page_size.to_i %>
+    <% cnt += 1 %>
     <% contents = IO.readlines("#{file}/procfax.log") %>
-    <% count = contents.map{|l| l if l.include?("INFO: Number of fax processed:")}.join.chomp.split(':')[-1] %>
-    処理済みFax <%= count %>件
-    <% count = contents.map{|l| l if l.include?("INFO: Number of error occured processing fax:")}.join.chomp.split(':')[-1] %>
-    (失敗 <%= count %>件)
-    <% count = contents.map{|l| l if l.include?("INFO: Number of sheet processed:")}.join.split(':')[-1] %>
-    処理済みシート <%= count %>件
-    <% count = contents.map{|l| l if l.include?("INFO: Number of error occured processing sheet:")}.join.chomp.split(':')[-1] %>
-    (失敗 <%= count %>件)</li>
+    <% count_f = contents.map{|l| l if l.include?("INFO: Number of fax processed:")}.join.chomp.split(':')[-1] %>
+    <% count_fe = contents.map{|l| l if l.include?("INFO: Number of error occured processing fax:")}.join.chomp.split(':')[-1] %>
+    <% count_se = contents.map{|l| l if l.include?("INFO: Number of error occured processing sheet:")}.join.chomp.split(':')[-1] %>
+    <% count_s = contents.map{|l| l if l.include?("INFO: Number of sheet processed:")}.join.split(':')[-1] %>
+    <% count_s = count_s.to_i - count_se.to_i %>
+    <% str += File.basename(file).gsub(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/, '\1/\2/\3 \4:\5　') %>
+    <% str += "到着Fax " + count_f.to_s + "件 (Fax処理失敗 " + count_fe.to_s +
+       " / シート処理失敗 " + count_se.to_s + ") →  " + count_s.to_s +
+       " シート受理\n" %>
     <% end %>
-  <% end %>
-</ul>
+    <% end %>
+
+<br>
+<center>
+  <textarea readonly style="width: 95%; height: 250px;">
+<%= str %>
+  </textarea>
+</center>
+<br>
+
+<table width="100%">
+<tr>
+  <td align="left">Log Directory Path: <%= @logdir_path %></td>
+  <td align="right"><%= button_to "procfax.sh実行", procfax_exec_configs_path, :onclick => "DisableButton(this);" %></td>
+</tr>
+</table>

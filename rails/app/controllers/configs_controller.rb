@@ -30,6 +30,7 @@ class ConfigsController < ApplicationController
   end
 
   def view_procfax_log
+    @page_size = page_size
     @logdir_path = "#{Rails.root}/../Faxsystem/Log/*"
     @files = Dir.glob(@logdir_path).sort.reverse
   end
@@ -92,6 +93,7 @@ class ConfigsController < ApplicationController
   end
 
   def view_sendfax_log
+    @page_size = page_size
     @log_file_path = "#{Rails.root}/../Faxsystem/Log/sendfax.log"
     @raw_config = `tail -10 #{@log_file_path}`
   end
