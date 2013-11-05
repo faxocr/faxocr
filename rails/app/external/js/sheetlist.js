@@ -99,6 +99,9 @@ jQuery(document).ready(function($) {
 
 	document.onkeyup = on_keyup;
 	document.onkeydown = on_keydown;
+
+	btn = $('.statusMenu button:disabled');
+	btn.parent().addClass('disable');
 });
 
 //

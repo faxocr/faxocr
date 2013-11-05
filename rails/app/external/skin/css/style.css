@@ -724,38 +724,103 @@ form {
 	border-top: 2px solid #C0C0C0;
 }
 
-.statusMenu	{
+.statusMenu {
+	width: 505px;
+	margin: 0 auto;
+	padding: 10px;
 	text-align: center;
-	height: auto;
 }
 
-.statusMenu div	{
-	list-style-type: none;
-	display: inline-block;
-	*display: inline;
-	zoom: 1;
-	vertical-align: middle;
-	height: 26px;
-	margin: 1px;
-	overflow: visible;
+.statusMenu div {
+	float: left;
+	margin-right: 10px;
 }
 
-.statusMenu div span {
-	display: inline-block;
-	*display: inline;
-	zoom: 1;
-	vertical-align: middle;
-	overflow: visible;
+.statusMenu button {
+    border: none;
+    width: 83px;
+    height: 26px;
+    text-indent: -9999px;
+	cursor: pointer;
 }
 
-.statusMenu div button {
-	display: inline-block;
-	*display: inline;
-	zoom: 1;
-	vertical-align: middle;
-	overflow: visible;
-	line-height: auto;
-	*line-height: 1;
+.statusMenu .current button, 
+.statusMenu .disable button {
+	cursor: auto;
+}
+
+.statusMenu .upload button {
+    background: url("/images/btn_sht.png") no-repeat scroll 0 0 transparent;
+}
+
+.statusMenu .field button {
+    background: url("/images/btn_sht.png") no-repeat scroll -89px 0 transparent;
+    width: 104px;
+}
+
+.statusMenu .marker button {
+    background: url("/images/btn_sht.png") no-repeat scroll -199px 0 transparent;
+    width: 95px;
+}
+
+.statusMenu .verify button {
+    background: url("/images/btn_sht.png") no-repeat scroll -300px 0 transparent;
+    width: 85px;
+}
+
+.statusMenu .commit button {
+    background: url("/images/btn_sht.png") no-repeat scroll -390px 0 transparent;
+    width: 85px;
+}
+
+/* disable */
+.statusMenu .upload.disable button {
+    background: url("/images/btn_sht.png") no-repeat scroll 0 -34px transparent;
+}
+
+.statusMenu .field.disable button {
+    background: url("/images/btn_sht.png") no-repeat scroll -89px -34px transparent;
+    width: 104px;
+}
+
+.statusMenu .marker.disable button {
+    background: url("/images/btn_sht.png") no-repeat scroll -199px -34px transparent;
+    width: 95px;
+}
+
+.statusMenu .verify.disable button {
+    background: url("/images/btn_sht.png") no-repeat scroll -300px -34px transparent;
+    width: 85px;
+}
+
+.statusMenu .commit.disable button {
+    background: url("/images/btn_sht.png") no-repeat scroll -390px -34px transparent;
+    width: 85px;
+}
+
+/* current */
+.statusMenu .upload.current button {
+    background: url("/images/btn_sht.png") no-repeat scroll 0 -104px transparent;
+}
+
+.statusMenu .field.current button {
+    background: url("/images/btn_sht.png") no-repeat scroll -89px -104px transparent;
+    width: 104px;
+}
+
+.statusMenu .marker.current button {
+    background: url("/images/btn_sht.png") no-repeat scroll -199px -104px transparent;
+    width: 95px;
+}
+
+.statusMenu .verify.current button {
+    background: url("/images/btn_sht.png") no-repeat scroll -300px -104px transparent;
+    width: 85px;
+}
+
+.statusMenu .commit.current button {
+    background: url("/images/btn_sht.png") no-repeat scroll -390px -104px transparent;
+    width: 85px;
 }
 
 .debug {

@@ -426,24 +426,18 @@ function put_status()
 
 	$status_label = $conf_sw ? "" : " disabled";
 
-	$style = array();
-	$style["normal"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffffff;padding:1px;color:gray\"";
-	$style["gray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#bbbbbb;padding:1px\"";
-	$style["lgray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#dddddd;padding:1px\"";
-	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
-
 	// XXX
-	print "<div style=\"padding:10px;\" class=\"statusMenu\">\n";
+	print "<div class=\"statusMenu clearfix\">\n";
 	print "<form action=\"/external/sht_marker/\" method=\"post\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
-	print "<div ${style["lgray"]}><button type=\"button\" id=\"\" onclick=\"this.disabled=false; go_sheet_upload(); return false;\" >再読み込み</button></div>\n";
-	print "<div ${style["pink"]}><span>フィールド指定</span></div>\n";
-	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; this.form.submit();\" " . $status_label . ">マーカー指定</button></div>\n";
-	print "<div ${style["gray"]}><span>シート確認</span></div>\n";
-	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
+	print "<div class=\"upload\"><button type=\"button\" id=\"\" onclick=\"this.disabled=false; go_sheet_upload(); return false;\" >再読み込み</button></div>\n";
+	print "<div class=\"field current\"><button type=\"button\" disabled=\"disabled\">フィールド指定</button></div>\n";
+	print "<div class=\"marker\"><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; this.form.submit();\" " . $status_label . ">マーカー指定</button></div>\n";
+	print "<div class=\"verify disable\"><button type=\"button\" disabled=\"disabled\">シート確認</button></div>\n";
+	print "<div class=\"commit disable\"><button type=\"button\" disabled=\"disabled\">シート登録</button></div>\n";
 
 	print "</form>\n";
 	print "</div>\n";

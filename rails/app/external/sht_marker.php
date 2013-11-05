@@ -175,6 +175,9 @@ var $ = jQuery;
 
 $().ready(function() {
 	$('#ex3').jqDrag('.jqDrag').jqResize('.jqResize');
+
+	btn = $('.statusMenu button:disabled');
+	btn.parent().addClass('disable');
 });
 
 var last_size = $marker_size;
@@ -372,15 +375,8 @@ function put_status()
 
 	$status_label = file_exists(DST_DIR . $file_id . ".rb") ? "" : "disabled=\"disabled\"";
 
-	$style = array();
-	$style["normal"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffffff;padding:1px;color:gray\"";
-	$style["gray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#bbbbbb;padding:1px\"";
-	$style["lgray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#dddddd;padding:1px\"";
-	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
-
 	// XXX
-	print "\n";
-	print "<div style=\"padding:10px;\" class=\"statusMenu\">\n";
+	print "<div class=\"statusMenu clearfix\">\n";
 	print "<form method=\"post\" id=\"form-status\" >\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	// for sht_field
@@ -388,11 +384,11 @@ function put_status()
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
-	print "<div ${style["gray"]}><span>再読み込み</span></div>\n";
-	print "<div ${style["gray"]}><button type=\"button\" id=\"prev\" onclick=\"this.disabled=true; go_prev();\" >フィールド指定</button></div>\n";
-	print "<div ${style["pink"]}><span>マーカー指定</span></div>\n";
-	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_next();\" {$status_label}>シート確認</button></div>\n";
-	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
+	print "<div class=\"upload disable\"><button type=\"button\" disabled=\"disabled\">再読み込み</button></div>\n";
+	print "<div class=\"field\"><button type=\"button\" id=\"prev\" onclick=\"this.disabled=true; go_prev();\" >フィールド指定</button></div>\n";
+	print "<div class=\"marker current\"><button type=\"button\" disabled=\"disabled\">マーカー指定</button></div>\n";
+	print "<div class=\"verify\"><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_next();\" {$status_label}>シート確認</button></div>\n";
+	print "<div class=\"commit disable\"><button type=\"button\" disabled=\"disabled\">シート登録</button></div>\n";
 
 	print "</form>\n";
 	print "</div>\n";
