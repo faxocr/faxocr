@@ -153,7 +153,7 @@ if ($tgt_file) {
 		// セルサイズチェック
 		if ( ($min_cell_width != 0 && ($min_cell_width * $scale) <= MIN_CELL_WIDTH) || ($min_cell_height != 0 &&($min_cell_height * $scale) <= MIN_CELL_HEIGHT) ) {
 			// 厳密にはマーカー指定時のサイズによって決まる
-			$errmsg = "セルのサイズが小さすぎます ".MIN_CELL_WIDTH."px x ".MIN_CELL_HEIGHT."px以下にしてください";
+			$errmsg = "セルのサイズが小さすぎます ".MIN_CELL_WIDTH."px x ".MIN_CELL_HEIGHT."px以上にしてください";
 		}
 	}
 }
