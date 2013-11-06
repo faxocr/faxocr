@@ -255,6 +255,11 @@ form{margin:0;padding:0;}
         color:#1d7877;
 }
 
+#contents_1c h1.admin {
+        background:url('../image/back_title_1column_red.gif') no-repeat 0 0;
+        color:#fa5f0a;
+}
+
 #contents .article{
         margin:0;
         padding:0 15px;
