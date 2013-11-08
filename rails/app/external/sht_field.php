@@ -174,6 +174,15 @@ if ($errmsg) {
 if ($xls) {
 	put_css($xls);
 
+	print "<div style=\"margin: 20px 0 30px; text-align:center;\">読み取りたいセルをクリックし、フィールド指定して下さい。</div>\n";
+
+	put_excel($xls);
+	if ($conf_sw) {
+		$dirty_label = " disabled";
+	} else {
+		$dirty_label = count($field_list) > 0 ? "" : "disabled=\"disabled\"";
+	}
+
 	// 集計フィールド
 	put_fields();
 
@@ -187,13 +196,6 @@ if ($xls) {
 	print "<button type=\"button\" id=\"sbmt\" onclick=\"this.disabled=true; pack_fields();\" {$dirty_label}>保存</button>\n";
 	print "</form>\n";
 	print "</div>\n";
-
-	put_excel($xls);
-	if ($conf_sw) {
-		$dirty_label = " disabled";
-	} else {
-		$dirty_label = count($field_list) > 0 ? "" : "disabled=\"disabled\"";
-	}
 }
 
 //
