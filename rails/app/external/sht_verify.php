@@ -121,10 +121,10 @@ STR;
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
 	print "<div class=\"upload disable\"><button type=\"button\" disabled=\"disabled\">再読み込み</button></div>\n";
-	print "<div class=\"field disable\"><button type=\"button\" disabled=\"disabled\">フィールド指定</button></div>\n";
-	print "<div class=\"marker disable\"><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_prev();\">マーカー指定</button></div>\n";
-	print "<div class=\"verify current\"><button type=\"button\" disabled=\"disabled\">シート確認</button></div>\n";
-	print "<div class=\"commit\"><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_next();\">シート登録</button></div>\n";
+	print "<div class=\"field disable\">&gt;<button type=\"button\" disabled=\"disabled\">フィールド指定</button></div>\n";
+	print "<div class=\"marker\">&gt;<button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_prev();\">マーカー指定</button></div>\n";
+	print "<div class=\"verify current\">&gt;<button type=\"button\" disabled=\"disabled\">シート確認</button></div>\n";
+	print "<div class=\"commit\">&gt;<button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_next();\">シート登録</button></div>\n";
 
 	print "</form>\n";
 	print "</div>\n";

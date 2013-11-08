@@ -725,21 +725,23 @@ form {
 }
 
 .statusMenu {
-	width: 505px;
+	width: 565px;
 	margin: 0 auto;
 	padding: 10px;
+	color: #1D7877;
 	text-align: center;
+	font-weight: bold;
 }
 
 .statusMenu div {
 	float: left;
-	margin-right: 10px;
 }
 
 .statusMenu button {
     border: none;
     width: 83px;
     height: 26px;
+	margin: 0 7px;
     text-indent: -9999px;
 	cursor: pointer;
 }

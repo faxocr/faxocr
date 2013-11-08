@@ -436,10 +436,10 @@ function put_status()
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
 	print "<div class=\"upload\"><button type=\"button\" id=\"\" onclick=\"this.disabled=false; go_sheet_upload(); return false;\" >再読み込み</button></div>\n";
-	print "<div class=\"field current\"><button type=\"button\" disabled=\"disabled\">フィールド指定</button></div>\n";
-	print "<div class=\"marker\"><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; this.form.submit();\" " . $status_label . ">マーカー指定</button></div>\n";
-	print "<div class=\"verify disable\"><button type=\"button\" disabled=\"disabled\">シート確認</button></div>\n";
-	print "<div class=\"commit disable\"><button type=\"button\" disabled=\"disabled\">シート登録</button></div>\n";
+	print "<div class=\"field current\">&gt;<button type=\"button\" disabled=\"disabled\">フィールド指定</button></div>\n";
+	print "<div class=\"marker\">&gt;<button type=\"button\" id=\"next\" onclick=\"this.disabled=true; this.form.submit();\" " . $status_label . ">マーカー指定</button></div>\n";
+	print "<div class=\"verify disable\">&gt;<button type=\"button\" disabled=\"disabled\">シート確認</button></div>\n";
+	print "<div class=\"commit disable\">&gt;<button type=\"button\" disabled=\"disabled\">シート登録</button></div>\n";
 
 	print "</form>\n";
 	print "</div>\n";
