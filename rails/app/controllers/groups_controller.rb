@@ -106,32 +106,36 @@ class GroupsController < ApplicationController
     @group = Group.find(params[:id])
     @surveys = @group.surveys
     datetime = DateTime.now
+
     @repyears = []
-    i = 2
-    while i >= 0 do      
+    i = 3
+    while i > 0 do
       tmpdatetime = datetime - (365 * i)
       repyear = [tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%Y")]
       @repyears << repyear
       i -= 1
     end
+
     @repmonths = []
     datetime = DateTime.now
     i = 6
-    while i >= 0 do      
+    while i > 0 do
       tmpdatetime = datetime - (31 * i)
       repmonth = [tmpdatetime.strftime("%m"), tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%m")]
       i -= 1
       @repmonths << repmonth
     end
+
     @repdays = []
     datetime = DateTime.now
     i = 6
-    while i >= 0 do      
+    while i > 0 do
       tmpdatetime = datetime - i
       repday = [tmpdatetime.strftime("%d"), tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%m"), tmpdatetime.strftime("%d")]
       i -= 1
       @repdays << repday
     end
+
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @group }

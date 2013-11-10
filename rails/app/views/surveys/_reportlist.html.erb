@@ -2,7 +2,7 @@
   <tr class="surveysobject">
     <th class="surveysobject">Status</th>
     <th class="surveysobject">名称</th>
-    <th class="surveysobject">集計レポート</th>
+    <th class="surveysobject">集計レポート(日)</th>
     <th class="surveysobject">月単位CSV</th>
     <th class="surveysobject">年単位CSV</th>
   </tr>
@@ -16,24 +16,30 @@
     <% end %>
    	<td class="surveysobject"><%=h Survey::STATUS[survey.status][0] %></td>
    	<td class="surveysobject"><%=h survey.survey_name %></td>
-    <td class="surveysobject">[
-    <% @repdays.each do |repday| %>
+    <td class="surveysobject">
+    <% @repdays.each_with_index do |repday, i| %>
 	  <%= link_to "#{repday[0]} ", :controller => 'report', :action => 'daily', :group_id => @group.id, :survey_id => survey.id, :year => repday[1], :month => repday[2], :day => repday[3] %>
+	  <% unless i == (@repdays.length - 1) %>
 	  -
+	  <% end %>
     <% end %>
-	]日</td>
-    <td class="surveysobject">[
-    <% @repmonths.each do |repmonth| %>
+    </td>
+    <td class="surveysobject">
+    <% @repmonths.each_with_index do |repmonth, i| %>
    	  <%= link_to "#{repmonth[0]} ", :controller => 'export', :action => 'csv', :group_id => @group.id, :survey_id => survey.id, :year => repmonth[1], :month => repmonth[2] %>
+	  <% unless i == (@repmonths.length - 1) %>
 	  -
+	  <% end %>
     <% end %>
-    ]月</td>
-    <td class="surveysobject">[
-    <% @repyears.each do |repyear| %>
+    </td>
+    <td class="surveysobject">
+    <% @repyears.each_with_index do |repyear, i| %>
       <%= link_to "#{repyear[0]} ", :controller => 'export', :action => 'csv', :group_id => @group.id, :survey_id => survey.id, :year => repyear[1] %>
+	  <% unless i == (@repyears.length - 1) %>
 	  -
+	  <% end %>
     <% end %>
-    ]年</td>
+    </td>
   </tr>
 <% end %>
 </table>
