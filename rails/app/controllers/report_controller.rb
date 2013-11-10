@@ -26,7 +26,7 @@ class ReportController < ApplicationController
     @survey_candidates.each do |survey_candidate|
       if survey_candidate.has_receivereport_role
         @answer_sheet = AnswerSheet.find_by_sheet_id_and_candidate_id(sheet_ids, survey_candidate.candidate_id,
-        :conditions => ['date <= ?', date_end],
+        :conditions => ['date >= ? and date <= ?', date_begin, date_end],
         :order => 'date desc')
         if @answer_sheet == nil
           @answer_sheet = AnswerSheet.new
