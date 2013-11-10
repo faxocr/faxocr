@@ -1,12 +1,7 @@
-<%
-  report_header = @survey.report_header
-  @place_holder.each do |k, v|
-      report_header = report_header.sub(/%%#{k}%%/, v)
-  end
-%>
-<%= report_header %>
-<%
+<h1>集計レポート(<%= @place_holder['YEAR'] + "/" +  @place_holder['MONTH'] + "/" +  @place_holder['DAY'] %>)</h1>
 
+<table class="report">
+<%
 # Collect
 survey_properties = SurveyProperty.find_all_by_survey_id(@survey.id,
   :order => 'view_order')
@@ -20,19 +15,25 @@ survey_properties.each do |rp|
 end
 
 line_num = 1
-@answer_sheets.each do |a|
 %>
   <tr>
-    <td><%= line_num %></td>
+    <th class="manage"></th>
+    <th>調査対象</th>
+    <% for column in columns do %>
+    <th></th>
+    <% end %>
+  </tr>
+<% @answer_sheets.each do |a| %>
+  <tr <%= ((line_num % 2) == 1) ? "class='dark'" : "" %>>
+    <td class="manage"><%= line_num %></td>
     <td><%= a.candidate.candidate_name %><br><%= a.candidate.tel_number %><br>
 	<% if a.date != nil %>
 		(<%= a.date.to_s(:date_nomal) %>)
 	<% end %>
 	</td>
 
-<%
-
-  for column in columns do
+  <% for column in columns do %>
+    <%
     rp = AnswerSheetProperty.find(:first,
       :conditions => ['answer_sheet_id = ? and ocr_name = ?', a.id, column])
     cell_str = rp != nil ? rp.ocr_value : '-'
@@ -54,34 +55,24 @@ line_num = 1
 		else
 			cell_item = '&nbsp;'
 		end
-    end
-%>
+      %>
+    <% end %>
     <td align="center"><%= cell_item %></td>
-<%
-  end
-%>
+  <% end %>
   </tr>
-<%
-  line_num = line_num + 1
-end
-%>
+  <% line_num = line_num + 1 %>
+<% end %>
 
 <!-- Sum -->
 <% unless @all_image %>
 <tr>
-    <td colspan="2">計</td>
+  <td class="manage">計</td>
+  <td></td>
 
-<%
-for column in columns do
-  cell_item = (data_types[column] == 'number') ? sums[column] : '&nbsp;'
-%>
+  <% for column in columns do %>
+    <% cell_item = (data_types[column] == 'number') ? sums[column] : '&nbsp;' %>
     <td align="center"><%= cell_item %></td>
-<%
-end
-%>
+  <% end %>
   </tr>
 <% end %>
-
-
-<%= @survey.report_footer %>
-
+</table>

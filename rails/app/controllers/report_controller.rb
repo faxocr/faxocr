@@ -10,6 +10,7 @@ class ReportController < ApplicationController
     date_begin = "#{year}/#{month}/#{day} 00:00:00"
     date_end =  "#{year}/#{month}/#{day} 23:59:59"
     
+    @group = Group.find(params[:group_id])
     @survey = Survey.find(params[:survey_id])
     unless @survey
       # No survey found (@survey = nil)

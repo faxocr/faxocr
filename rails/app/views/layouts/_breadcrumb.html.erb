@@ -22,7 +22,7 @@
 	  &gt;&nbsp;<%= link_to '新規グループ登録', new_group_path() %>
 	<% end %>
 
-	<% if /^(surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties|report)$/ =~ params[:controller] %>
+	<% if /^(surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties)$/ =~ params[:controller] %>
 	  &gt;&nbsp;<%= link_to '調査一覧', group_surveys_path(@group) %>
 	  <% if !(/^(surveys)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action]) %>
 	  &gt;&nbsp;<%= link_to @survey.survey_name, group_survey_path(@group, @survey) %>
@@ -79,6 +79,12 @@
 	  &gt;&nbsp;<%= @user.full_name %>
 	  <% elsif (/^(users)$/ =~ params[:controller] && /^(new)$/ =~ params[:action])%>
 	  &gt;&nbsp;<%= link_to 'ユーザ新規作成', new_group_user_path(@group) %>
+	  <% end %>
+	<% elsif /^(report)$/ =~ params[:controller] %>
+	  &gt;&nbsp;<%= link_to 'ダウンロード', report_group_path(@group) %>
+	  &gt;&nbsp;<%= link_to @survey.survey_name, group_survey_path(@group, @survey) %>
+	  <% if (/^(report)$/ =~ params[:controller] && /^(daily)$/ =~ params[:action])%>
+	  &gt;&nbsp;集計レポート(<%= @place_holder['YEAR'] + "/" +  @place_holder['MONTH'] + "/" +  @place_holder['DAY'] %>)
 	  <% end %>
 	<% end %>
 	<% if /^(groups)$/ =~ params[:controller] && /^(report)$/ =~ params[:action] %>

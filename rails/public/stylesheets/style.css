@@ -579,6 +579,41 @@ td.surveysobject_manage {
 	text-align: center;
 }
 
+table.surveysobject {
+	border-collapse:collapse;
+	width: 100%;
+	font-size: 10pt;
+}
+
+div.surveysobject_new {
+	text-align: right;
+}
+
+/* report */
+table.report {
+	border-collapse:collapse;
+	width: 100%;
+	margin-top: 10px;
+	font-size: 10pt;
+}
+
+table.report th {
+	color: #ffffff;
+	background-color: #cccc88;
+}
+
+table.report tr {
+	background-color: #eeeeee;
+}
+
+table.report tr {
+	text-align: center;
+}
+
+table.report tr.dark {
+	background-color: #f5f5f5;
+}
+
 .rotate90 {
     transform: rotate(-90deg);
     -webkit-transform: rotate(-90deg);
