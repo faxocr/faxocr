@@ -18,7 +18,7 @@ line_num = 1
 %>
   <tr>
     <th class="manage"></th>
-    <th>調査対象</th>
+    <th class="name">調査対象</th>
     <% for column in columns do %>
     <th></th>
     <% end %>
@@ -26,8 +26,9 @@ line_num = 1
 <% @answer_sheets.each do |a| %>
   <tr <%= ((line_num % 2) == 1) ? "class='dark'" : "" %>>
     <td class="manage"><%= line_num %></td>
-    <td><%= a.candidate.candidate_name %><br><%= a.candidate.tel_number %><br>
+    <td class="name"><%= a.candidate.candidate_name %><br><%= a.candidate.tel_number %>
 	<% if a.date != nil %>
+	<br>
 		(<%= a.date.to_s(:date_nomal) %>)
 	<% end %>
 	</td>
@@ -65,7 +66,7 @@ line_num = 1
 
 <!-- Sum -->
 <% unless @all_image %>
-<tr>
+<tr class="summary">
   <td class="manage">計</td>
   <td></td>
 

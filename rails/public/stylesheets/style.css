@@ -597,21 +597,34 @@ table.report {
 	font-size: 10pt;
 }
 
-table.report th {
-	color: #ffffff;
-	background-color: #cccc88;
-}
-
 table.report tr {
 	background-color: #eeeeee;
-}
-
-table.report tr {
 	text-align: center;
 }
 
 table.report tr.dark {
 	background-color: #f5f5f5;
+}
+
+table.report tr.summary {
+	border-top: 1px solid #DDDDDD;
+}
+
+table.report th {
+	color: #ffffff;
+	background-color: #cccc88;
+}
+
+table.report th.manage {
+	width: 30px;
+}
+
+table.report th.name {
+	width: 200px;
+}
+
+table.report td {
+	padding: 3px 0;
 }
 
 .rotate90 {
