@@ -19,11 +19,15 @@
 <!-- header END -->
 
 <!-- nav STR -->
+<% if ( /^(masquerade)$/ =~ params[:action])%>
+  <%= render :partial => "layouts/menu" %>
+<% else %>
 <div id="nav">
 	<ul class="clearfix">
-		<li>　　　　　　　　　　　　　　　　　　　　　　　　</li>
+		<li></li>
 	</ul>
 </div>
+<% end %>
 <!-- nav END -->
 
 <!-- container STR -->
