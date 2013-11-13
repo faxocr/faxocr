@@ -16,7 +16,7 @@
   <p class="surveysobject">
     <%= f.select(:status, Survey::STATUS) %>
   </p>
-  
+
   <h2 class="surveysobject">集計レポート配信時間</h2>
   <div class="surveysobject">
   	集計レポートの配信時間を選択してください。
@@ -38,6 +38,7 @@
     <% end %>
   </p>
 
+<!--  
   <h2 class="surveysobject">集計レポートHTMLヘッダー</h2>
   <div class="surveysobject">
   	集計レポートで使用するHTMLヘッダーを入力してください。
@@ -52,6 +53,7 @@
   <p class="surveysobject">
     <%= f.text_area :report_footer, :cols => "120" %>
   </p>
+-->
   <p>
     <%= f.submit '保存' %>
   </p>
