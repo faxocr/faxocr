@@ -104,7 +104,7 @@ for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
 	for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
 			$val = $xls->getCellVal($sn, $r, $i);
-			$val = strconv($val['val']);
+			$val = $val['val'];
 			$xf = $xls->getCellAttrib($sn, $r, $i);
 			$xf = $xf['xf'];
 			$bgcolor = false;

@@ -274,7 +274,6 @@ STR;
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
-				$dispval = htmlspecialchars($dispval);
 
 				if (isset($xls->hlink[$sn][$r][$i])) {
 					$dispval = "<a href=\"" . $xls->hlink[$sn][$r][$i] . "\">" . $dispval . "</a>";
