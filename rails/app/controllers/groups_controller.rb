@@ -128,7 +128,7 @@ class GroupsController < ApplicationController
 
     @repdays = []
     datetime = DateTime.now
-    i = 6
+    i = 7
     while i > 0 do
       tmpdatetime = datetime - i
       repday = [tmpdatetime.strftime("%d"), tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%m"), tmpdatetime.strftime("%d")]
