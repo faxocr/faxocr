@@ -1,3 +1,4 @@
 <h1><%= @survey.survey_name %> のFAX受信調査シート一覧<%= (@group.id == 1 && @survey.id == 1) ? "(宛先不明Fax一覧)" : "" %></h1>
+<p style="color: green"><%= flash[:notice] %></p>
 <br>
 <%= render :partial => "list" %>

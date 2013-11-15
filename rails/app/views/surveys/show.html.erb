@@ -1,5 +1,6 @@
 <h1 class="surveysobject"><%= @survey.survey_name %>
 (<%=h Survey::STATUS[@survey.status][0] %>)</h1> 
+<p style="color: green"><%= flash[:notice] %></p>
 
 <div align="right">
 <% if @current_user.has_survey_role(@current_group.id) %>

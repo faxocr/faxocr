@@ -1,4 +1,5 @@
 <h1>Fax処理履歴 (直近<%= @page_size %>件)</h1>
+<p style="color: green"><%= flash[:notice] %></p>
 
     <% str = ""; cnt = 0 %>
     <% @files.each do |file| %>

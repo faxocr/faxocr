@@ -1,3 +1,4 @@
 <h1 class="surveysobject"><%=h @group.group_name %> のダウンロード一覧</h1>
+<p style="color: green"><%= flash[:notice] %></p>
 <br>
 <%= render :partial => "surveys/reportlist" %>

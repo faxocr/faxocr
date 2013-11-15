@@ -1,2 +1,3 @@
 <h1><%=h @group.group_name %> の調査対象一覧</h1>
+<p style="color: green"><%= flash[:notice] %></p>
 <%= render :partial => "candidates/list" %>
