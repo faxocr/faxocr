@@ -100,6 +100,12 @@ jQuery(document).ready(function($) {
 	document.onkeyup = on_keyup;
 	document.onkeydown = on_keydown;
 
+	var targettd = $('#field_list td');
+	targetid = targettd.attr('name');
+	if (targettd.length = 1 && targetid == 0) {
+		btn = $('.statusMenu .marker button').attr('disabled', true);
+	}
+
 	btn = $('.statusMenu button:disabled');
 	btn.parent().addClass('disable');
 });
@@ -147,6 +153,13 @@ function reset_field () {
 			del_column(targettd, index);
 		}
 	}
+
+	var targettd = $('#field_list td');
+	targetid = targettd.attr('name');
+	if (targettd.length = 1 && targetid == 0) {
+		btn = $('.statusMenu .marker button').attr('disabled', true);
+		$('.statusMenu .marker').addClass('disable');
+	}
 }
 
 //
@@ -185,7 +198,9 @@ function add_column(html, width) {
 
 	$('#field_list').flexReload();
 	dirty = true;
-	document.getElementById('sbmt').disabled = null;
+
+	$('.statusMenu .marker button').attr('disabled', false);
+	$('.statusMenu .marker').removeClass('disable');
 }
 
 //
@@ -221,7 +236,10 @@ function delColumn(target, idx) {
 
 	$('#field_list').flexReload();
 	dirty = true;
-	document.getElementById('sbmt').disabled = null;
+
+	$('.statusMenu .marker button').attr('disabled', false);
+	$('.statusMenu .marker').removeClass('disable');
+
 	$('#fieldreset li a').unbind('click');
 }
 
@@ -261,7 +279,9 @@ function del_column(target, index) {
 
 	dirty = true;
 	$('#field_list').flexReload();
-	document.getElementById('sbmt').disabled = null;
+
+	$('.statusMenu .marker button').attr('disabled', false);
+	$('.statusMenu .marker').removeClass('disable');
 }
 
 //
@@ -338,7 +358,9 @@ function field_click() {
 			    .html('<div style="width: ' + width + 'px" >' +
 				  htmlval + '</div>');
 			$('#' + targetid).html('<b>' + inputVal + '</b>');
-			document.getElementById('sbmt').disabled = null;
+
+			$('.statusMenu .marker button').attr('disabled', false);
+			$('.statusMenu .marker').removeClass('disable');
 		});
 	}
 }
@@ -367,9 +389,8 @@ function on_keydown(e) {
 	}
 
 	if (ctrl) {
-		if ($('#sbmt').length > 0) {
-			dirty = !document.getElementById('sbmt').disabled;
-		}
+		dirty = !$('.statusMenu .marker button').attr('disabled');
+
 		keychar = String.fromCharCode(keycode).toUpperCase();
 
 		if (keychar == 'S') {
@@ -443,7 +464,8 @@ function on_keyup(e) {
 		set_field($target);
 		targetid = null;
 
-		document.getElementById('sbmt').disabled = null;
+		$('.statusMenu .marker button').attr('disabled', false);
+		$('.statusMenu .marker').removeClass('disable');
 	}
 }
 
