@@ -250,7 +250,7 @@ class ExternalController < ApplicationController
     # @html += "<PRE>\n"
     # render :dummy
 
-    redirect_to :controller => 'external', :action => 'sht_field', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid}
+    redirect_to :controller => 'external', :action => 'sht_marker', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid}
   end
 
   def sht_marker
