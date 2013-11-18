@@ -3,8 +3,10 @@
 <table class="surveysobject">
   <tr class="surveysobject">
     <th class="surveysobject">受信日時</th>
-    <th class="surveysobject">送信FAX番号</th>
-    <th class="surveysobject">受信FAX番号</th>
+    <th class="surveysobject">
+	送信FAX番号<br/>
+	受信FAX番号
+    </th>
     <th class="surveysobject">シートコード</th>
     <th class="surveysobject">調査対象コード</th>
     <th class="surveysobject">エラー送信種別</th>
@@ -18,8 +20,10 @@
   <tr class="surveysobject_dark">
   <% end %>
     <td class="surveysobject"><%= answer_sheet.date.to_s(:datetime_jp).gsub(/日/, "日<BR>　　　") %></td>
-    <td class="surveysobject"><%=h answer_sheet.sender_number %></td>
-    <td class="surveysobject"><%=h answer_sheet.receiver_number %></td>
+    <td class="surveysobject">
+	<%=h answer_sheet.sender_number %><br/>
+	<%=h answer_sheet.receiver_number %>
+    </td>
     <td class="surveysobject"><%=h answer_sheet.analyzed_sheet_code %> (<%=h answer_sheet.sheet.sheet_name %>)</td>
     <td class="surveysobject"><%=h answer_sheet.analyzed_candidate_code %> (<%=h answer_sheet.candidate.candidate_name %>)</td>
     <td class="surveysobject"><%=h answer_sheet.printable_srerror %></td>

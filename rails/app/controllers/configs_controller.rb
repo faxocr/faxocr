@@ -142,6 +142,15 @@ class ConfigsController < ApplicationController
     end
   end
 
+  def view_answer_sheet
+    # index for all user
+    group_id = 1
+    survey_id = 1
+    @group = Group.find(group_id)
+    @survey = @group.surveys.find(survey_id)
+    sheet_ids = @survey.sheet_ids
+    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids, :order => 'date desc')
+  end
 
 private
   def administrator_only

@@ -16,6 +16,8 @@
 		<% end %>
 		<% if @current_user.login_name == 'admin' %>
 		<li><%= link_to "システム管理", configs_url %></li>
+		<% else %>
+		<li><%= link_to "宛先不明Fax一覧", '/answer_sheets' %></li>
 		<% end %>
 		<li><%= link_to 'ログアウト', {:action=>"logout", :controller=>"faxocr"}, :class => "welcome_logout" %>
 	</ul>
