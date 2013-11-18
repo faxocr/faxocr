@@ -7,8 +7,10 @@
 	送信FAX番号<br/>
 	受信FAX番号
     </th>
-    <th class="surveysobject">シートコード</th>
-    <th class="surveysobject">調査対象コード</th>
+    <th class="surveysobject">
+	シートコード
+	調査対象コード
+    </th>
     <th class="surveysobject">エラー送信種別</th>
   </tr>
   <% count = 0 %>
@@ -24,8 +26,10 @@
 	<%=h answer_sheet.sender_number %><br/>
 	<%=h answer_sheet.receiver_number %>
     </td>
-    <td class="surveysobject"><%=h answer_sheet.analyzed_sheet_code %> (<%=h answer_sheet.sheet.sheet_name %>)</td>
-    <td class="surveysobject"><%=h answer_sheet.analyzed_candidate_code %> (<%=h answer_sheet.candidate.candidate_name %>)</td>
+    <td class="surveysobject">
+	<%=h answer_sheet.analyzed_sheet_code %> (<%=h answer_sheet.sheet.sheet_name %>)<br/>
+	<%=h answer_sheet.analyzed_candidate_code %> (<%=h answer_sheet.candidate.candidate_name %>)
+    </td>
     <td class="surveysobject"><%=h answer_sheet.printable_srerror %></td>
   </tr>
 <% end %>
