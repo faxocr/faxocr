@@ -35,6 +35,8 @@ ActionController::Routing::Routes.draw do |map|
     group.resources :users, :member => {:edit_self => :get, :update_self => :post}
   end
 
+  map.contact '/answer_sheets', :controller => 'answer_sheets', :action => 'index_all'
+
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:

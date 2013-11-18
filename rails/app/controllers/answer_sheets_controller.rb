@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 class AnswerSheetsController < ApplicationController
-  before_filter :verify_group_authority
+  before_filter :verify_group_authority, :except => [:index_all]
+
   # GET /answer_sheets
   # GET /answer_sheets.xml
   def index
@@ -12,6 +13,20 @@ class AnswerSheetsController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @answer_sheets }
+    end
+  end
+
+  def index_all
+    # index for all user
+    group_id = 1
+    survey_id = 1
+    @group = Group.find(group_id)
+    @survey = @group.surveys.find(survey_id)
+    sheet_ids = @survey.sheet_ids
+    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids, :order => 'date desc')
+
+    respond_to do |format|
+      format.html # index_all.html.erb
     end
   end
 
