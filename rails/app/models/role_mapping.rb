@@ -4,7 +4,7 @@ class RoleMapping < ActiveRecord::Base
   belongs_to :user
   validates_uniqueness_of :user_id, :scope => 'group_id'
 
-  ROLES = [['ユーザ管理', 'u'], ['サーベイ管理', 's'], ['調査対象管理', 'c'], ['代理ログイン', 'm']]
+  ROLES = [['ユーザ管理', 'u'], ['調査管理', 's'], ['調査対象管理', 'c'], ['代理ログイン', 'm']]
 
   def printable_role
     role = self.role
