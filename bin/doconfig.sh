@@ -67,6 +67,14 @@ if [ -z "$SMTP_HOST" ] ; then
     SMTP_HOST="no"
 fi
 
+if [ -z "$ERRORPDF" ] ; then
+    ERRORPDF="/home/faxocr/etc/error.pdf"
+fi
+
+if [ -z "$BIZFAX_FAX_SIZE" ] ; then
+    BIZFAX_FAX_SIZE="A4"
+fi
+
 
 #################
 # DO NOT EDIT
