@@ -1,0 +1,11 @@
+require 'spec_helper'
+
+require 'cookbooks/faxocr/attributes/opencv'
+
+default[:opencv][:packages].each do |pkg|
+  describe package(pkg) do
+    it { should be_installed }
+  end
+end
+
+# vim:set expandtab shiftwidth=2 tabstop=2 softtabstop=2:

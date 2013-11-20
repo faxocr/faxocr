@@ -18,3 +18,8 @@ git submodule update; \
 (cd faxocr/setup/chef-solo; \
 chef-solo -c `pwd`/solo.rb -j `pwd`/nodes/localhost.json; \
 )
+
+gem1.8 install serverspec
+(cd faxocr/setup/serverspec; \
+rake spec; \
+)
