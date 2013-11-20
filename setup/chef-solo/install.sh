@@ -16,5 +16,5 @@ git submodule init; \
 git submodule update; \
 )
 (cd faxocr/setup/chef-solo; \
-chef-solo -l info -c `pwd`/solo.rb -j `pwd`/nodes/localhost.json; \
+chef-solo -c `pwd`/solo.rb -j `pwd`/nodes/localhost.json; \
 )
