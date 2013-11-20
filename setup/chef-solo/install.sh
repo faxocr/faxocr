@@ -11,9 +11,10 @@ gem1.8 install knife-solo --no-ri --no-rdoc
 
 git clone https://code.google.com/p/faxocr
 sed -i'' -e "s#%%EDIT_ME%%#`pwd`#" faxocr/setup/chef-solo/solo.rb
-cd faxocr
-git submodule init
-git submodule update
-cd setup/chef-solo
-chef-solo -l info -c `pwd`/solo.rb -j `pwd`/nodes/localhost.json
-cd ../../..
+(cd faxocr; \
+git submodule init; \
+git submodule update; \
+)
+(cd faxocr/setup/chef-solo; \
+chef-solo -l info -c `pwd`/solo.rb -j `pwd`/nodes/localhost.json; \
+)
