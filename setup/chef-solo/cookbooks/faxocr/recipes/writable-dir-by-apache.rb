@@ -11,6 +11,7 @@ end
 %w{rails/files
   rails/faxocr_config/receive_sheetreader/srml
   rails/faxocr_config/recognize_sheetreader/srml
+  etc
 }.each do |d|
   dir = node[:faxocr][:home_dir] + '/' + d
   directory dir do
