@@ -36,6 +36,9 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.contact '/answer_sheets', :controller => 'answer_sheets', :action => 'index_all'
+  map.resources :answer_sheets, 
+    :collection => { :index_all => :get }, 
+    :member => { :show_all => :get, :image_thumb_all => :get }
 
   # The priority is based upon order of creation: first created -> highest priority.
 

@@ -22,7 +22,7 @@
 	  &gt;&nbsp;<%= link_to '新規グループ登録', new_group_path() %>
 	<% end %>
 
-	<% if /^(surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties)$/ =~ params[:controller] && !(/^(answer_sheets)$/ =~ params[:controller] && /^(index_all)$/ =~ params[:action]) %>
+	<% if /^(surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties)$/ =~ params[:controller] && !(/^(answer_sheets)$/ =~ params[:controller] && /^(index_all|show_all)$/ =~ params[:action]) %>
 	  &gt;&nbsp;<%= link_to '調査一覧', group_surveys_path(@group) %>
 	  <% if !(/^(surveys)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action]) %>
 	  &gt;&nbsp;<%= link_to @survey.survey_name, group_survey_path(@group, @survey) %>
@@ -91,8 +91,11 @@
 	  &gt;&nbsp;<%= link_to 'ダウンロード', report_group_path(@group) %>
 	<% end %>
 
-	<% if /^(answer_sheets)$/ =~ params[:controller] && /^(index_all)$/ =~ params[:action] %>
-	  &gt;&nbsp;宛先不明Fax一覧
+	<% if /^(answer_sheets)$/ =~ params[:controller] && /^(index_all|show_all)$/ =~ params[:action] %>
+	  &gt;&nbsp;<%= link_to '宛先不明Fax一覧', "/answer_sheets" %>
+	  <% if /^(answer_sheets)$/ =~ params[:controller] && /^(show_all)$/ =~ params[:action] %>
+	    &gt;&nbsp;<%= link_to @answer_sheet.date.to_s(:datetime_jp), show_all_answer_sheet_path(@answer_sheet) %>
+	  <% end %>
 	<% end %>
 <% end %>
 </div>

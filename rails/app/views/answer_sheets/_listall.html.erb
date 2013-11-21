@@ -12,6 +12,7 @@
 	調査対象コード
     </th>
     <th class="surveysobject">エラー送信種別</th>
+    <th class="surveysobject">操作</th>
   </tr>
   <% count = 0 %>
   <% @answer_sheets.each do |answer_sheet| %>
@@ -31,6 +32,7 @@
 	<%=h answer_sheet.analyzed_candidate_code %> (<%=h answer_sheet.candidate.candidate_name %>)
     </td>
     <td class="surveysobject"><%=h answer_sheet.printable_srerror %></td>
+    <td class="surveysobject_manage"><%= link_to '表示', show_all_answer_sheet_path(answer_sheet) %></td>
   </tr>
 <% end %>
 </table>

@@ -565,6 +565,10 @@ div.surveysobject_new {
 	text-align: right;
 }
 
+table.surveysobject th, 
+table.surveysobject td {
+	padding: 5px;
+}
 th.surveysobject {
 	color: #ffffff;
 	background-color: #cccc88;
