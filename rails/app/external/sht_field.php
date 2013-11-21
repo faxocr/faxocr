@@ -121,7 +121,9 @@ if ($tgt_file) {
 
 		$scale = get_scaling($tblwidth, $tblheight, 940);
 
-		if (0) { // 長方形版では以下のコードは用いない
+		$enableRectCell = false;
+		if (!$enableRectCell) {
+			// 長方形版では以下のコードは用いない
 			// cellのサイズの縦横比が10%以上はエラー
 			$cellaspect_range = 0.1;
 			$cellaspect = $xls->getColWidth($sn, 0) / $xls->getRowHeight($sn, 0);
@@ -140,6 +142,7 @@ if ($tgt_file) {
 				$errmsg = "セルはすべて同じサイズにしてください";
 			}
 		}
+		if ($xls) {
 		if (($xls->maxcell[$sn]+1 <= MIN_SHEET_WIDTH || $xls->maxrow[$sn]+1 <= MIN_SHEET_HEIGHT) && ($xls->maxrow[$sn]+1 <= MIN_SHEET_WIDTH || $xls->maxcell[$sn]+1 <= MIN_SHEET_HEIGHT)) {
 			// シートサイズチェック
 			$xls = null;
@@ -154,6 +157,7 @@ if ($tgt_file) {
 		if ( ($min_cell_width != 0 && ($min_cell_width * $scale) <= MIN_CELL_WIDTH) || ($min_cell_height != 0 &&($min_cell_height * $scale) <= MIN_CELL_HEIGHT) ) {
 			// 厳密にはマーカー指定時のサイズによって決まる
 			$errmsg = "セルのサイズが小さすぎます ".MIN_CELL_WIDTH."px x ".MIN_CELL_HEIGHT."px以上にしてください";
+		}
 		}
 	}
 }
