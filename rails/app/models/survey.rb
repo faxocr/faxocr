@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+require 'rexml/text'
+
 class Survey < ActiveRecord::Base
   belongs_to  :group
 
@@ -113,9 +116,10 @@ class Survey < ActiveRecord::Base
         srmlstr = srmlstr + "/>\n"
         if sheet.sheet_properties != nil
           sheet.sheet_properties.each do |property|
+            escaped_ocr_name = REXML::Text::normalize(property.survey_property.ocr_name, nil, nil)
             if property.survey_property.data_type == "image"
               srmlstr = srmlstr + "      <blockImg"
-              srmlstr = srmlstr + " name=\"#{property.survey_property.ocr_name}\""
+              srmlstr = srmlstr + " name=\"#{escaped_ocr_name}\""
               srmlstr = srmlstr + " x=\"#{property.position_x}\""
               srmlstr = srmlstr + " y=\"#{property.position_y}\""
               srmlstr = srmlstr + " colspan=\"#{property.colspan}\""
@@ -123,14 +127,14 @@ class Survey < ActiveRecord::Base
               srmlstr = srmlstr + "/>\n"                
             else
               srmlstr = srmlstr + "      <blockOcr"
-              srmlstr = srmlstr + " name=\"#{property.survey_property.ocr_name}\""
+              srmlstr = srmlstr + " name=\"#{escaped_ocr_name}\""
               srmlstr = srmlstr + " x=\"#{property.position_x}\""
               srmlstr = srmlstr + " y=\"#{property.position_y}\""
               srmlstr = srmlstr + " colspan=\"#{property.colspan}\""
               srmlstr = srmlstr + " option=\"#{property.survey_property.data_type}\""
               srmlstr = srmlstr + "/>\n"
               srmlstr = srmlstr + "      <blockImg"
-              srmlstr = srmlstr + " name=\"#{property.survey_property.ocr_name}\""
+              srmlstr = srmlstr + " name=\"#{escaped_ocr_name}\""
               srmlstr = srmlstr + " x=\"#{property.position_x}\""
               srmlstr = srmlstr + " y=\"#{property.position_y}\""
               srmlstr = srmlstr + " colspan=\"#{property.colspan}\""
