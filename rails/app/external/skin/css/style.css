@@ -685,10 +685,6 @@ form {
 	table-layout: fixed;
 }
 
-.sheet_field td {
-	word-wrap: break-word;
-}
-
 .sheet_field td.not-selected {
 	background-color: #ffffff;
 }
