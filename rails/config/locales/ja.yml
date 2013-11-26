@@ -12,6 +12,8 @@ ja:
         login_name: "ユーザ名"
         full_name: "担当者名"
         password: "ログインパスワード"
+      group:
+        group_name: "グループ名"
     errors:
       template:
         header: "{{model}}でエラーが発生しました"
