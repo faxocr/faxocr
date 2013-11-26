@@ -1,14 +1,14 @@
 <% form_for([@group,@user]) do |f| %>
   <%= f.error_messages %>
 
-  <h2 class="surveysobject">ユーザ名</h2>
+  <h2 class="surveysobject">ユーザ名(必須)</h2>
   <div class="surveysobject">
 	本Webシステムで使用するユーザ名を入力してください。
   </div>
   <p class="surveysobject">
     <%= f.text_field :login_name %>
   </p>
-  <h2 class="surveysobject">ログインパスワード</h2>
+  <h2 class="surveysobject">ログインパスワード(必須)</h2>
   <div class="surveysobject">
 	本Webシステムへログインするパスワードを入力してください。
   </div>
@@ -22,7 +22,7 @@
   <p class="surveysobject">
     <%= f.password_field :password_confirmation %>
   </p>
-  <h2 class="surveysobject">担当者名</h2>
+  <h2 class="surveysobject">担当者名(必須)</h2>
   <div class="surveysobject">
   	担当者名を入力してください。
   </div>
