@@ -134,10 +134,10 @@ if ($tgt_file) {
 			if (($celaspect < 1 - $cellaspect_range) && ($celaspect > 1 + $cellaspect_range)) {
 				$xls = null;
 				$errmsg = "セルが正方形になっていません";
-			} else if (($xls->getColWidth($sn, 0) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
+			} else if ((floor($xls->getColWidth($sn, 0)) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
 				$xls = null;
 				$errmsg = "セルはすべて同じサイズにしてください";
-			} else if (($xls->getRowHeight($sn, 0) * ($xls->maxrow[$sn]+1)) != $tblheight) {
+			} else if ((floor($xls->getRowHeight($sn, 0)) * ($xls->maxrow[$sn]+1)) != $tblheight) {
 				$xls = null;
 				$errmsg = "セルはすべて同じサイズにしてください";
 			}
