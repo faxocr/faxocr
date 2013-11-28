@@ -14,11 +14,11 @@
     <td class="welcome_user">
       <font size="-1">
 	<% if @current_user != nil %>
-	ようこそ <%= @current_group ? @current_group.group_name + ' の ': nil %><%=h @current_user.full_name %> さん。
+	ようこそ <%= @current_group ? @current_group.group_name + ' の ': nil %><%=h @current_user.login_name %> さん。
 	<% end %>
 	<% if @masq_from_user != nil %>
 	<font color="red">
-	(<%=h @masq_from_user.full_name %> さんから、代理ログイン中)
+	(<%=h @masq_from_user.login_name %> さんから、代理ログイン中)
 	</font>
 	<% end %>
       </font>
