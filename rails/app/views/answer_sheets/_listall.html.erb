@@ -8,7 +8,7 @@
 	受信FAX番号
     </th>
     <th class="surveysobject">
-	シートコード
+	シートコード<br/>
 	調査対象コード
     </th>
     <th class="surveysobject">エラー送信種別</th>
@@ -28,8 +28,8 @@
 	<%=h answer_sheet.receiver_number %>
     </td>
     <td class="surveysobject">
-	<%=h answer_sheet.analyzed_sheet_code %> (<%=h answer_sheet.sheet.sheet_name %>)<br/>
-	<%=h answer_sheet.analyzed_candidate_code %> (<%=h answer_sheet.candidate.candidate_name %>)
+	<%=h answer_sheet.analyzed_sheet_code.blank? ? "_____" : answer_sheet.analyzed_sheet_code %> (<%=h answer_sheet.sheet.sheet_name %>)<br/>
+	<%=h answer_sheet.analyzed_candidate_code.blank? ? "_____" : answer_sheet.analyzed_candidate_code %> (<%=h answer_sheet.candidate.candidate_name %>)
     </td>
     <td class="surveysobject"><%=h answer_sheet.printable_srerror %></td>
     <td class="surveysobject_manage"><%= link_to '表示', show_all_answer_sheet_path(answer_sheet) %></td>
