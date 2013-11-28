@@ -55,7 +55,7 @@ fi
 
 # temp files
 ERRORMAIL="/tmp/error"$$".eml"
-ECHOFILE="/tmp/echofile"$$
+ECHOFILE="~faxocr/echofile"$$
 ECHOMAIL="/tmp/echofile"$$".eml"
 LOG=$LOGDIR"/procfax.log"
 TIME=`date +%H%M%S`
