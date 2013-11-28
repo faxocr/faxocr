@@ -131,7 +131,7 @@ if ($tgt_file) {
 				// cellが厳密に正方形ではない場合メッセージのみ表示
 				$errmsg = "";
 			}
-			if (($celaspect < 1 - $cellaspect_range) && ($celaspect > 1 + $cellaspect_range)) {
+			if (($cellaspect < 1 - $cellaspect_range) || ($cellaspect > 1 + $cellaspect_range)) {
 				$xls = null;
 				$errmsg = "セルが正方形になっていません";
 			} else if ((floor($xls->getColWidth($sn, 0)) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
