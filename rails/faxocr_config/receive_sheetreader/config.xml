@@ -93,7 +93,7 @@
 					f.write "<tr><td colspan=3><img width=\"500\" src=\"#{image_prefix}#SHEETIMAGE#\"></td></tr>\n"
 					f.write "</table></body></html>\n"
 					f.close
-					system("wkhtmltopdf --page-size A4 --encoding utf-8 #{echo_prefix}.html #{echo_prefix}.pdf")
+					system("wkhtmltopdf --quiet --page-size A4 --encoding utf-8 #{echo_prefix}.html #{echo_prefix}.pdf")
 					exit(8)
 				end
 				]]>
