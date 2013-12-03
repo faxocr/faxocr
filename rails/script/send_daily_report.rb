@@ -101,7 +101,7 @@ groups.each do |group|
     File.open(filename,"w") {|file|
       file.write rep.render()
     }
-    system("wkhtmltopdf --page-size A4 --orientation Landscape --encoding utf-8 #{filename} #{filename}.pdf")
+    system("wkhtmltopdf --quiet --page-size A4 --orientation Landscape --encoding utf-8 #{filename} #{filename}.pdf")
     survey_candidates = survey.survey_candidates
     survey_candidates.each do |survey_candidate|
       next if !survey_candidate.has_sendreport_role
