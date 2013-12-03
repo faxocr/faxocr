@@ -145,17 +145,84 @@ function put_config($file_id, $REQUEST)
 		}
 	}
 
+	// cell size
+	$width_marker_window = $conf->get("block_width");
+	$height_marker_window = $conf->get("block_height");
+	$offsetx_marker = $conf->get("block_offsetx");
+	$offsety_marker = $conf->get("block_offsety");
+
 	$sn = 0;
+
+	// テーブルサイズ(excel)
+	$tblwidth_origin = 0;
+	$tblheight_origin = 0;
+	for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
+		$tblwidth_origin += $xls->getColWidth($sn, $i);
+	}
+	for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
+		$tblheight_origin += $xls->getRowHeight($sn, $i);
+	}
+
+	// markerの引数は sht_marker.php でのサイズなので excel のサイズを補正する
+	// テーブルの表サイズ補正
+	$scale_table = get_scaling($tblwidth_origin, $tblheight_origin, 940); // 940: sht_marker のサイズ
+
+	// テーブルサイズ(sht_marker)
+	$tblwidth_raw = 0;
+	$tblheight_raw = 0;
+	for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
+		$tblwidth_raw += floor($xls->getColWidth($sn, $i) * $scale_table);
+	}
+	for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
+		$tblheight_raw += floor($xls->getRowHeight($sn, $i) * $scale_table);
+	}
+
+	// シートサイズ
+	$sheet_width = 0;
+	$sheet_height = 0;
+
+	$width_marker_window_without_offset = $width_marker_window + $offsetx_marker;
+	if ($offsetx_marker < 0) {
+		// add offset
+		$sheet_width += abs($$offsetx_marker);
+
+		$width_marker_window_without_offset = $width_marker_window;
+	}
+
+	if ($tblwidth_raw > $width_marker_window_without_offset) {
+		$sheet_width += $tblwidth_raw;
+	} else {
+		$sheet_width += $width_marker_window_without_offset;
+	}
+
+	$height_marker_window_without_offset = $height_marker_window + $offsety_marker;
+	if ($offsety_marker < 0) {
+		// add offset
+		$sheet_height += abs($$offsety_marker);
+
+		$height_marker_window_without_offset = $height_marker_window;
+	}
+
+	if ($tblheight_raw > $height_marker_window_without_offset) {
+		$sheet_height += $tblheight_raw;
+	} else {
+		$sheet_height += $height_marker_window_without_offset;
+	}
+
+	// 縮小/拡大率
+	$scale = get_scaling($sheet_width, $sheet_height, 960);
+
+
 	$list_of_cell_size = array();
 	foreach (range(0, $xls->maxcell[$sn]) as $i) {
-		array_push($list_of_cell_size, floor($xls->getColWidth($sn, $i)));
+		array_push($list_of_cell_size, floor($xls->getColWidth($sn, $i) * $scale * $scale_table));
 	}
 	$val = var_export_1line($list_of_cell_size);
 	$conf->set("cell_width", $val);
 
 	$list_of_cell_size = array();
 	foreach (range(0, $xls->maxrow[$sn]) as $i) {
-		array_push($list_of_cell_size, floor($xls->getRowHeight($sn, $i)));
+		array_push($list_of_cell_size, floor($xls->getRowHeight($sn, $i) * $scale * $scale_table));
 	}
 	$val = var_export_1line($list_of_cell_size);
 	$conf->set("cell_height", $val);
