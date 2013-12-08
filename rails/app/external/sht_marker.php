@@ -128,6 +128,8 @@ if ($xls) {
 
 function show_marker()
 {
+    table = $(".sheet_marker");
+	$("#ex3").css("top", table.position().top).css("left", table.position().left).css("width", table.width()).css("height", table.height());
 	$("#ex3").show("slow");
 }
 
@@ -174,7 +176,9 @@ function hide_marker()
 var $ = jQuery;
 
 $().ready(function() {
-	$('#ex3').jqDrag('.jqDrag').jqResize('.jqResize');
+	// セルサイズ数の補正が未対応なのでドラッグを無効化
+//	$('#ex3').jqDrag('.jqDrag').jqResize('.jqResize');
+	$('#ex3').jqResize('.jqResize');
 
 	btn = $('.statusMenu button:disabled');
 	btn.parent().addClass('disable');
