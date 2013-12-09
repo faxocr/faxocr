@@ -108,8 +108,8 @@ class GroupsController < ApplicationController
     datetime = DateTime.now
 
     @repyears = []
-    i = 3
-    while i > 0 do
+    i = 2
+    while i >= 0 do
       tmpdatetime = datetime - (365 * i)
       repyear = [tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%Y")]
       @repyears << repyear
@@ -118,8 +118,8 @@ class GroupsController < ApplicationController
 
     @repmonths = []
     datetime = DateTime.now
-    i = 6
-    while i > 0 do
+    i = 5
+    while i >= 0 do
       tmpdatetime = datetime - (31 * i)
       repmonth = [tmpdatetime.strftime("%m"), tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%m")]
       i -= 1
@@ -128,8 +128,8 @@ class GroupsController < ApplicationController
 
     @repdays = []
     datetime = DateTime.now
-    i = 7
-    while i > 0 do
+    i = 6
+    while i >= 0 do
       tmpdatetime = datetime - i
       repday = [tmpdatetime.strftime("%d"), tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%m"), tmpdatetime.strftime("%d")]
       i -= 1
