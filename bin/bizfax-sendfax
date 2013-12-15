@@ -419,15 +419,16 @@ class LibraryFinder:
         self.libraries = self.getAlistOfLibraries()
         self.arch = self.getSystemArchitecture()
 
-    def getPathName(self, libname):
+    def getPathName(self, libnameRegex):
         archs = ['i686']
         if self.arch == 'x86_64':
             archs.append(self.arch)
         archs.reverse()
         for arch in archs:
-            libnamePlusArch = libname + ':' + arch
-            if libnamePlusArch in self.libraries:
-                return self.libraries[libnamePlusArch]
+            regex = re.compile(libnameRegex + ':' + arch)
+            result = [self.libraries[x] for x in self.libraries if regex.search(x) is not None]
+            if len(result) != 0:
+                return result[0]
         raise
 
     def show(self):
@@ -461,9 +462,9 @@ class LibraryFinder:
 def testLibraryFinder():
     """test for LibraryFinder"""
     lf = LibraryFinder()
-    print lf.getPathName('libgobject-2.0.so.0')
-    print lf.getPathName('libsoup-2.4.so')
-    print lf.getPathName('libwebkitgtk-1.0.so.0')
+    print lf.getPathName('libgobject-2\.0\.so\.0')
+    print lf.getPathName('libsoup-2.4\.so(\.\d)?')
+    print lf.getPathName('libwebkitgtk-1\.0\.so\.0')
 
 
 #############################################################################
@@ -507,10 +508,10 @@ def main():
     #
     # Change the following path to fit your environment
     lf = LibraryFinder()
-    libgobject = ctypes.CDLL(lf.getPathName('libgobject-2.0.so.0'))
-    #libwebkit = ctypes.CDLL('/usr/lib/libsoup-2.4.so.1')
-    libsoup = ctypes.CDLL(lf.getPathName('libsoup-2.4.so'))
-    libwebkit = ctypes.CDLL(lf.getPathName('libwebkitgtk-1.0.so.0'))
+    libgobject = ctypes.CDLL(lf.getPathName('libgobject-2\.0\.so(\.\d)?'))
+    #libwebkit = ctypes.CDLL('/usr/lib/libsoup-2\.4\.so\.1')
+    libsoup = ctypes.CDLL(lf.getPathName('libsoup-2\.4.so(\.\d)?'))
+    libwebkit = ctypes.CDLL(lf.getPathName('libwebkitgtk-1\.0.so(\.\d)?'))
 
     #proxy_uri = libsoup.soup_uri_new('http://tcdproxy.tcd.ie:8080') #proxy urli
 
@@ -521,7 +522,7 @@ def main():
     # Read a password from STDIN due to security consideration.
     # It is dangerous to specify the password in the command line.
     password = sys.stdin.readline().replace("\n", "")
-    webbrowser = WebBrowser(sys.argv[1], password, sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5] if len(sys.argv) >= 6 else None)
+    webbrowser = WebBrowser(sys.argv[1], password, sys.argv[2], sys.argv[3], sys.argv[4], ((len(sys.argv) >= 6 and sys.argv[5]) or None))
     gtk.main()
 
     #remove all cookiejars
