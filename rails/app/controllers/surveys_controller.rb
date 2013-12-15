@@ -28,7 +28,7 @@ class SurveysController < ApplicationController
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:id])
     @survey_candidates = @survey.survey_candidates
-    @survey_properties = @survey.survey_properties
+    @survey_properties = @survey.survey_properties.all(:order => "view_order")
     @sheets = @survey.sheets
     sheet_ids = @survey.sheet_ids
     datetime = DateTime.now
