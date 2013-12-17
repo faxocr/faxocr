@@ -88,14 +88,8 @@ class GroupsController < ApplicationController
   # DELETE /groups/1.xml
   def destroy
     @group = Group.find(params[:id])
-    candidate = Candidate.find_by_group_id(params[:id])
-    role_mapping = RoleMapping.find_by_group_id(params[:id])
-    survey = Survey.find_by_group_id(params[:id])
-    if candidate != nil || role_mapping != nil || survey != nil
-      flash[:notice] = "このグループは使用されているため削除できません"
-    else
-      @group.destroy
-    end
+    @group.destroy
+
     respond_to do |format|
       format.html { redirect_to(groups_url) }
       format.xml  { head :ok }

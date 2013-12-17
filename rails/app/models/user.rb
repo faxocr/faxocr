@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require "digest/sha1"
 class User < ActiveRecord::Base
-  has_many  :role_mappings
+  has_many  :role_mappings, :dependent => :destroy
   has_many  :groups,  :through => :role_mappings
 
   validates_presence_of :login_name, :full_name

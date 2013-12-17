@@ -143,12 +143,7 @@ class UsersController < ApplicationController
   def destroy
     @group = @authorized_group
     @user = User.find(params[:id])
-    role_mappings = RoleMapping.find_all_by_user_id(@user.id)
-    if role_mappings.length == 1
-      @user.destroy
-    end
-    role_mapping = RoleMapping.find_by_group_id_and_user_id(@group.id, @user.id)
-    role_mapping.destroy
+    @user.destroy
 
     respond_to do |format|
       format.html { redirect_to group_users_path(@group) }

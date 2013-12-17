@@ -106,14 +106,8 @@ class SurveysController < ApplicationController
   def destroy
     @group = Group.find(params[:group_id])
     @survey = Survey.find(params[:id])
-    sheet = Sheet.find_by_survey_id(params[:id])
-    survey_candidate = SurveyCandidate.find_by_survey_id(params[:id])
-    survey_property = SurveyProperty.find_by_survey_id(params[:id])
-    if sheet != nil || survey_candidate != nil || survey_property != nil
-      flash[:notice] = "この調査は使用されているため削除できません"
-    else
-      @survey.destroy
-    end
+    @survey.destroy
+
     respond_to do |format|
       format.html { redirect_to group_surveys_path(@group) }
       format.xml  { head :ok }

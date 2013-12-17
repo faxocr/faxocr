@@ -74,13 +74,8 @@ class CandidatesController < ApplicationController
   def destroy
     @group = Group.find(params[:group_id])
     @candidate = Candidate.find(params[:id])
-    survey_candidate = SurveyCandidate.find_by_candidate_id(params[:id])
-    answer_sheets = AnswerSheet.find_by_candidate_id(params[:id])
-    if survey_candidate != nil || answer_sheets != nil
-      flash[:notice] = "この調査対象は使用されているため削除できません"
-    else
-      @candidate.destroy
-    end
+    @candidate.destroy
+
     respond_to do |format|
       format.html { redirect_to group_candidates_path(@group) }
       format.xml  { head :ok }
