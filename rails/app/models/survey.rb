@@ -5,10 +5,10 @@ require 'rexml/text'
 class Survey < ActiveRecord::Base
   belongs_to  :group
 
-  has_many    :sheets
-  has_many    :survey_properties
+  has_many    :sheets, :dependent => :destroy
+  has_many    :survey_properties, :dependent => :destroy
 
-  has_many    :survey_candidates
+  has_many    :survey_candidates, :dependent => :destroy
   has_many    :candidates, :through => :survey_candidates
 
   STATUS = [["クローズ", 0], ["オープン", 1]]
