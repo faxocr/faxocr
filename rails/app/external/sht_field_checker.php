@@ -23,6 +23,7 @@
 require_once "config.php";
 require_once "init.php";
 require_once "lib/common.php";
+require_once "lib/sheet.php";
 require_once "contrib/peruser.php";
 
 // require_once "lib/file_conf.php";
@@ -72,7 +73,7 @@ include( TMP_HTML_DIR . "tpl.header.html" );
 // Excelファイル読み込み処理
 //
 if ($tgt_file) {
-	global $xls;
+	global $xls, $sheet;
 	$xls = NEW Excel_Peruser;
 	$xls->setErrorHandling(1);
 	$xls->setInternalCharset($charset);
@@ -83,6 +84,8 @@ if ($tgt_file) {
 		$xls = null;
 	}
 
+	$sheet = new Sheet($xls);
+
 	if ($xls) {
 		if (count($xls->boundsheets) != 1) {
 			$errmsg = "シートの数 (" . count($xls->boundsheets) .
@@ -92,56 +95,15 @@ if ($tgt_file) {
 	}
 
 	if ($xls) {
-		// 各 cell のサイズからテーブルの大きさを求める
-		$sn = 0;
-		$tblwidth = 0;
-		$tblheight = 0;
-		// 最小のセルのサイズ
-		$min_cell_width = 0;
-		$min_cell_height = 0;
-		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$tblwidth += floor($xls->getColWidth($sn, $i));
-			if ($min_cell_width == 0 || $min_cell_width > $xls->getColWidth($sn, $i)) {
-				$min_cell_width = $xls->getColWidth($sn, $i);
-			}
-		}
-		for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
-			$tblheight += floor($xls->getRowHeight($sn, $i));
-			if ($min_cell_height == 0 || $min_cell_height > $xls->getRowHeight($sn, $i)) {
-				$min_cell_height = $xls->getRowHeight($sn, $i);
-			}
-		}
-
-		$scale = get_scaling($tblwidth, $tblheight, 940);
-
-		$enableRectCell = false;
-		if (!$enableRectCell) {
-			// 長方形版では以下のコードは用いない
-			// cellのサイズの縦横比が10%以上はエラー
-			$cellaspect_range = 0.1;
-			$cellaspect = $xls->getColWidth($sn, 0) / $xls->getRowHeight($sn, 0);
-			if ($cellaspect != 1) {
-				// cellが厳密に正方形ではない場合メッセージのみ表示
-				$errmsg = "";
-			}
-			if (($cellaspect < 1 - $cellaspect_range) || ($cellaspect > 1 + $cellaspect_range)) {
-				$errmsg = "セルが正方形になっていません";
-			} else if ((floor($xls->getColWidth($sn, 0)) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
-				$errmsg = "セルはすべて同じサイズにしてください";
-			} else if ((floor($xls->getRowHeight($sn, 0)) * ($xls->maxrow[$sn]+1)) != $tblheight) {
-				$errmsg = "セルはすべて同じサイズにしてください";
-			}
-		}
-		if (($xls->maxcell[$sn]+1 <= MIN_SHEET_WIDTH || $xls->maxrow[$sn]+1 <= MIN_SHEET_HEIGHT) && ($xls->maxrow[$sn]+1 <= MIN_SHEET_WIDTH || $xls->maxcell[$sn]+1 <= MIN_SHEET_HEIGHT)) {
+		if (($sheet->col_count + 1 <= MIN_SHEET_WIDTH || $sheet->row_count + 1 <= MIN_SHEET_HEIGHT) && ($sheet->row_count + 1 <= MIN_SHEET_WIDTH || $sheet->col_count + 1 <= MIN_SHEET_HEIGHT)) {
 			// シートサイズチェック
 			$errmsg = "シートのサイズが小さすぎます ".MIN_SHEET_WIDTH."x".MIN_SHEET_HEIGHT."以上にしてください";
-		} else if (($xls->maxcell[$sn]+1 >= MAX_SHEET_WIDTH || $xls->maxrow[$sn]+1 >= MAX_SHEET_HEIGHT) && ($xls->maxrow[$sn]+1 >= MAX_SHEET_WIDTH || $xls->maxcell[$sn]+1 >= MAX_SHEET_HEIGHT)) {
-
+		} else if (($sheet->col_count + 1 >= MAX_SHEET_WIDTH || $sheet->row_count + 1 >= MAX_SHEET_HEIGHT) && ($sheet->row_count + 1 >= MAX_SHEET_WIDTH || $sheet->col_count + 1 >= MAX_SHEET_HEIGHT)) {
 			// シートサイズチェック
 			$errmsg = "シートのサイズが大きすぎます ".MAX_SHEET_WIDTH."x".MAX_SHEET_HEIGHT."以下にしてください";
 		}
 		// セルサイズチェック
-		if ( ($min_cell_width != 0 && ($min_cell_width * $scale) <= MIN_CELL_WIDTH) || ($min_cell_height != 0 &&($min_cell_height * $scale) <= MIN_CELL_HEIGHT) ) {
+		if ( ($sheet->min_cell_width != 0 && ($sheet->min_cell_width * $sheet->scale) <= MIN_CELL_WIDTH) || ($sheet->min_cell_height != 0 &&($sheet->min_cell_height * $sheet->scale) <= MIN_CELL_HEIGHT) ) {
 			// 厳密にはマーカー指定時のサイズによって決まる
 			$errmsg = "セルのサイズが小さすぎます ".MIN_CELL_WIDTH."px x ".MIN_CELL_HEIGHT."px以上にしてください";
 		}
@@ -199,10 +161,9 @@ die;
 //
 function put_excel($xls)
 {
+    global $sheet;
 	global $field_list;
 	global $field_width;
-	global $tblwidth;
-	global $tblheight;
 
 	// タブコントロール表示
 	// print "<div class=\"simpleTabs\">";
@@ -219,10 +180,6 @@ function put_excel($xls)
 	// for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
 	$sn = 0;
 	{
-		$scale = get_scaling($tblwidth, $tblheight, 940);
-		$tblwidth_scaled = floor($tblwidth * $scale);
-		$tblheight_scaled = floor($tblheight * $scale);
-
 		// ファイル名表示
 		global $sheet_name;
 		global $file_id;
@@ -231,43 +188,36 @@ function put_excel($xls)
 
 		print "<table>";
 		print "<tr>";
-		print "<td>幅: " . $tblwidth_scaled . "(" . $tblwidth . ")</td>";
-		print "<td>高さ: " . $tblheight_scaled . "(" . $tblheight . ")</td>";
+		print "<td>幅: " . $sheet->disp_tblwidth . "(" . $sheet->tblwidth . ")</td>";
+		print "<td>高さ: " . $sheet->disp_tblheight . "(" . $sheet->tblheight . ")</td>";
 		print "</tr>";
 		print "<tr>";
-		print "<td>行: " . ($xls->maxrow[0] + 1) . "</td>";
-		print "<td>列: " . ($xls->maxcell[0] + 1) . "</td>";
+		print "<td>行: " . ($sheet->row_count + 1) . "</td>";
+		print "<td>列: " . ($sheet->col_count + 1) . "</td>";
 		print "</tr>";
 		print "</table>";
 
 		// シートテーブル表示
 		print <<< STR
-		\n<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="${tblwidth_scaled}" bgcolor="#FFFFFF" style="table-layout:fixed; border-collapse: collapse;">\n
+		\n<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="{$sheet->disp_tblwidth}" bgcolor="#FFFFFF" style="table-layout:fixed; border-collapse: collapse;">\n
 STR;
 
 		print "<tr>\n";
 		// サイズ表示列
-		print "<td width=\"" . floor($xls->getColWidth($sn, 0) * $scale) . "\" style=\"text-align:center;\"></td>";
-
-		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
-			print "<td width=\"$tdwidth\" style=\"text-align:center;\">" . floor($xls->getColWidth($sn, $i) * $scale) . "<br />(" . $xls->getColWidth($sn, $i) . ")</td>";
+		print "<td width=\"" . $sheet->get_disp_col_size(0) . "\" style=\"text-align:center;\"></td>";
+		for ($i = 0; $i <= $sheet->col_count; $i++) {
+			$tdwidth  = $sheet->get_disp_col_size($i);
+			print "<td width=\"$tdwidth\" style=\"text-align:center;\">" . $sheet->get_disp_col_size($i) . "<br />(" . $sheet->get_col_size($i) . ")</td>";
 		}
 		print "\n</tr>\n";
-
-		if (!isset($xls->maxrow[$sn]))
-			$xls->maxrow[$sn] = 0;
-
-		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
-			$trheight = floor($xls->getRowHeight($sn, $r) * $scale);
+		for ($r = 0; $r <= $sheet->row_count; $r++) {
+			$trheight = $sheet->get_disp_row_size($r);
 
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
-
 			// 行サイズ表示
-			print " <td style=\"text-align:center;\">" . $trheight . "<br />(". $xls->getRowHeight($sn, $r) . ")</td>\n";
-
-			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-				$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
+			print " <td style=\"text-align:center;\">" . $trheight . "<br />(". $sheet->get_row_size($r) . ")</td>\n";
+			for ($i = 0; $i <= $sheet->col_count; $i++) {
+				$tdwidth  = $sheet->get_disp_col_size($i);
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
@@ -313,7 +263,7 @@ STR;
 				}
 
 				$celattr =  $xls->getAttribute($sn, $r, $i);
-				$fontsize =  $celattr["font"]["height"] * $scale / 16;
+				$fontsize =  $celattr["font"]["height"] * $sheet->scale / 16;
 				if (isset($xls->celmergeinfo[$sn][$r][$i]["cond"])) {
 					if ($xls->celmergeinfo[$sn][$r][$i]["cond"] == 1) {
 						$colspan = $xls->celmergeinfo[$sn][$r][$i]["cspan"];
