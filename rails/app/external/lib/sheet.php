@@ -56,6 +56,9 @@ class Sheet {
     public $disp_cells_width;
     public $disp_cells_height;
 
+    // マーカーサイズ
+	public $marker_size;
+
 	function __construct($xls) {
         $this->xls = $xls;
 
@@ -102,6 +105,11 @@ class Sheet {
 
 		//$this->disp_tblwidth = floor($this->tblwidth * $this->scale);
 		//$this->disp_tblheight = floor($this->tblheight * $this->scale);
+
+        $this->marker_size = $this->disp_cells_width[0];
+        if ($this->disp_cells_height[0] > $this->disp_cells_width[0]) {
+            $this->marker_size = $this->disp_cells_height[0];
+        }
     }
 
     public function get_row_size($row) {

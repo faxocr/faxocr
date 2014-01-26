@@ -23,6 +23,7 @@
 require_once 'config.php';
 require_once 'init.php';
 require_once 'lib/common.php';
+require_once "lib/sheet.php";
 require_once 'lib/file_conf.php';
 require_once 'contrib/peruser.php';
 
@@ -58,6 +59,8 @@ if ($tgt_file) {
 		$errmsg = $result->getMessage();
 		$xls = null;
 	}
+
+	$sheet = new Sheet($xls);
 }
 
 //
@@ -129,7 +132,7 @@ if ($xls) {
 function show_marker()
 {
     table = $(".sheet_marker");
-	$("#ex3").css("top", table.position().top).css("left", table.position().left).css("width", (table.width() + $marker_size)).css("height", (table.height() + $marker_size));
+	$("#ex3").css("top", table.position().top).css("left", table.position().left).css("width", (table.width() + $sheet->marker_size)).css("height", (table.height() + $sheet->marker_size));
 	$("#ex3").show("slow");
 }
 
@@ -184,7 +187,7 @@ $().ready(function() {
 	btn.parent().addClass('disable');
 });
 
-var last_size = $marker_size;
+var last_size = $sheet->marker_size;
 
 function size_up() {
 	var w = parseInt($("#ex3").css("width"));
@@ -224,9 +227,9 @@ function go_next() {
 <div id="ex3" class="jqDnR" style="opacity:0.9; position: absolute; top:200px; left:100px;display:none">
 <div class="jqDrag" style="height:100%">
 
-<img src="/image/mark.gif" class="mark-img" style="top: 0;left: 0; width: {$marker_size}px;" />
-<img src="/image/mark.gif" class="mark-img" style="top: 0;right: 0; width: {$marker_size}px;" />
-<img src="/image/mark.gif" class="mark-img" style="bottom: 0;left: 0; width: {$marker_size}px;" />
+<img src="/image/mark.gif" class="mark-img" style="top: 0;left: 0; width: {$sheet->marker_size}px;" />
+<img src="/image/mark.gif" class="mark-img" style="top: 0;right: 0; width: {$sheet->marker_size}px;" />
+<img src="/image/mark.gif" class="mark-img" style="bottom: 0;left: 0; width: {$sheet->marker_size}px;" />
 
 <br /><br />
 <center>
@@ -252,53 +255,32 @@ include( TMP_HTML_DIR . "tpl.footer.html" );
 
 die;
 
-$marker_size = 0;
-
 function put_excel($xls) {
-
-	global $marker_size;
+	global $sheet;
 
 	// シート表示
 	// for ($sn = 0; $sn < 1; $sn++) {
 
 	$sn = 0;
 	{
-		$tblwidth = 0;
-		$tblheight = 0;
-		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$tblwidth += floor($xls->getColWidth($sn, $i));
-		}
-		for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
-			$tblheight += floor($xls->getRowHeight($sn, $i));
-		}
-		$scale = get_scaling($tblwidth, $tblheight, 940);
-		$tdwidth = floor($xls->getColWidth($sn, 0) * $scale);
-		$trheight = floor($xls->getRowHeight($sn, 0) * $scale);
-		$tblwidth  = floor($tblwidth * $scale);
-		$tblheight = floor($tblheight * $scale);
-
-		$marker_size = $tdwidth;
-
 		// シートテーブル表示
 		print "<table class=\"sheet_marker\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
-		print ${tblwidth} . "\" bgcolor=\"#FFFFFF\" style=\"table-layout:fixed; border-collapse: collapse;\">\n";
+		print $sheet->disp_tblwidth . "\" bgcolor=\"#FFFFFF\" style=\"table-layout:fixed; border-collapse: collapse;\">\n";
 
 		print "<tr>\n";
-		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
+		for ($i = 0; $i <= $sheet->col_count; $i++) {
+			$tdwidth  = $sheet->get_disp_col_size($i);
 			print "<th height=\"0\" width=\"$tdwidth\"></th>";
 		}
 		print "\n</tr>\n";
 
-		if (!isset($xls->maxrow[$sn]))
-			$xls->maxrow[$sn] = 0;
-		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
+		for ($r = 0; $r <= $sheet->row_count; $r++) {
 
-			$trheight = $xls->getRowHeight($sn, $r) * $scale;
+			$trheight = $sheet->get_disp_row_size($r);
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
 
-			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-				$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
+			for ($i = 0; $i <= $sheet->col_count; $i++) {
+                $tdwidth  = $sheet->get_disp_col_size($i);
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
@@ -336,7 +318,7 @@ function put_excel($xls) {
 				$bgcolor = ($xf['fillpattern'] == 1);
 
 				$celattr =  $xls->getAttribute($sn, $r, $i);
-				$fontsize =  $celattr["font"]["height"] * $scale / 16;
+				$fontsize =  $celattr["font"]["height"] * $sheet->scale / 16;
 				if (isset($xls->celmergeinfo[$sn][$r][$i]['cond'])) {
 					if ($xls->celmergeinfo[$sn][$r][$i]['cond'] == 1) {
 						$colspan = $xls->celmergeinfo[$sn][$r][$i]['cspan'];
