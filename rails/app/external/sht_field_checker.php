@@ -188,8 +188,8 @@ function put_excel($xls)
 
 		print "<table>";
 		print "<tr>";
-		print "<td>幅: " . $sheet->disp_tblwidth . "(" . $sheet->tblwidth . ")</td>";
-		print "<td>高さ: " . $sheet->disp_tblheight . "(" . $sheet->tblheight . ")</td>";
+		print "<td>幅: " . $sheet->disp->tblwidth . "(" . $sheet->tblwidth . ")</td>";
+		print "<td>高さ: " . $sheet->disp->tblheight . "(" . $sheet->tblheight . ")</td>";
 		print "</tr>";
 		print "<tr>";
 		print "<td>行: " . ($sheet->row_count + 1) . "</td>";
@@ -199,25 +199,25 @@ function put_excel($xls)
 
 		// シートテーブル表示
 		print <<< STR
-		\n<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="{$sheet->disp_tblwidth}" bgcolor="#FFFFFF" style="table-layout:fixed; border-collapse: collapse;">\n
+		\n<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="{$sheet->disp->tblwidth}" bgcolor="#FFFFFF" style="table-layout:fixed; border-collapse: collapse;">\n
 STR;
 
 		print "<tr>\n";
 		// サイズ表示列
-		print "<td width=\"" . $sheet->get_disp_col_size(0) . "\" style=\"text-align:center;\"></td>";
+		print "<td width=\"" . $sheet->disp->get_col_size(0) . "\" style=\"text-align:center;\"></td>";
 		for ($i = 0; $i <= $sheet->col_count; $i++) {
-			$tdwidth  = $sheet->get_disp_col_size($i);
-			print "<td width=\"$tdwidth\" style=\"text-align:center;\">" . $sheet->get_disp_col_size($i) . "<br />(" . $sheet->get_col_size($i) . ")</td>";
+			$tdwidth  = $sheet->disp->get_col_size($i);
+			print "<td width=\"$tdwidth\" style=\"text-align:center;\">" . $sheet->disp->get_col_size($i) . "<br />(" . $sheet->get_col_size($i) . ")</td>";
 		}
 		print "\n</tr>\n";
 		for ($r = 0; $r <= $sheet->row_count; $r++) {
-			$trheight = $sheet->get_disp_row_size($r);
+			$trheight = $sheet->disp->get_row_size($r);
 
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
 			// 行サイズ表示
 			print " <td style=\"text-align:center;\">" . $trheight . "<br />(". $sheet->get_row_size($r) . ")</td>\n";
 			for ($i = 0; $i <= $sheet->col_count; $i++) {
-				$tdwidth  = $sheet->get_disp_col_size($i);
+				$tdwidth  = $sheet->disp->get_col_size($i);
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);

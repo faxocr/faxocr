@@ -51,10 +51,7 @@ class Sheet {
     public $min_cell_height;
 
     // 表示シート情報
-    public $disp_tblwidth;
-    public $disp_tblheight;
-    public $disp_cells_width;
-    public $disp_cells_height;
+    public $disp;
 
     // マーカーサイズ
 	public $marker_size;
@@ -91,24 +88,11 @@ class Sheet {
 		$this->scale = get_scaling($this->tblwidth, $this->tblheight, 940);
 
         // 表示サイズ取得
-        $this->disp_tblwidth = 0;
-        $this->disp_tblheight = 0;
-        for ($i = 0; $i <= $this->xls->maxcell[$this->sn]; $i++) {
-            $this->disp_cells_width[$i] = floor($this->cells_width[$i] * $this->scale);
-            $this->disp_tblwidth += $this->disp_cells_width[$i];
-        }
+        $this->disp = new DispSheet($this);
 
-        for ($i = 0; $i <= $this->xls->maxrow[$this->sn]; $i++) {
-            $this->disp_cells_height[$i] = floor($this->cells_height[$i] * $this->scale);
-            $this->disp_tblheight += $this->disp_cells_height[$i];
-        }
-
-		//$this->disp_tblwidth = floor($this->tblwidth * $this->scale);
-		//$this->disp_tblheight = floor($this->tblheight * $this->scale);
-
-        $this->marker_size = $this->disp_cells_width[0];
-        if ($this->disp_cells_height[0] > $this->disp_cells_width[0]) {
-            $this->marker_size = $this->disp_cells_height[0];
+        $this->marker_size = $this->disp->cells_width[0];
+        if ($this->disp->cells_height[0] > $this->disp->cells_width[0]) {
+            $this->marker_size = $this->disp->cells_height[0];
         }
     }
 
@@ -120,16 +104,44 @@ class Sheet {
         return $this->cells_width[$col];
     }
 
-    public function get_disp_row_size($row) {
-        return $this->disp_cells_height[$row];
-    }
-
-    public function get_disp_col_size($col) {
-        return $this->disp_cells_width[$col];
-    }
-
     public function get_disp_size($size) {
         return floor($size * $this->scale);
+    }
+}
+
+//
+// シート(表示)クラス
+//
+class DispSheet {
+    // 表示シート情報
+    public $tblwidth;
+    public $tblheight;
+    public $cells_width;
+    public $cells_height;
+
+	function __construct($sheet) {
+        $this->tblwidth = 0;
+        $this->tblheight = 0;
+        for ($i = 0; $i <= $sheet->xls->maxcell[$sheet->sn]; $i++) {
+            $this->cells_width[$i] = floor($sheet->cells_width[$i] * $sheet->scale);
+            $this->tblwidth += $this->cells_width[$i];
+        }
+
+        for ($i = 0; $i <= $sheet->xls->maxrow[$sheet->sn]; $i++) {
+            $this->cells_height[$i] = floor($sheet->cells_height[$i] * $sheet->scale);
+            $this->tblheight += $this->cells_height[$i];
+        }
+
+		//$this->tblwidth = floor($sheet->tblwidth * $sheet->scale);
+		//$this->tblheight = floor($sheet->tblheight * $sheet->scale);
+    }
+
+    public function get_row_size($row) {
+        return $this->cells_height[$row];
+    }
+
+    public function get_col_size($col) {
+        return $this->cells_width[$col];
     }
 
 }

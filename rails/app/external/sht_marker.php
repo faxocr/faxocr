@@ -265,22 +265,22 @@ function put_excel($xls) {
 	{
 		// シートテーブル表示
 		print "<table class=\"sheet_marker\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"";
-		print $sheet->disp_tblwidth . "\" bgcolor=\"#FFFFFF\" style=\"table-layout:fixed; border-collapse: collapse;\">\n";
+		print $sheet->disp->tblwidth . "\" bgcolor=\"#FFFFFF\" style=\"table-layout:fixed; border-collapse: collapse;\">\n";
 
 		print "<tr>\n";
 		for ($i = 0; $i <= $sheet->col_count; $i++) {
-			$tdwidth  = $sheet->get_disp_col_size($i);
+			$tdwidth  = $sheet->disp->get_col_size($i);
 			print "<th height=\"0\" width=\"$tdwidth\"></th>";
 		}
 		print "\n</tr>\n";
 
 		for ($r = 0; $r <= $sheet->row_count; $r++) {
 
-			$trheight = $sheet->get_disp_row_size($r);
+			$trheight = $sheet->disp->get_row_size($r);
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
 
 			for ($i = 0; $i <= $sheet->col_count; $i++) {
-                $tdwidth  = $sheet->get_disp_col_size($i);
+                $tdwidth  = $sheet->disp->get_col_size($i);
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
