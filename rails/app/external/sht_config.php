@@ -25,6 +25,7 @@ require_once 'config.php';
 require_once 'init.php';
 require_once 'lib/common.php';
 require_once 'lib/file_conf.php';
+require_once 'lib/sheet_marker.php';
 require_once 'contrib/peruser.php';
 
 define('sht_config', true);
@@ -126,6 +127,7 @@ function put_config($file_id, $REQUEST)
 	global $sheet_id;
 	global $conf;
 	global $xls;
+	global $sheet_marker;
 
 	$conf = new FileConf($file_id);
 
@@ -145,84 +147,20 @@ function put_config($file_id, $REQUEST)
 		}
 	}
 
-	// cell size
-	$width_marker_window = $conf->get("block_width");
-	$height_marker_window = $conf->get("block_height");
-	$offsetx_marker = $conf->get("block_offsetx");
-	$offsety_marker = $conf->get("block_offsety");
+    $sheet_marker = new SheetMarker($xls, $conf->get("block_width"), $conf->get("block_height"), $conf->get("block_offsetx"), $conf->get("block_offsety"), $conf->get("block_size"));
 
 	$sn = 0;
 
-	// テーブルサイズ(excel)
-	$tblwidth_origin = 0;
-	$tblheight_origin = 0;
-	for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-		$tblwidth_origin += $xls->getColWidth($sn, $i);
-	}
-	for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
-		$tblheight_origin += $xls->getRowHeight($sn, $i);
-	}
-
-	// markerの引数は sht_marker.php でのサイズなので excel のサイズを補正する
-	// テーブルの表サイズ補正
-	$scale_table = get_scaling($tblwidth_origin, $tblheight_origin, 940); // 940: sht_marker のサイズ
-
-	// テーブルサイズ(sht_marker)
-	$tblwidth_raw = 0;
-	$tblheight_raw = 0;
-	for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-		$tblwidth_raw += floor($xls->getColWidth($sn, $i) * $scale_table);
-	}
-	for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
-		$tblheight_raw += floor($xls->getRowHeight($sn, $i) * $scale_table);
-	}
-
-	// シートサイズ
-	$sheet_width = 0;
-	$sheet_height = 0;
-
-	$width_marker_window_without_offset = $width_marker_window + $offsetx_marker;
-	if ($offsetx_marker < 0) {
-		// add offset
-		$sheet_width += abs($$offsetx_marker);
-
-		$width_marker_window_without_offset = $width_marker_window;
-	}
-
-	if ($tblwidth_raw > $width_marker_window_without_offset) {
-		$sheet_width += $tblwidth_raw;
-	} else {
-		$sheet_width += $width_marker_window_without_offset;
-	}
-
-	$height_marker_window_without_offset = $height_marker_window + $offsety_marker;
-	if ($offsety_marker < 0) {
-		// add offset
-		$sheet_height += abs($$offsety_marker);
-
-		$height_marker_window_without_offset = $height_marker_window;
-	}
-
-	if ($tblheight_raw > $height_marker_window_without_offset) {
-		$sheet_height += $tblheight_raw;
-	} else {
-		$sheet_height += $height_marker_window_without_offset;
-	}
-
-	// 縮小/拡大率
-	$scale = get_scaling($sheet_width, $sheet_height, 960);
-
-
 	$list_of_cell_size = array();
 	foreach (range(0, $xls->maxcell[$sn]) as $i) {
-		array_push($list_of_cell_size, floor($xls->getColWidth($sn, $i) * $scale * $scale_table));
+		array_push($list_of_cell_size, floor($xls->getColWidth($sn, $i) * $sheet_marker->marker_scale * $sheet_marker->scale));
 	}
 	$val = var_export_1line($list_of_cell_size);
 	$conf->set("cell_width", $val);
 
 	$list_of_cell_size = array();
 	foreach (range(0, $xls->maxrow[$sn]) as $i) {
-		array_push($list_of_cell_size, floor($xls->getRowHeight($sn, $i) * $scale * $scale_table));
+		array_push($list_of_cell_size, floor($xls->getRowHeight($sn, $i) * $sheet_marker->marker_scale * $sheet_marker->scale));
 	}
 	$val = var_export_1line($list_of_cell_size);
 	$conf->set("cell_height", $val);
@@ -272,197 +210,71 @@ function put_excel($xls)
 	global $conf;
 	global $debug_mode;
 
+    $sheet_marker = new SheetMarker($xls, $conf->get("block_width"), $conf->get("block_height"), $conf->get("block_offsetx"), $conf->get("block_offsety"), $conf->get("block_size"));
+
 	$sid = sprintf("%05d", $conf->get("sid"));
 	$cid = strtok($conf->get("candidate_code"), "-");
-	$width_marker_window = $conf->get("block_width");
-	$height_marker_window = $conf->get("block_height");
-	$size_of_marker = $conf->get("block_size");
-	$offsetx_marker = $conf->get("block_offsetx");
-	$offsety_marker = $conf->get("block_offsety");
 
 	// シート表示
 	// for ($sn = 0; $sn < 1; $sn++) {
 	$sn = 0;
-
-	// テーブルサイズ(excel)
-	$tblwidth_origin = 0;
-	$tblheight_origin = 0;
-	for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-		$tblwidth_origin += $xls->getColWidth($sn, $i);
-	}
-	for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
-		$tblheight_origin += $xls->getRowHeight($sn, $i);
-	}
-
-	// markerの引数は sht_marker.php でのサイズなので excel のサイズを補正する
-	// テーブルの表サイズ補正
-	$scale_table = get_scaling($tblwidth_origin, $tblheight_origin, 940); // 940: sht_marker のサイズ
-
-	// テーブルサイズ(sht_marker)
-	$tblwidth_raw = 0;
-	$tblheight_raw = 0;
-	for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-		$tblwidth_raw += floor($xls->getColWidth($sn, $i) * $scale_table);
-	}
-	for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
-		$tblheight_raw += floor($xls->getRowHeight($sn, $i) * $scale_table);
-	}
-
-	// シートサイズ
-	$sheet_width = 0;
-	$sheet_height = 0;
-
-	$width_marker_window_without_offset = $width_marker_window + $offsetx_marker;
-	if ($offsetx_marker < 0) {
-		// add offset
-		$sheet_width += abs($$offsetx_marker);
-
-		$width_marker_window_without_offset = $width_marker_window;
-	}
-
-	if ($tblwidth_raw > $width_marker_window_without_offset) {
-		$sheet_width += $tblwidth_raw;
-	} else {
-		$sheet_width += $width_marker_window_without_offset;
-	}
-
-	$height_marker_window_without_offset = $height_marker_window + $offsety_marker;
-	if ($offsety_marker < 0) {
-		// add offset
-		$sheet_height += abs($$offsety_marker);
-
-		$height_marker_window_without_offset = $height_marker_window;
-	}
-
-	if ($tblheight_raw > $height_marker_window_without_offset) {
-		$sheet_height += $tblheight_raw;
-	} else {
-		$sheet_height += $height_marker_window_without_offset;
-	}
-
-	// 縮小/拡大率
-	$scale = get_scaling($sheet_width, $sheet_height, 960);
-	// $scale = $scale > 1 ? $scale : 1; // シートを拡大しない(縮小のみ)
-
-	// シートウインドウ
-	$sheet_width = floor($sheet_width * $scale);
-	$sheet_height = floor($sheet_height * $scale);
-
-	$offsetx_marker = floor($offsetx_marker * $scale);
-	$offsety_marker = floor($offsety_marker * $scale);
-
-	// テーブルウインドウ
-	$tblwidth = floor($tblwidth_raw * $scale);
-	$tblheight = floor($tblheight_raw * $scale);
-	$offset_top_table = $offsety_marker < 0 ? abs($offsety_marker) : 0;
-	$offset_left_table = $offsetx_marker < 0 ? abs($offsetx_marker) : 0;
-
-	// マーカーウインドウ
-	$width_marker_window = floor($width_marker_window * $scale);
-	$height_marker_window = floor($height_marker_window * $scale);
-	$size_of_marker = floor($size_of_marker * $scale);
-	$position_of_sheet_id_from_left_side = $offsetx_marker < 0 ? floor($size_of_marker * 2) : floor($size_of_marker * 2 + abs($offsetx_marker));
-	$position_top_marker = $offsety_marker < 0 ? 0 : abs($offsety_marker);
-	$position_left_marker = $offsetx_marker < 0 ? 0 : abs($offsetx_marker);
-	$position_bottom_marker = $position_top_marker + $height_marker_window - $size_of_marker; // from top
-	$position_right_marker = $position_left_marker + $width_marker_window - $size_of_marker; // from left
-
-	// Spec is not fixed that assigning position of marker by users from web UI.
-	// the following variable can control which feature is preferred
-	$feature_fixed_marker_window = 0;
-	if ($debug_mode === 'true') {
-		$feature_fixed_marker_window = 1;
-	}
-	if ($feature_fixed_marker_window == 1) {
-		// set marker size from the size of A1 cell
-		$scale = 1;
-
-		$size_of_marker = floor($xls->getRowHeight($sn, 0) * $scale_table);
-		$tblwidth = $tblwidth_raw;
-		$tblheight = $tblheight_raw;
-
-		// シートウインドウ
-		$sheet_width = $tblwidth;
-		$sheet_height = $tblheight;
-		$offsetx_marker = 0;
-		$offsety_marker = 0;
-		// テーブルウインドウ
-		$offset_top_table = 0;
-		$offset_left_table = 0;
-		// マーカーウインドウ
-		$width_marker_window = $tblwidth;
-		$height_marker_window = $tblheight;
-
-		$position_of_sheet_id_from_left_side = floor($size_of_marker * 2);
-		$position_top_marker = 0;
-		$position_left_marker = 0;
-		$position_bottom_marker = $height_marker_window - $size_of_marker; // from top
-		$position_right_marker = $width_marker_window - $size_of_marker; // from left
-	}
 
 	while ($cid != FALSE) {
 		$cid = sprintf("%05d", $cid);
 
 		// 調査シートHTML
 		$html .= "\n<hr style=\"page-break-after:always; visibility:hidden;\">\n\n";
-		$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"z-index: 3; position: relative; width: " . $sheet_width . "px; height: " . $sheet_height . "px; font-size: 12px; padding: 0px; border: 0px; margin: 0px; \">\n";
+		$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"z-index: 3; position: relative; width: " . $sheet_marker->disp_sheet->sheet_width . "px; height: " . $sheet_marker->disp_sheet->sheet_height . "px; font-size: 12px; padding: 0px; border: 0px; margin: 0px; \">\n";
 
 		// marker: top - left
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $position_top_marker . "px; left: " . $position_left_marker . "px; width: " . $size_of_marker . "px; height: " . $size_of_marker . "px; z-index: 100; \">";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->position_top_marker . "px; left: " . $sheet_marker->disp_sheet->position_left_marker . "px; width: " . $sheet_marker->disp_sheet->size_of_marker . "px; height: " . $sheet_marker->disp_sheet->size_of_marker . "px; z-index: 100; \">";
 		// sheet ID: top
-		$html .= "<div style=\"position: absolute; top: " . $position_top_marker . "px; left: " . $position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $size_of_marker * 0.9 . "px; font-size: " . $size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $cid . "</font></div>\n";
+		$html .= "<div style=\"position: absolute; top: " . $sheet_marker->disp_sheet->position_top_marker . "px; left: " . $sheet_marker->disp_sheet->position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-size: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $cid . "</font></div>\n";
 
 		// marker: top - right
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $position_top_marker . "px; left: " . $position_right_marker . "px; width: " . $size_of_marker . "px; height: " . $size_of_marker . "px; z-index: 100; \">\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->position_top_marker . "px; left: " . $sheet_marker->disp_sheet->position_right_marker . "px; width: " . $sheet_marker->disp_sheet->size_of_marker . "px; height: " . $sheet_marker->disp_sheet->size_of_marker . "px; z-index: 100; \">\n";
 
 		// marker: bottom - left
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $position_bottom_marker . "px; left: " . $position_left_marker . "px; width: " . $size_of_marker . "px; height: " . $size_of_marker . "px; z-index: 100; \">";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->position_bottom_marker . "px; left: " . $sheet_marker->disp_sheet->position_left_marker . "px; width: " . $sheet_marker->disp_sheet->size_of_marker . "px; height: " . $sheet_marker->disp_sheet->size_of_marker . "px; z-index: 100; \">";
 		// sheet ID: bottom
-		$html .= "<div style=\"position: absolute; top: " . ($position_bottom_marker + $size_of_marker * 0.1) . "px; left: " . $position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $size_of_marker * 0.9 . "px; font-size: " . $size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $sid . "</font></div>\n";
+		$html .= "<div style=\"position: absolute; top: " . ($sheet_marker->disp_sheet->position_bottom_marker + $sheet_marker->disp_sheet->size_of_marker * 0.1) . "px; left: " . $sheet_marker->disp_sheet->position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-size: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $sid . "</font></div>\n";
 
 		$cid = strtok("-");
 
 		// debug
-		/*
+/*
 		$html .= "<div style='position: relative; z-index: 100;'>";
-		$html .= "scale: " . $scale . "<br />";
-		$html .= "scale_table: " . $scale_table . "<br />";
-		$html .= "tableheight_raw: " . $tblheight_raw . "<br />";
-		$html .= "tableheight: " . $tblheight . "<br />";
-		$html .= "row: " . $xls->getRowHeight($sn, 0) . "<br />";
-		$html .= "row_scale: " . floor($xls->getRowHeight($sn, 0) * $scale * $scale_table) . "<br />";
-		$html .= "width_marker_window: " . $width_marker_window . "<br />";
-		$html .= "height_marker_window: " . $height_marker_window . "<br />";
-		$html .= "offsetx_marker: " . $offsetx_marker . "<br />";
-		$html .= "offsety_marker: " . $offsety_marker . "<br />";
-		$html .= "size_of_marker: " . $size_of_marker . "<br />";
-		$html .= "position_of_sheet_id_from_left_side: " . $position_of_sheet_id_from_left_side . "<br />";
-		$html .= "position_top_marker: " . $position_top_marker . "<br />";
-		$html .= "position_left_marker: " . $position_left_marker . "<br />";
-		$html .= "position_bottom_marker: " . $position_bottom_marker . "<br />";
-		$html .= "position_right_marker: " . $position_right_marker . "<br />";
+		$html .= "scale: " . $sheet_marker->scale . "<br />";
+		$html .= "marker_scale: " . $sheet_marker->marker_scale . "<br />";
+		$html .= "tablewidth: " . $sheet_marker->disp_sheet->tblwidth . "<br />";
+		$html .= "tableheight: " . $sheet_marker->disp_sheet->tblheight . "<br />";
+		$html .= "row: " . $sheet_marker->row_count . "<br />";
+		$html .= "row_size(1): " . $sheet_marker->get_row_size(1) . "<br />";
+		$html .= "sheet_width: " . $sheet_marker->disp_sheet->sheet_width . "<br />";
+		$html .= "sheet_height: " . $sheet_marker->disp_sheet->sheet_height . "<br />";
+		$html .= "marker_offset_x: " . $sheet_marker->disp_sheet->marker_offset_x . "<br />";
+		$html .= "marker_offset_y: " . $sheet_marker->disp_sheet->marker_offset_y . "<br />";
+		$html .= "size_of_marker: " . $sheet_marker->disp_sheet->size_of_marker . "<br />";
+		$html .= "position_of_sheet_id_from_left_side: " . $sheet_marker->disp_sheet->position_of_sheet_id_from_left_side . "<br />";
+		$html .= "position_top_marker: " . $sheet_marker->disp_sheet->position_top_marker . "<br />";
+		$html .= "position_left_marker: " . $sheet_marker->disp_sheet->position_left_marker . "<br />";
+		$html .= "position_bottom_marker: " . $sheet_marker->disp_sheet->position_bottom_marker . "<br />";
+		$html .= "position_right_marker: " . $sheet_marker->disp_sheet->position_right_marker . "<br />";
 		$html .= "</div>";
-		*/
+*/
 
 		// シートテーブル表示		
 		$html .= "<table class=\"sheet\" border=\"0\" cellpadding=\"0\"";
-		$html .= " cellspacing=\"0\" width=\"" . $tblwidth . "px\" height=\"" . $tblheight . "px\"";
-		$html .= " style=\"table-layout: fixed; border-collapse: collapse; table-layout: fixed; position: absolute; top: " . $offset_top_table . "px; left: " . $offset_left_table . "px; z-index: 10; \"";
+		$html .= " cellspacing=\"0\" width=\"" . $sheet_marker->disp_sheet->tblwidth . "px\" height=\"" . $sheet_marker->disp_sheet->tblheight . "px\"";
+		$html .= " style=\"table-layout: fixed; border-collapse: collapse; table-layout: fixed; position: absolute; top: " . $sheet_marker->disp_sheet->offset_top_table . "px; left: " . $sheet_marker->disp_sheet->offset_left_table . "px; z-index: 10; \"";
 		$html .=" bgcolor=\"#FFFFFF\" >\n";
 
-		//$html .= '<tr height="' . $topheight . 'px" margin="0" padding="0">' . "\n";
-		//for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-		//	$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale * $scale_table);
-		//	$html .= " <th border=\"0\" height=\"0\" width=\"$tdwidth\"></th>\n";
-		//}
-		//$html .= "\n</tr>\n";
-
-		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
-			$trheight = floor($xls->getRowHeight($sn, $r) * $scale * $scale_table);
+		for ($r = 0; $r <= $sheet_marker->row_count; $r++) {
+			$trheight = $sheet_marker->disp_sheet->get_row_size($r);
 			$html .= "  <tr height=\"" . $trheight . "px\">" . "\n";
 
-			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-				$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale * $scale_table);
+			for ($i = 0; $i <= $sheet_marker->col_count; $i++) {
+				$tdwidth  = $sheet_marker->disp_sheet->get_col_size($i);
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
@@ -504,7 +316,7 @@ function put_excel($xls)
 				}
 
 				$celattr =  $xls->getAttribute($sn, $r, $i);
-				$fontsize =  $celattr["font"]["height"] * $scale * $scale_table / 16;
+				$fontsize =  $celattr["font"]["height"] * $sheet_marker->marker_scale * $sheet_marker->scale / 16;
 				if (isset($xls->celmergeinfo[$sn][$r][$i]['cond'])) {
 					if ($xls->celmergeinfo[$sn][$r][$i]['cond'] == 1) {
 						$colspan = $xls->celmergeinfo[$sn][$r][$i]['cspan'];
