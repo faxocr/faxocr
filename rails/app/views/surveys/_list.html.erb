@@ -1,7 +1,7 @@
 <div class="surveysobject_new">
 <% if params[:controller] == "surveys" %>
 <% if @current_user.has_survey_role(@group.id) %>
-<%= link_to '調査の新規作成', new_group_survey_path(@group) %>
+<%= link_to 'サーベイの新規作成', new_group_survey_path(@group) %>
 <% end %>
 <% end %>
 </div>
@@ -22,9 +22,15 @@
   <% else %>
   <tr class="surveysobject_dark">
   <% end %>
+   	<% faxcount = 0 %>
+	<% if survey.sheets != nil %>
+		<% survey.sheets.each do |sheet| %>
+			<% faxcount = faxcount + sheet.answer_sheets.length %>
+		<% end %>
+   	<% end %>
    	<td class="surveysobject"><%=h Survey::STATUS[survey.status][0] %></td>
    	<td class="surveysobject"><%= link_to survey.survey_name, group_survey_path(@group, survey) %></td>
-   	<td class="surveysobject"><%= link_to '表示', group_survey_answer_sheets_path(@group, survey) %></td>
+   	<td class="surveysobject" align="center"><%= link_to faxcount.to_s + "件", group_survey_answer_sheets_path(@group, survey) %></td>
 	<% if params[:controller] == "surveys" %>
     <% if @current_user.has_survey_role(@group.id) %>
     <td class="surveysobject_manage"><%= link_to '削除', group_survey_path(@group, survey), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
