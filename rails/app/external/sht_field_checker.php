@@ -95,10 +95,10 @@ if ($tgt_file) {
 	}
 
 	if ($xls) {
-		if (($sheet->col_count + 1 <= MIN_SHEET_WIDTH || $sheet->row_count + 1 <= MIN_SHEET_HEIGHT) && ($sheet->row_count + 1 <= MIN_SHEET_WIDTH || $sheet->col_count + 1 <= MIN_SHEET_HEIGHT)) {
+		if (($sheet->col_count + 1 < MIN_SHEET_WIDTH || $sheet->row_count + 1 < MIN_SHEET_HEIGHT) && ($sheet->row_count + 1 < MIN_SHEET_WIDTH || $sheet->col_count + 1 < MIN_SHEET_HEIGHT)) {
 			// シートサイズチェック
 			$errmsg = "シートのサイズが小さすぎます ".MIN_SHEET_WIDTH."x".MIN_SHEET_HEIGHT."以上にしてください";
-		} else if (($sheet->col_count + 1 >= MAX_SHEET_WIDTH || $sheet->row_count + 1 >= MAX_SHEET_HEIGHT) && ($sheet->row_count + 1 >= MAX_SHEET_WIDTH || $sheet->col_count + 1 >= MAX_SHEET_HEIGHT)) {
+		} else if (($sheet->col_count + 1 > MAX_SHEET_WIDTH || $sheet->row_count + 1 > MAX_SHEET_HEIGHT) && ($sheet->row_count + 1 > MAX_SHEET_WIDTH || $sheet->col_count + 1 > MAX_SHEET_HEIGHT)) {
 			// シートサイズチェック
 			$errmsg = "シートのサイズが大きすぎます ".MAX_SHEET_WIDTH."x".MAX_SHEET_HEIGHT."以下にしてください";
 		}
