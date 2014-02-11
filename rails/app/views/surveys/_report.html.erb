@@ -1,0 +1,44 @@
+<% form_for([@group, @survey]) do |f| %>
+  <%= f.error_messages %>
+  <%= f.hidden_field :group_id %>
+
+  <h2 class="surveysobject">集計レポート配信時間</h2>
+  <div class="surveysobject">
+  	集計レポートの配信時間を選択してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.time_select :report_time, {:minute_step => 15} %>
+  </p>
+
+  <h2 class="surveysobject">集計レポート配信曜日</h2>
+  <div class="surveysobject">
+  	集計レポートの配信曜日を選択してください。
+  </div>
+  <p class="surveysobject">
+    <%
+      Survey::REPORT_WDAY.each do |r|
+      checked = @survey.report_wday_by_array.include?(r[1]) ? true : false
+    %>
+    <%= check_box_tag "report_wday_by_array[]", r[1], checked %><%= r[0] %>
+    <% end %>
+  </p>
+
+  <h2 class="surveysobject">集計レポートHTMLヘッダー</h2>
+  <div class="surveysobject">
+  	集計レポートで使用するHTMLヘッダーを入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_area :report_header, :cols => "120" %>
+  </p>
+  <h2 class="surveysobject">集計レポートHTMLフッター</h2>
+  <div class="surveysobject">
+  	集計レポートで使用するHTMLフッターを入力してください。
+  </div>
+  <p class="surveysobject">
+    <%= f.text_area :report_footer, :cols => "120" %>
+  </p>
+
+  <p>
+    <%= f.submit '保存' %>
+  </p>
+<% end %>

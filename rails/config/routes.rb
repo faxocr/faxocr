@@ -46,6 +46,10 @@ ActionController::Routing::Routes.draw do |map|
   #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'
   # Keep in mind you can assign values other than :controller and :action
 
+  map.connect 'groups/:group_id/surveys/:id/report',
+    :controller => "surveys",
+    :action => "report"
+
   #
   # PHP driver (Target registration)
   #

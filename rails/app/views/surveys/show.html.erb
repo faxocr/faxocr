@@ -2,7 +2,6 @@
 (<%=h Survey::STATUS[@survey.status][0] %>)</h1> 
 <p style="color: green"><%= flash[:notice] %></p>
 
-
 <script type="text/javascript">
 <!--
 function show_sheets() {
@@ -10,6 +9,7 @@ $('#panel_sheets').slideDown('slow');
 close_candidate();
 close_properties();
 close_reports();
+close_survey();
 }
 
 function close_sheets() {
@@ -21,6 +21,7 @@ $('#panel_candidate').slideDown('slow');
 close_sheets();
 close_properties();
 close_reports();
+close_survey();
 }
 
 function close_candidate() {
@@ -32,6 +33,7 @@ $('#panel_properties').slideDown('slow');
 close_sheets();
 close_candidate();
 close_reports();
+close_survey();
 }
 
 function close_properties() {
@@ -43,10 +45,23 @@ $('#panel_report').slideDown('slow');
 close_sheets();
 close_candidate();
 close_properties();
+close_survey();
 }
 
 function close_reports() {
 $('#panel_report').slideUp('slow');
+}
+
+function show_survey() {
+$('#panel_survey').slideDown('slow');
+close_sheets();
+close_candidate();
+close_properties();
+close_reports();
+}
+
+function close_survey() {
+$('#panel_survey').slideUp('slow');
 }
 
 -->
@@ -58,14 +73,16 @@ $('#panel_report').slideUp('slow');
     <th>
       <a onclick="show_sheets();">
 	<img src="/image/icon-pdf.gif"><br>
-	配布シート</a>
+	配布シート
+      </a>
     </th>
 
     <th width="48"><img src="/image/rightarrow.gif"></th>
     <th>
       <a onclick="show_candidate();">
 	<img src="/image/icon-targets.gif"><br>
-	配布対象</a>
+	配布対象
+      </a>
     </th>
 
     <th width="48"><img src="/image/rightarrow.gif"></th>
@@ -80,23 +97,25 @@ $('#panel_report').slideUp('slow');
     <th>
       <a onclick="show_properties();">
 	<img src="/image/icon-database.gif"><br>
-	調査項目</a>
+	調査項目
+      </a>
     </th>
 
     <th width="48"><img src="/image/rightarrow.gif"></th>
     <th>
-      <a onclick="show_reports();">
+<!--      <a onclick="show_reports();"> -->
 	<img src="/image/icon-reports.gif"><br>
-	集計レポート</a>
+	<font color="gray">集計レポート</font>
+<!--      </a> -->
     </th>
 
     <% if @current_user.has_survey_role(@current_group.id) %>
     <th width="48"><img src="/image/dot.gif"></th>
-    <th >
-      <% link_to edit_group_survey_path(@group, @survey) do %>
-      <img src="/image/icon-config.gif"><br>
-      シート設定
-      <% end %>
+    <th>
+      <a onclick="show_survey();">
+	<img src="/image/icon-config.gif"><br>
+	シート設定
+      </a>
     </th>
     <% end %>
 
@@ -105,7 +124,7 @@ $('#panel_report').slideUp('slow');
 </center>
 
 <div id="panel_sheets" style="display:none">
-<h2 class="surveysobject_title">シート</h2>
+<h2 class="surveysobject_title">配布シート</h2>
 <%= render :partial => "sheets/list" %>
 <div align="right">
 <% if @current_user.has_survey_role(@current_group.id) %>
@@ -175,8 +194,15 @@ $('#panel_report').slideUp('slow');
 
 <div align="right">
 <% if @current_user.has_survey_role(@current_group.id) %>
-<%= link_to '[編集]', edit_group_survey_path(@group, @survey) %>
+<%= link_to '[編集]', group_survey_path(@group, @survey) + "/report" %>
 <% end %>
+</div>
+</div>
+
+<div id="panel_survey" style="display:none; border-style:none; padding:20px;">
+<div style="border-style:none; background-color:#eeeeff; padding:20px">
+<h3>シート設定</h3>
+<%= render :partial => "form" %>
 </div>
 </div>
 

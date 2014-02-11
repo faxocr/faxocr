@@ -63,6 +63,12 @@ class SurveysController < ApplicationController
     end
   end
 
+  # GET /surveys/1/report
+  def report
+    @group = Group.find(params[:group_id])
+    @survey = @group.surveys.find(params[:id])
+  end
+
   # POST /surveys
   # POST /surveys.xml
   def create
