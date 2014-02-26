@@ -132,7 +132,8 @@ if ($xls) {
 function show_marker()
 {
     table = $(".sheet_marker");
-	$("#ex3").css("top", table.position().top).css("left", table.position().left).css("width", (table.width() + $sheet->marker_size)).css("height", (table.height() + $sheet->marker_size));
+	$("#ex3").css("top", table.position().top).css("left", table.position().left).css("width", (Math.ceil(table.width() / $sheet->marker_size + 1) * $sheet->marker_size)).css("height", (Math.ceil(table.height() / $sheet->marker_size + 1) * $sheet->marker_size));
+
 	$("#ex3").show("slow");
 }
 
