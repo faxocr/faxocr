@@ -60,6 +60,22 @@ link "/etc/fonts/conf.d/09-faxocr-ocrb.conf" do
   link_type :symbolic
 end
 
+package "fonts-takao" do
+  action :install
+end
+
+template "/etc/fonts/conf.avail/69-msfonts-to-takao.conf" do
+  source "msfonts-to-takao.conf.erb"
+  owner "root"
+  group "root"
+  mode 0644
+end
+
+link "/etc/fonts/conf.d/69-msfonts-to-takao.conf" do
+  to "/etc/fonts/conf.avail/69-msfonts-to-takao.conf"
+  link_type :symbolic
+end
+
 execute "recreating font's cache" do
   user "root"
   group "root"
