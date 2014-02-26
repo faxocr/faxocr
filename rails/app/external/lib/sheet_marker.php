@@ -76,7 +76,7 @@ class SheetMarker extends Sheet {
             $this->sheet_width += $width_marker_window_without_offset;
         }
 
-        $height_marker_window_without_offset = $this->marker_offset_height + $this->marker_offset_y;
+        $height_marker_window_without_offset = $this->marker_block_height + $this->marker_offset_y;
         if ($this->marker_offset_y < 0) {
             // add offset
             $this->sheet_height += abs($this->marker_offset_y);
