@@ -11,7 +11,8 @@
 	"mysql": {
 		"server_root_password": "faxocrmysql",
 		"server_repl_password": "faxocrmysql",
-		"server_debian_password": "faxocrmysql"
+		"server_debian_password": "faxocrmysql",
+		"bind_address": "localhost"
 	},
 	"apache-conf": {
 		"type": "normal"
