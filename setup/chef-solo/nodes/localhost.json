@@ -11,7 +11,8 @@
 	"mysql": {
 		"server_root_password": "faxocrmysql",
 		"server_repl_password": "faxocrmysql",
-		"server_debian_password": "faxocrmysql"
+		"server_debian_password": "faxocrmysql",
+		"bind_address": "localhost"
 	},
 	"apache-conf": {
 		"type": "normal"
@@ -20,7 +21,7 @@
 		"setup_mode": "initial_setup",
 		"rails_base_version": "rails2",
 		"rails_mode": "production",
-		"passenger_version": "4.0.20"
+		"passenger_version": "4.0.37"
 	},
 	"run_list": [
 		"recipe[apache2::default]",
