@@ -88,100 +88,29 @@ $msg = "tgt: " . $tgt_file . "\n";
 $reviser = NEW Excel_Reviser;
 $reviser->setInternalCharset($charset);
 $reviser->setErrorHandling(1); // エラーハンドリング依頼
-$reviser->addSheet(0, $xls->sheetnum);
+$res = $reviser->parseFile($tgt_file);
 
 for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
-
-	if (!isset($xls->maxcell[$sn]))
-		$xls->maxcell[$sn] = 0;
-
-	if (!isset($xls->maxrow[$sn]))
-		$xls->maxrow[$sn] = 0;
-
-	// Sheet 設定
-	$reviser->setSheetname($sn + 2, strconv($xls->getSheetName($sn)));
-
 	for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
 		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$val = $xls->getCellVal($sn, $r, $i);
-			$val = $val['val'];
-			$xf = $xls->getCellAttrib($sn, $r, $i);
-			$xf = $xf['xf'];
-			$bgcolor = false;
-			if (isset($xf['fillpattern']) && $xf['fillpattern'] == 1) {
-				if ($xf['PtnFRcolor'] == COLOR_FILL)
-					$bgcolor = 2; // header
-				else
-					$bgcolor = 1; // other
-			}
-			if (isset($xls->celmergeinfo[$sn][$r][$i]['cond'])) {
-				if ($xls->celmergeinfo[$sn][$r][$i]['cond'] == 1) {
-					$rowspan = $xls->celmergeinfo[$sn][$r][$i]['rspan'];
-					$colspan = $xls->celmergeinfo[$sn][$r][$i]['cspan'];
-					if ($colspan > 1) {
-						$list_colspan["${sn}-${r}-${i}"] = $colspan;
-					}
-
-					$reviser->setCellMerge($sn + 2, $r, $r + $rowspan - 1, $i,
-							       $i + $colspan - 1);
-				} else {
-					continue;
-				}
-			}
-
 			if (isset($_REQUEST["cell-${sn}-${r}-${i}-mark"])) {
 				$val = $_REQUEST["cell-${sn}-${r}-${i}-mark"];
-				$bgcolor = 1;
+				if (is_numeric($val)) {
+					$reviser->addNumber($sn, $r, $i, $val, 0, 0, 0);
+				} else {
+					$reviser->addString($sn, $r, $i, $val, 0, 0, 0);
+				}
 			} else if (isset($_REQUEST["cell-${sn}-${r}-${i}-clear"])) {
 				$val = $_REQUEST["cell-${sn}-${r}-${i}-clear"];
-				$bgcolor = 0;
-			}
-
-			if ($bgcolor == 1) {
 				if (is_numeric($val)) {
-					$reviser->addNumber($sn + 2, $r, $i, $val, 0, 0, 1);
+					$reviser->addNumber($sn, $r, $i, $val, 0, 0, 0);
 				} else {
-					$reviser->addString($sn + 2, $r, $i, $val, 0, 0, 1);
-				}
-			} else if ($bgcolor == 2) {
-				if (is_numeric($val)) {
-					$reviser->addNumber($sn + 2, $r, $i, $val, 1, 0, 1);
-				} else {
-					$reviser->addString($sn + 2, $r, $i, $val, 1, 0, 1);
-				}
-			} else {
-				// blank
-				if (is_numeric($val)) {
-					$reviser->addNumber($sn + 2, $r, $i, $val, 0, 0, 0);
-				} else {
-					$reviser->addString($sn + 2, $r, $i, $val, 0, 0, 0);
+					$reviser->addString($sn, $r, $i, $val, 0, 0, 0);
 				}
 			}
 		}
 	}
-
-	for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-		// Col Width 設定
-		$col_width = $xls->getColWidth($sn, $i);
-		$col_width = ($col_width >= 160) ? $col_width - 160: $col_width;
-		$reviser->chgColWidth($sn + 2, $i, $col_width);
-	}
-
-	for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
-		// Row height 設定
-		$row_height = $xls->getRowHeight($sn, $r);
-		$reviser->chgRowHeight($sn + 2, $r, $row_height);
-	}
-
-	// $msg .= "col_width: " . $col_width . "\n";
-	// $msg .= "row_height: " . $row_height . "\n";
 }
-
-//
-// Color sheet削除
-//
-$reviser->rmSheet(0);
-$reviser->rmSheet(1);
 
 //
 // コミット
@@ -195,7 +124,8 @@ $tmp_file = uniqid();
 /* $msg .= "tmp xls: " . $template_xls . "\n"; */
 
 if (filesize($tgt_file)) {
-	$result = $reviser->reviseFile($template_xls, $tmp_file, TMP_DIR);
+	$result = $reviser->buildFile($tmp_file, TMP_DIR);
+    echo "rviser:" . $result;
 }
 
 if (!file_exists(DST_DIR . $file_id . ORIG_EXT)) {
