@@ -102,8 +102,10 @@ jQuery(document).ready(function($) {
 
 	var targettd = $('#field_list td');
 	targetid = targettd.attr('name');
-	if (targettd.length = 1 && targetid == 0) {
+	if (targettd.length == 1 && targetid == 0) {
 		btn = $('.statusMenu .marker button').attr('disabled', true);
+	} else {
+		btn = $('.statusMenu .marker button').attr('disabled', false);
 	}
 
 	btn = $('.statusMenu button:disabled');
