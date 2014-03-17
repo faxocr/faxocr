@@ -334,13 +334,13 @@ function put_excel($xls) {
 							$rcspan .= " rowspan=\"" . $rowspan . "\"";
 						$class = " class=\"XFs" . $sn . "r" . $r . "c" . $i . "\"";
 						$id = " id=\"". $sn . "-" . $r ."-" . $i . "\"";
-						print " <td $class $rcspan $align style=\"font-size: " . $fontsize . "px;\">$dispval</td>\n";
+						print " <td $class $rcspan $align style=\"width: " . $tdwidth . "px; font-size: " . $fontsize . "px;\">$dispval</td>\n";
 					}
 				} else {
 					$class = " class=\"XF" . $xfno . "\" ";
 					$id = " id=\"". $sn . "-" . $r . "-" . $i . "\"";
 
-					print " <td nowrap=\"nowrap\" $class $align style=\"font-size: " . $fontsize . "px;\">$dispval</td>\n";
+					print " <td nowrap=\"nowrap\" $class $align style=\"width: " . $tdwidth . "px; font-size: " . $fontsize . "px;\">$dispval</td>\n";
 				}
 			}
 			print "</tr>\n";
