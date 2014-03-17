@@ -237,7 +237,7 @@ function put_excel($xls)
 		// marker: bottom - left
 		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->position_bottom_marker . "px; left: " . $sheet_marker->disp_sheet->position_left_marker . "px; width: " . $sheet_marker->disp_sheet->size_of_marker . "px; height: " . $sheet_marker->disp_sheet->size_of_marker . "px; z-index: 100; \">";
 		// sheet ID: bottom
-		$html .= "<div style=\"position: absolute; top: " . ($sheet_marker->disp_sheet->position_bottom_marker + $sheet_marker->disp_sheet->size_of_marker * 0.1) . "px; left: " . $sheet_marker->disp_sheet->position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-size: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $sid . "</font></div>\n";
+		$html .= "<div style=\"position: absolute; top: " . $sheet_marker->disp_sheet->position_bottom_marker . "px; left: " . $sheet_marker->disp_sheet->position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-size: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $sid . "</font></div>\n";
 
 		$cid = strtok("-");
 
