@@ -13,6 +13,7 @@ fi
 if [ "$OCR_ENGINE" = "kocr" ]; then
     OCR_DIR="-l ./etc/"
 fi
+OCR_DIR=${OCR_DIR:=""}
 
 #
 # AWS specific processing
@@ -67,14 +68,13 @@ if [ -z "$SMTP_HOST" ] ; then
     SMTP_HOST="no"
 fi
 
-if [ -z "$ERRORPDF" ] ; then
-    ERRORPDF="/home/faxocr/etc/error.pdf"
-fi
+ERROR_PDF_FILE_FOR_FAX_SENDER=${ERRORPDF:="/home/faxocr/etc/error.pdf"}
 
 if [ -z "$BIZFAX_FAX_SIZE" ] ; then
     BIZFAX_FAX_SIZE="A4"
 fi
 
+GNU_PARALLEL_LEVEL=${JOB_PARALLEL_LEVEL:="100%"}
 
 #################
 # DO NOT EDIT
@@ -85,16 +85,17 @@ DIR_RAILS="./rails"
 DIR_MAIL="./Maildir/new"
 DIR_FAX="./Faxsystem"
 
-DATE=`date +%Y%m%d%H%M`
-MDIR=$DIR_MAIL
+DATE=`date +%Y%m%d`
+TIME=`date +%H%M%S`
+MAIL_QUEUE_DIR=$DIR_MAIL
 
-RAILSPATH=$DIR_RAILS
-SHEETREADERCONF=$DIR_RAILS"/faxocr_config/receive_sheetreader"
-ANALYZEDIR=$DIR_FAX"/analyzedimage/"
+RAILS_ROOT_DIR=$DIR_RAILS
+SHEETREADER_CONF_DIR=$DIR_RAILS"/faxocr_config/receive_sheetreader"
+SHEETREADER_ANALYZE_DIR=$DIR_FAX"/analyzedimage/"
 
-UNTMPDIR=$DIR_FAX"/Tempmunpack/"`date +%H%M%S`
-MBACKDIR=$DIR_FAX"/Mailbackup/"$DATE
-SBACKDIR=$DIR_FAX"/Sendbackup/"$DATE
-MBACKDIR=$DIR_FAX"/Mailbackup/"$DATE
-FBACKDIR=$DIR_FAX"/Faxbackup/"$DATE
-LOGDIR=$DIR_FAX"/Log/"$DATE
+MUNPACK_TMP_DIR_PREFIX=$DIR_FAX"/Tempmunpack/"$DATE$TIME
+MAIL_BACKUP_DIR=$DIR_FAX"/Mailbackup/"$DATE$TIME
+SEND_BACKUP_DIR=$DIR_FAX"/Sendbackup/"$DATE$TIME
+FAX_BACKUP_DIR=$DIR_FAX"/Faxbackup/"$DATE$TIME
+SESSION_LOG_DIR=$DIR_FAX"/Log/"$DATE$TIME
+PROCFAX_TMP_DIR=$DIR_FAX"/Procfaxtmp/"$DATE$TIME

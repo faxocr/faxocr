@@ -7,8 +7,8 @@
     <% cnt += 1 %>
     <% contents = IO.readlines("#{file}/procfax.log") %>
     <% count_f = contents.map{|l| l if l.include?("INFO: Number of fax processed:")}.join.chomp.split(':')[-1] %>
-    <% count_fe = contents.map{|l| l if l.include?("INFO: Number of error occured processing fax:")}.join.chomp.split(':')[-1] %>
-    <% count_se = contents.map{|l| l if l.include?("INFO: Number of error occured processing sheet:")}.join.chomp.split(':')[-1] %>
+    <% count_fe = contents.map{|l| l if l.include?("INFO: Number of error occurred processing fax:")}.join.chomp.split(':')[-1] %>
+    <% count_se = contents.map{|l| l if l.include?("INFO: Number of error occurred processing sheet:")}.join.chomp.split(':')[-1] %>
     <% count_s = contents.map{|l| l if l.include?("INFO: Number of sheet processed:")}.join.split(':')[-1] %>
     <% count_s = count_s.to_i - count_se.to_i %>
     <% str += File.basename(file).gsub(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/, '\1/\2/\3 \4:\5　') %>
