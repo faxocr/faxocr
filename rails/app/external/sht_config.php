@@ -313,6 +313,10 @@ function put_excel($xls)
 				$loc = $sn . "-" . $r . "-" . $i;
 				if (isset($field_index[$loc])) {
 					$dispval = "";
+                    if ($debug_mode) {
+                        // debug for ocr test
+                        $dispval = "<div style='text-align: center;'>X</div>";
+                    }
 				}
 
 				$celattr =  $xls->getAttribute($sn, $r, $i);

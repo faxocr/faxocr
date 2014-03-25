@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+require "net/smtp"
+
 class ExternalController < ApplicationController
 
   skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec, :sht_field, :sht_script, :sht_marker, :sht_config, :sht_verify, :sht_commit, :sht_field_checker]
@@ -341,6 +343,13 @@ class ExternalController < ApplicationController
 
     @result = `ruby #{RAILS_ROOT}/files/#{@file}.rb #{RAILS_ROOT} #{@gid}`
 
+    if debug_mode
+      @file_prefix = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}"
+      @debug = `cd #{RAILS_ROOT}/files/`
+      @debug = `convert #{@file_prefix}.pdf #{@file_prefix}.tif`
+      sendmail "#{@file_prefix}.tif"
+    end
+
     flash[:notice] = "シートを登録しました"
     redirect_to group_url(@group)
   end
@@ -384,6 +393,40 @@ class ExternalController < ApplicationController
     send_file(@file_png,
               {:filename => "#{@gid}-#{@sid}.png",
                 :type => "application/png"})
+  end
+
+  private
+
+  def sendmail(file_name)
+    from = 'faxocr@localhost'
+    to = 'faxocr@localhost'
+    subject = 'Debug Mode'
+    host = "localhost"
+    port = 25
+
+    body = <<EOT
+From: #{from}
+To: #{to.to_a.join(",\n ")}
+Subject: #{NKF.nkf("-WMm0", subject)}
+Date: #{Time::now.strftime("%a, %d %b %Y %X %z")}
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-2022-JP
+Content-Transfer-Encoding: 7bit
+
+--#{$BOUNDARY}
+Content-Type: application/octet-stream;
+ name="#{File.basename(file_name)}"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="#{File.basename(file_name)}"
+
+#{[File.open(file_name).readlines.join('')].pack('m')}
+--#{$BOUNDARY}--
+EOT
+ 
+    Net::SMTP.start(host, port) do |smtp|
+      smtp.send_mail body, from, to
+    end
   end
 
 end
