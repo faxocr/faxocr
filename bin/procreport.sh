@@ -18,17 +18,17 @@ SENDNUMBER=$5
 
 REPHTML="/tmp/procrep"$$".html"
 REPMAIL="/tmp/procrep"$$".eml"
-LOG=$LOGDIR"/procrep.log"
+LOG=$SESSION_LOG_DIR"/procrep.log"
 
-mkdir $SBACKDIR 2> /dev/null
+mkdir $SEND_BACKUP_DIR 2> /dev/null
 
 #
 # generate the report and send it (NEEDS CHECK)
 #
-$RAILSPATH/script/send_daily_report.rb $DATE $ANALYZEDIR $SBACKDIR \
+$RAILS_ROOT_DIR/script/send_daily_report.rb $DATE $TIME $SHEETREADER_ANALYZE_DIR $SEND_BACKUP_DIR \
     $FAX_SEND_FROM $FAX_SEND_TARGET
 
-if [ "`ls $SBACKDIR`" = '' ]; then
-    rm -r $SBACKDIR
+if [ "`ls $SEND_BACKUP_DIR`" = '' ]; then
+    rm -r $SEND_BACKUP_DIR
 fi
 

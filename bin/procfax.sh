@@ -1,232 +1,133 @@
 #!/bin/sh
 
+
 # export PATH=/usr/local/bin:/usr/sbin:$PATH
-export PATH=/usr/local/bin:/usr/sbin:/home/faxocr/bin/:$PATH
+export PATH=/usr/local/bin:/usr/sbin:/home/faxocr/bin/:"$PATH"
 
-# get configuration
-
+#
+# import configuration
+#
 CONF_FILE=~faxocr/etc/faxocr.conf
 CONF_PROC=~faxocr/bin/doconfig.sh
+UTIL_FILE=~faxocr/bin/procfax_utils.sh
 
 . $CONF_FILE
 . $CONF_PROC
+. $UTIL_FILE
 
-show_error_message()
-{
-	_header=`date +%Y/%m/%d\ %H:%M:%S`
+set -u
 
-	echo $_header Error: "$@"
-	echo $_header Error: "$@" >> $LOG
-	echo $_header Error: "$@" >&2
-}
+#
+# global variables
+#
+LOG_FILE_FOR_THIS_SESSION="$SESSION_LOG_DIR"/procfax.log
 
-show_info_message()
-{
-	_header=`date +%Y/%m/%d\ %H:%M:%S`
-
-	echo $_header Info: "$@"
-	echo $_header Info: "$@" >> $LOG
-}
-
-show_message_to_console()
-{
-	_header=`date +%Y/%m/%d\ %H:%M:%S`
-
-	echo $_header Info: "$@"
-	echo $_header Info: "$@" >&2
-}
-
-# move to home directory
+#
+# set working directory of this script
+#
 cd ~faxocr
 
-# cannot run multiple instance
-LOCKFILE=${DIR_FAX}"/"`basename $0`.lock
-trap 'echo "trapped."; rm -f ${LOCKFILE}; exit 1' 1 2 3 15
+#
+# have not to run multiple instances
+#
+session_lock_file="$DIR_FAX"/"`basename $0`".lock
+trap 'echo "trapped."; rm -f ${session_lock_file}; exit 1' 1 2 3 15
 
-if ! ln -s $$ ${LOCKFILE}; then
+if ! ln -s $$ "${session_lock_file}"; then
 	show_message_to_console 'Cannot run multiple instances.'
 	exit 1
 fi
 
-# receive fax
+#
+# retrieve fax from a pop server
+#
 if [ "$FAX_RECV_SETTING" = "pop3" ]; then
 	getfax
+	show_cmd_result $? retrieving Fax via a pop server
 fi
 
-# temp files
-ERRORMAIL="/tmp/error"$$".eml"
-ECHOFILE="echofile"$$
-ECHOMAIL="/tmp/echofile"$$".eml"
-LOG=$LOGDIR"/procfax.log"
-TIME=`date +%H%M%S`
-FAX_COUNT=0
-FAX_ERROR_COUNT=0
-SHEET_COUNT=0
-SHEET_ERROR_COUNT=0
-
-if [ "`ls $MDIR`" = '' ]; then
-	echo `date +%Y/%m/%d\ %H:%M:%S` "NOT FOUND: not found new email"
-	rm ${LOCKFILE}
+#
+# check new arrival mail
+#
+if [ "`ls $MAIL_QUEUE_DIR`" = '' ]; then
+	show_info_message NOT FOUND: not found new email
+	rm "$session_lock_file"
+	show_cmd_result $? removing lock "file($session_lock_file)"
 	exit
 fi
 
-mkdir $MBACKDIR 2> /dev/null
-mkdir $FBACKDIR 2> /dev/null
-mkdir $LOGDIR 2> /dev/null
-mkdir $UNTMPDIR 2> /dev/null
+#
+# prepare some directories before main process
+#
+mkdir "$MAIL_BACKUP_DIR" 2> /dev/null
+mkdir "$FAX_BACKUP_DIR" 2> /dev/null
+mkdir -p "$PROCFAX_TMP_DIR" 2> /dev/null
+mkdir "$SESSION_LOG_DIR" 2> /dev/null
 
-ruby rails/script/getsrml.rb > $SHEETREADERCONF/srml/faxocr.xml
-for MFILE in `ls $MDIR`
-do
-	# initialize local variable
-	FAX_ERROR_HAPPENS_FLAG=0
-
-	FAX_COUNT=`expr $FAX_COUNT + 1`
-
-	#
-	# directory setting / preprocessing
-	#
-	show_info_message FOUND: $MDIR/$MFILE
-	show_info_message BACKUP MAIL: $MBACKDIR/$MFILE
-	cp $MDIR/$MFILE $MBACKDIR
-
-	# removes messages from root
-	ISFROMROOT=`grep "From: " $MDIR/$MFILE | grep root | head -1`
-	if [ "$ISFROMROOT" != "" ]; then
-		rm $MDIR/$MFILE
-		continue;
-	fi
-
-	#
-	# recognize from/to number (based on fax service type)
-	#
-	ISFAXIMO=`grep "faximo.jp" $MDIR/$MFILE | head -1`
-	ISMESSAGEPLUS=`grep "everynet.jp" $MDIR/$MFILE | head -1`
-	ISBIZFAX=`grep "050fax.jp" $MDIR/$MFILE | head -1`
-	SRHMODE="faximo"
-	if [ "$ISFAXIMO" != "" ]; then
-		SRHMODE="faximo"
-	fi
-	if [ "$ISMESSAGEPLUS" != "" ]; then
-		SRHMODE="messageplus"
-	fi
-	if [ "$ISBIZFAX" != "" ]; then
-		SRHMODE="bizfax"
-	fi
-	if [ x"$ISFAXIMO" = x"" -a x"$ISMESSAGEPLUS" = x"" -a x"$ISBIZFAX" = x"" ]; then
-		show_error_message FAX: ERROR: cannot recognize a fax service from Mail
-		FAX_ERROR_HAPPENS_FLAG=1
-	fi
-	FFROM=`srhelper -m from -s $SRHMODE $MDIR/$MFILE`
-	if [ "$FFROM" = "" ]; then
-		FFROM="UNNUMBER"
-	fi
-	FTO=`srhelper -m to -s $SRHMODE $MDIR/$MFILE`
-	if [ "$FTO" = "" ]; then
-		FTO="UNNUMBER"
-	fi
-	show_info_message FAX: from:$FFROM to:$FTO
+#
+# main
+#
+ruby rails/script/getsrml.rb > "$SHEETREADER_CONF_DIR"/srml/faxocr.xml
+show_cmd_result_and_logfile $? generating faxocr.xml
+ls "$MAIL_QUEUE_DIR" | (export \
+	LOG_FILE_FOR_THIS_SESSION="$LOG_FILE_FOR_THIS_SESSION" \
+	DATE="$DATE" TIME="$TIME" \
+	MAIL_QUEUE_DIR="$MAIL_QUEUE_DIR" \
+	MAIL_BACKUP_DIR="$MAIL_BACKUP_DIR" \
+	MUNPACK_TMP_DIR_PREFIX="$MUNPACK_TMP_DIR_PREFIX" \
+	FAX_BACKUP_DIR="$FAX_BACKUP_DIR" \
+	SHEETREADER_CONF_DIR="$SHEETREADER_CONF_DIR" \
+	OCR_DIR="$OCR_DIR" \
+	SHEETREADER_ANALYZE_DIR="$SHEETREADER_ANALYZE_DIR" \
+	ERROR_PDF_FILE_FOR_FAX_SENDER="$ERROR_PDF_FILE_FOR_FAX_SENDER" \
+	RAILS_ROOT_DIR="$RAILS_ROOT_DIR" \
+	PROCFAX_TMP_DIR="$PROCFAX_TMP_DIR" \
+	\
+	FAX_SEND_TYPE="$FAX_SEND_TYPE" \
+	; \
+	IFS=""; \
+	RESULT_MESSAGE=`parallel -N1 --jobs "$GNU_PARALLEL_LEVEL" "(export MAIL_FILE_NAME={}; \
+		./bin/procfax_1mail.sh > \"$PROCFAX_TMP_DIR\"/{}.log 2>&1; \
+		echo $? > \"$PROCFAX_TMP_DIR\"/{}.exit_status; \
+		cat \"$PROCFAX_TMP_DIR\"/{}.log \
+		)" 2>&1`; \
+	echo "$RESULT_MESSAGE" >> "$LOG_FILE_FOR_THIS_SESSION"; \
+	echo "$RESULT_MESSAGE"; \
+)
 
 
-	#
-	# unpack the fax image file
-	#
-	cat $MDIR/$MFILE | munpack -C $UNTMPDIR 2>> $LOG 1>> $LOG
-	rm $MDIR/$MFILE
+#
+# calculate result of each fax processing
+#
+sum ()
+{
+	_total=0
 
-	UNTMPDIR_FILES=`ls $UNTMPDIR/* | wc -l`
-	if [ "$UNTMPDIR_FILES" -gt "0" ]; then
-		ATTACHED_TIFF=`ls $UNTMPDIR/* | grep -ie TIF$ 2>> $LOG |head -1`
-	fi
-	if [ "$ATTACHED_TIFF" != "" ]; then
-		# When a tiff file has only one page, old version of converter
-		# command generates "single%d.tif" instead of "single0.tif".
-		# On the other hand a newer version of converter command
-		# generates "single0.tif".
-		convert $ATTACHED_TIFF $UNTMPDIR/single%d.tif
-		if [ -e $UNTMPDIR/single%d.tif ]; then
-			mv $UNTMPDIR/single%d.tif $UNTMPDIR/single.tif
-		fi
-	fi
-
-	# XXX
-	# pwd >> /tmp/taka-log
-	# echo $ATTACHED_TIFF >> /tmp/taka-log
-	# cp $ATTACHED_TIFF /tmp/taka-tiff-orig.tif
-	# cp $UNTMPDIR/single* /tmp
-
-	for TIFFILE in `ls $UNTMPDIR/single*`
-	do
-		# initialize local variable
-		SHEET_ERROR_HAPPENS_FLAG=0
-
-		#
-		# Sheetreader processing
-		#
-		#echo BACKUP TIF: $MBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME.TIF
-		#echo BACKUP TIF: $MBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME.TIF >> $LOG
-		SHEET_COUNT=`expr $SHEET_COUNT + 1`
-		BACKTIFF=$FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT.TIF
-		show_info_message BACKUP TIF: $BACKTIFF
-
-		convert -resample 200 $TIFFILE $BACKTIFF
-		sheetreader -m rails -c $SHEETREADERCONF $OCR_DIR -r $FTO -s $FFROM -p $ANALYZEDIR \
-			$BACKTIFF 2>> $LOG 1> $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb"
-		SRRESULT=$?
-		if [ $SRRESULT -ne 0 ]; then
-			show_error_message SHEETREADER: ERROR: sheetreader returns non-zero value: $SRRESULT
-			SHEET_ERROR_HAPPENS_FLAG=1
-		else
-			show_info_message SHEETREADER: $SRRESULT
-		fi
-
-		#
-		# generate thumbnail image
-		#
-		SRDATE=`grep answer_sheet.date $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb" | head -1 | cut -d\" -f2`
-		if [ x"${SRDATE}" = x"" ]; then
-			show_error_message SHEETREADER: date used in sheetreader: ERROR: result is empty
-			SHEET_ERROR_HAPPENS_FLAG=1
-		else
-			show_info_message SHEETREADER: date used in sheetreader: $SRDATE
-		fi
-		IMAGEDIR=${ANALYZEDIR}R${FFROM}/S${FTO}/${SRDATE}
-		convert -geometry 500 ${IMAGEDIR}/image.png ${IMAGEDIR}/image_thumb.png
-
-		#
-		# Error file processing
-		#
-		if [ "$FFROM" != "UNNUMBER" -a "$SRRESULT" != "0" ]; then
-			show_info_message SEND ERROR MAIL
-			sendfax $FFROM errorreport $ERRORPDF
-		fi
-
-		#
-		# Echo file processing
-		#
-		ruby $FBACKDIR"/"$FFROM"_"$FTO"_"$DATE"_"$TIME"_"$SHEET_COUNT".rb" $RAILSPATH $ANALYZEDIR \
-			$ECHOFILE
-		RUBYRESULT=$?
-		if [ "$RUBYRESULT" = "8" ]; then
-			show_info_message SEND ECHO MAIL
-			sendfax $FFROM echoreport $ECHOFILE.pdf
-			rm $ECHOFILE.pdf
-			rm $ECHOFILE.html
-		fi
-		if [ $SHEET_ERROR_HAPPENS_FLAG -eq 1 ]; then
-			SHEET_ERROR_COUNT=`expr $SHEET_ERROR_COUNT + 1`
-			FAX_ERROR_HAPPENS_FLAG=1
-		fi
+	for targetFile in "$@"; do
+		_val=`cat "$targetFile"`
+		_total=`expr $_total + $_val`
 	done
-	rm $UNTMPDIR/* 2>> $LOG
-	if [ $FAX_ERROR_HAPPENS_FLAG -eq 1 ]; then
-		FAX_ERROR_COUNT=`expr $FAX_ERROR_COUNT + 1`
-	fi
-done
-show_info_message "INFO: Number of fax processed:$FAX_COUNT"
-show_info_message "INFO: Number of sheet processed:$SHEET_COUNT"
-show_info_message "INFO: Number of error occured processing fax:$FAX_ERROR_COUNT"
-show_info_message "INFO: Number of error occured processing sheet:$SHEET_ERROR_COUNT"
-rmdir $UNTMPDIR 2>> $LOG
+	return $_total
+}
 
-rm ${LOCKFILE}
+sum `ls "$PROCFAX_TMP_DIR"/*.fax_count`
+fax_count=$?
+sum `ls "$PROCFAX_TMP_DIR"/*.fax_error_count`
+fax_error_count=$?
+sum `ls "$PROCFAX_TMP_DIR"/*.sheet_count`
+sheet_count=$?
+sum `ls "$PROCFAX_TMP_DIR"/*.sheet_error_count`
+sheet_error_count=$?
+
+show_info_message_and_logfile "INFO: Number of fax processed:$fax_count"
+show_info_message_and_logfile "INFO: Number of sheet processed:$sheet_count"
+show_info_message_and_logfile "INFO: Number of error occurred processing fax:$fax_error_count"
+show_info_message_and_logfile "INFO: Number of error occurred processing sheet:$sheet_error_count"
+
+rm "$PROCFAX_TMP_DIR"/*
+show_cmd_result_and_logfile $? cleaning up files in "$PROCFAX_TMP_DIR"
+rmdir "$PROCFAX_TMP_DIR"
+show_cmd_result_and_logfile $? removing "directory($PROCFAX_TMP_DIR)"
+
+rm "$session_lock_file"
+show_cmd_result_and_logfile $? removing lock "file($session_lock_file)"
