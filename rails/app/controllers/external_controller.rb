@@ -401,6 +401,7 @@ class ExternalController < ApplicationController
     from = 'faxocr@localhost'
     to = 'faxocr@localhost'
     subject = 'Debug Mode'
+    body = 'everynet.jp'
     host = "localhost"
     port = 25
 
@@ -410,18 +411,26 @@ To: #{to.to_a.join(",\n ")}
 Subject: #{NKF.nkf("-WMm0", subject)}
 Date: #{Time::now.strftime("%a, %d %b %Y %X %z")}
 Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="boundary.faxocr.debug"
+X-MPlus-MsgType: 1
+X-MPlus-MsgNo: 347601
+X-MPlus-ReceiverUserID: 90016528
+X-MPlus-CallerTelNo: 05000000000
+X-MPlus-UniDTWhenThisWasSent: 1395122105
+
+--boundary.faxocr.debug
 Content-Type: text/plain; charset=ISO-2022-JP
 Content-Transfer-Encoding: 7bit
 
---#{$BOUNDARY}
-Content-Type: application/octet-stream;
- name="#{File.basename(file_name)}"
+#{NKF.nkf("-Wjm0", body)}
+
+--boundary.faxocr.debug
+Content-Type: application/octet-stream; name="#{File.basename(file_name)}"
+Content-Disposition: attachment; name="#{File.basename(file_name)}"; filename="#{File.basename(file_name)}"
 Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="#{File.basename(file_name)}"
 
 #{[File.open(file_name).readlines.join('')].pack('m')}
---#{$BOUNDARY}--
+--boundary.faxocr.debug--
 EOT
  
     Net::SMTP.start(host, port) do |smtp|
