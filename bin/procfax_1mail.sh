@@ -2,8 +2,15 @@
 
 set -u
 
+CONF_FILE=~faxocr/etc/faxocr.conf
 UTIL_FILE=~faxocr/bin/procfax_utils.sh
+
+. $CONF_FILE
 . $UTIL_FILE
+
+if [ x"$DEBUG_MODE" = x'true' ]; then
+	show_info_message "===== DEBUG MODE ====="
+fi
 
 #
 # private functions
@@ -68,7 +75,7 @@ fi
 if [ "$is_bizfax" != "" ]; then
 	srhelper_fax_mode="bizfax"
 fi
-if [ x"$is_faximo" = x"" -a x"$is_messageplus" = x"" -a x"$is_bizfax" = x"" ]; then
+if [ x"$DEBUG_MODE" != x'true' -a x"$is_faximo" = x"" -a x"$is_messageplus" = x"" -a x"$is_bizfax" = x"" ]; then
 	show_error_message FAX: ERROR: cannot recognize a fax service from Mail
 	fax_error_happens_flag=1
 fi
@@ -79,6 +86,10 @@ fi
 dest_fax_number=`srhelper -m to -s "$srhelper_fax_mode" "$mail_file"`
 if [ "$dest_fax_number" = "" ]; then
 	dest_fax_number="UNNUMBER"
+fi
+if [ x"$DEBUG_MODE" = x'true' ]; then
+	src_fax_number="TEST"
+	dest_fax_number="TEST"
 fi
 show_info_message got fax info from e-mail: from:"$src_fax_number" to:"$dest_fax_number"
 

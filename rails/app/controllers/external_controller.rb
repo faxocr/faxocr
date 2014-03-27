@@ -343,7 +343,7 @@ class ExternalController < ApplicationController
 
     @result = `ruby #{RAILS_ROOT}/files/#{@file}.rb #{RAILS_ROOT} #{@gid}`
 
-    if debug_mode
+    if debug_mode == 'true'
       @file_prefix = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}"
       @debug = `cd #{RAILS_ROOT}/files/`
       @debug = `convert #{@file_prefix}.pdf #{@file_prefix}.tif`

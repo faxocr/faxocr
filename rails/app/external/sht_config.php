@@ -315,7 +315,7 @@ function put_excel($xls)
 					$dispval = "";
                     if ($debug_mode) {
                         // debug for ocr test
-                        $dispval = "<div style='text-align: center;'>X</div>";
+                        $dispval = "<div style='text-align: center;'>0</div>";
                     }
 				}
 
