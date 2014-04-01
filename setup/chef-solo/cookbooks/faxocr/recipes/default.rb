@@ -4,6 +4,7 @@
 #
 
 include_recipe "faxocr::package"
+include_recipe "faxocr::fonts"
 include_recipe "faxocr::wkhtmltopdf"
 include_recipe "faxocr::opencv"
 include_recipe "faxocr::user-faxocr"
