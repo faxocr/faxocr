@@ -48,3 +48,8 @@ show_cmd_result_and_logfile()
 	show_cmd_result "$@"
 	show_cmd_result "$@" >> $LOG_FILE_FOR_THIS_SESSION
 }
+
+get_current_running_mode_of_rails()
+{
+	awk '/^[\t ]*RackEnv/ {print $2}' /etc/apache2/sites-enabled/faxocr.conf
+}
