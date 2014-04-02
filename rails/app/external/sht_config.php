@@ -313,7 +313,7 @@ function put_excel($xls)
 				$loc = $sn . "-" . $r . "-" . $i;
 				if (isset($field_index[$loc])) {
 					$dispval = "";
-                    if ($debug_mode) {
+                    if ($debug_mode === 'true') {
                         // debug for ocr test
                         $dispval = "<div style='text-align: center;'>0</div>";
                     }
