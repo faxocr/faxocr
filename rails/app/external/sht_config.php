@@ -335,12 +335,12 @@ function put_excel($xls)
 							$rcspan .= " rowspan=\"" . $rowspan . "\"";
 						$class = " class=\"XFs" . $sn . "r" . $r . "c" . $i . "\"";
 						$id = " id=\"". $sn . "-" . $r ."-" . $i . "\"";
-						$html .= " <td $class $rcspan $align style=\"width: " . $tdwidth . "px; font-size: " . $fontsize . "px;\">$dispval</td>\n";
+						$html .= " <td $class $rcspan $align style=\"font-size: " . $fontsize . "px;\">$dispval</td>\n";
 					}
 				} else {
 					$class = " class=\"XF" . $xfno . "\" ";
 					$id = " id=\"". $sn . "-" . $r . "-" . $i . "\"";
-					$html .= " <td nowrap=\"nowrap\" $class $align style=\"width: " . $tdwidth . "px; font-size: " . $fontsize . "px;\">$dispval</td>\n";
+					$html .= " <td nowrap=\"nowrap\" $class $align style=\"font-size: " . $fontsize . "px;\">$dispval</td>\n";
 				}
 			}
 			$html .= "</tr>\n";
