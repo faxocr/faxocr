@@ -54,9 +54,9 @@ class Sheet {
     public $disp;
 
     // マーカーサイズ
-	public $marker_size;
+    public $marker_size;
 
-	function __construct($xls) {
+    function __construct($xls) {
         $this->xls = $xls;
 
         // サイズ取得
@@ -85,7 +85,7 @@ class Sheet {
         $this->row_count = $this->xls->maxrow[$this->sn];
         $this->col_count = $this->xls->maxcell[$this->sn];
 
-		$this->scale = get_scaling($this->tblwidth, $this->tblheight, 940);
+        $this->scale = get_scaling($this->tblwidth, $this->tblheight, 940);
 
         // 表示サイズ取得
         $this->disp = new DispSheet($this);
@@ -119,7 +119,7 @@ class DispSheet {
     public $cells_width;
     public $cells_height;
 
-	function __construct($sheet) {
+    function __construct($sheet) {
         $this->tblwidth = 0;
         $this->tblheight = 0;
         for ($i = 0; $i <= $sheet->xls->maxcell[$sheet->sn]; $i++) {
@@ -132,8 +132,8 @@ class DispSheet {
             $this->tblheight += $this->cells_height[$i];
         }
 
-		//$this->tblwidth = floor($sheet->tblwidth * $sheet->scale);
-		//$this->tblheight = floor($sheet->tblheight * $sheet->scale);
+        //$this->tblwidth = floor($sheet->tblwidth * $sheet->scale);
+        //$this->tblheight = floor($sheet->tblheight * $sheet->scale);
     }
 
     public function get_row_size($row) {
@@ -146,4 +146,5 @@ class DispSheet {
 
 }
 
+/* vim: set et fenc=utf-8 ff=unix sts=4 sw=4 ts=4 : */
 ?>

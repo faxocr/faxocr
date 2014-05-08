@@ -48,7 +48,7 @@ class SheetMarker extends Sheet {
 
     public $marker_scale;
 
-	function __construct($xls, $marker_block_width, $marker_block_height, $marker_offset_x, $marker_offset_y, $marker_size) {
+    function __construct($xls, $marker_block_width, $marker_block_height, $marker_offset_x, $marker_offset_y, $marker_size) {
         parent::__construct($xls);
 
         // args as disp scale(without marker window)
@@ -129,7 +129,7 @@ class DispSheetMarker {
 
     public $position_of_sheet_id_from_left_side;
 
-	function __construct($sheet_marker) {
+    function __construct($sheet_marker) {
         // シートウインドウ
         $this->sheet_width = floor($sheet_marker->sheet_width * $sheet_marker->marker_scale);
         $this->sheet_height = floor($sheet_marker->sheet_height * $sheet_marker->marker_scale);
@@ -213,4 +213,5 @@ class DispSheetMarker {
 
 }
 
+/* vim: set et fenc=utf-8 ff=unix sts=4 sw=4 ts=4 : */
 ?>
