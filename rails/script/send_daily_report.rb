@@ -121,14 +121,8 @@ groups.each do |group|
       print "#Candidate:#{survey_candidate.candidate.candidate_name}\n"
       fax_number = survey_candidate.candidate.fax_number
       fax_number = fax_number.gsub(/-/, '')
-
-      #to the iFax
-      system("echo '#userid=#{faxuser}' > #{filename}.pass")
-      system("echo '#passwd=#{faxpass}' >> #{filename}.pass")
-      print "sendemail -t #{fax_number}#{to_mailaddr} -u report -a #{filename}.pdf -o message-file=#{filename}.pass -f #{from_mailaddr}\n"
-      system("sendemail -t #{fax_number}#{to_mailaddr} -u report -a #{filename}.pdf -o message-file=#{filename}.pass -f #{from_mailaddr}")
-
-      system("rm #{filename}.pass")
+      print "sendfax #{fax_number} summary-report #{filename}.pdf\n"
+      system("sendfax #{fax_number} summary-report #{filename}.pdf")
     end
     #system("rm #{filename}.pdf")
     #system("rm #{filename}")
