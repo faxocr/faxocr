@@ -33,14 +33,14 @@ require_once "lib/sheet.php";
 //
 class SheetMarker extends Sheet {
     // マーカー情報
-    public $marker_block_width;
-    public $marker_block_height;
+    public $marker_block_width;     // marker window's width
+    public $marker_block_height;    // marker window's height
     public $marker_offset_x;
     public $marker_offset_y;
     public $size_of_marker;
 
     // 表示シート情報
-    public $disp_sheet;
+    public $disp_sheet;     // object to DispSheetMarker
 
     // シート(マーカー付き)情報
     public $sheet_width;

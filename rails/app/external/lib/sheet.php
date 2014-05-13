@@ -39,10 +39,10 @@ class Sheet {
     public $scale;
 
     // シート情報
-    public $tblwidth;
-    public $tblheight;
-    public $cells_width;
-    public $cells_height;
+    public $tblwidth;       // width of the sheet
+    public $tblheight;      // height of the sheet
+    public $cells_width;    // arrray
+    public $cells_height;   // arrray
     public $row_count; // セル数(縦)
     public $col_count; // セル数(横)
 
@@ -51,7 +51,7 @@ class Sheet {
     public $min_cell_height;
 
     // 表示シート情報
-    public $disp;
+    public $disp;       // object to DispSheet
 
     // マーカーサイズ
     public $marker_size;
@@ -90,6 +90,7 @@ class Sheet {
         // 表示サイズ取得
         $this->disp = new DispSheet($this);
 
+        // A1 cell の大きさをマーカーサイズとする
         $this->marker_size = $this->disp->cells_width[0];
         if ($this->disp->cells_height[0] > $this->disp->cells_width[0]) {
             $this->marker_size = $this->disp->cells_height[0];
@@ -113,11 +114,11 @@ class Sheet {
 // シート(表示)クラス
 //
 class DispSheet {
-    // 表示シート情報
+    // 表示シート情報: 表示用にスケーリングした値を保持
     public $tblwidth;
     public $tblheight;
-    public $cells_width;
-    public $cells_height;
+    public $cells_width;    // array
+    public $cells_height;   // array
 
     function __construct($sheet) {
         $this->tblwidth = 0;
