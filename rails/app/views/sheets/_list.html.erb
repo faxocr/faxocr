@@ -31,8 +31,8 @@
    	<td class="surveysobject"><%=h Sheet::STATUS[sheet.status][0] %></td>
 	<td class="surveysobject"><%=h sheet.sheet_code %></td>
    	<td class="surveysobject"><%= link_to sheet.sheet_name, group_survey_sheet_path(@group, @survey, sheet) %></td>
-	<td class="surveysobject"><%=h sheet.block_width + 1 %></td>
-	<td class="surveysobject"><%=h sheet.block_height + 1 %></td>
+	<td class="surveysobject"><%=h sheet.block_width %></td>
+	<td class="surveysobject"><%=h sheet.block_height %></td>
 	<% if params[:controller] == "sheets" %>
     <% if @current_user.has_survey_role(@group.id) %>
     <td class="surveysobject_manage">

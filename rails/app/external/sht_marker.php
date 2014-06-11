@@ -95,6 +95,7 @@ if ($errmsg) {
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"target\" value=\"" . $target . "\" />\n";
+	print "<input type=\"hidden\" name=\"scale\" value=\"" . $sheet->scale . "\" />\n";
 	print "</form>\n";
 
 	if (file_exists(DST_DIR . $file_id . ".rb")) {
@@ -132,7 +133,7 @@ if ($xls) {
 function show_marker()
 {
     table = $(".sheet_marker");
-	$("#ex3").css("top", table.position().top).css("left", table.position().left).css("width", (Math.ceil(table.width() / $sheet->marker_size + 1) * $sheet->marker_size)).css("height", (Math.ceil(table.height() / $sheet->marker_size + 1) * $sheet->marker_size));
+	$("#ex3").css("top", table.position().top).css("left", table.position().left).css("width", table.width()).css("height", (table.height()));
 
 	$("#ex3").show("slow");
 }
@@ -155,7 +156,7 @@ function hide_marker()
 
 	// block_size
 	var cmd = '<input type="hidden" name="block_size" ' +
-		  'value="' + last_size + '" />';
+		  'value="' + prev_size + '" />';
 	form.append(cmd);
 
 	var m = $(".sheet_marker").get(0);
@@ -180,38 +181,38 @@ function hide_marker()
 var $ = jQuery;
 
 $().ready(function() {
-	// セルサイズ数の補正が未対応なのでドラッグを無効化
-//	$('#ex3').jqDrag('.jqDrag').jqResize('.jqResize');
-	$('#ex3').jqResize('.jqResize');
+	$('#ex3').jqDrag('.jqDrag').jqResize('.jqResize');
+//	$('#ex3').jqResize('.jqResize');
 
 	btn = $('.statusMenu button:disabled');
 	btn.parent().addClass('disable');
 });
 
 var last_size = $sheet->marker_size;
+var prev_size = $sheet->marker_size;
 
 function size_up() {
 	var w = parseInt($("#ex3").css("width"));
-	var block = w / last_size;
+	var block = w / prev_size;
 
-	last_size = last_size + 1;
+	prev_size = prev_size + 1;
 	$(".mark-img").each( function () {
-		$(this).css("width", last_size);
+		$(this).css("width", prev_size);
 	});
 
-	$("#ex3").css("width", (block * last_size) + "px");
+	//$("#ex3").css("width", (block * prev_size) + "px");
 }
 
 function size_down() {
 	var w = parseInt($("#ex3").css("width"));
-	var block = w / last_size;
+	var block = w / prev_size;
 
-	last_size = last_size > 17 ? (last_size - 1) : 16;
+	prev_size = prev_size > 1 ? (prev_size - 1) : 0;
 	$(".mark-img").each( function () {
-		$(this).css("width", last_size);
+		$(this).css("width", prev_size);
 	});
 
-	$("#ex3").css("width", (block * last_size) + "px");
+	//$("#ex3").css("width", (block * prev_size) + "px");
 }
 
 function go_prev() {
@@ -234,8 +235,13 @@ function go_next() {
 
 <br /><br />
 <center>
-<h3>マーカーサイズ</h3>
+<h3>マーカー位置指定</h3>
+<p>
+マーカーが置かれるセルを指定します。<br>
+マーカーの詳細な大きさは無視していただいて結構です。<br>
+</p>
 
+<h3>マーカーサイズ変更</h3>
 縮小 <img src="/image/arrow-l.gif" onmousedown="size_down();" />
 　　<img src="/image/arrow-r.gif" onmousedown="size_up();" /> 拡大<br />
 

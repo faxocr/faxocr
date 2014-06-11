@@ -25,7 +25,7 @@ require_once 'config.php';
 require_once 'init.php';
 require_once 'lib/common.php';
 require_once 'lib/file_conf.php';
-require_once 'lib/sheet_marker.php';
+require_once 'lib/sheet_cell_fit_marker.php';
 require_once 'contrib/peruser.php';
 
 define('sht_config', true);
@@ -60,7 +60,14 @@ if ($tgt_file) {
 
 put_config($file_id, $_REQUEST);
 get_config($file_id);
-put_rails($file_id);
+
+$marker_window = new MarkerWindowWebUI(
+			$conf->get("block_width"), $conf->get("block_height"),
+			$conf->get("block_offsetx"), $conf->get("block_offsety"),
+			$conf->get("block_size"), $_REQUEST['scale']);
+$sheet_marker = new SheetCellFitMarker($xls, $marker_window);
+
+put_rails($file_id, $sheet_marker);
 
 //
 // HTMLファイル作成処理
@@ -68,7 +75,7 @@ put_rails($file_id);
 if ($xls) {
 	$html = put_header();
 	$html .= put_css($xls);
-	$html .= put_excel($xls);
+	$html .= put_excel($xls, $marker_window, $sheet_marker);
 	$html .= put_footer();
 	file_put_contents(DST_DIR . $file_id . ".html", $html);
 
@@ -147,7 +154,11 @@ function put_config($file_id, $REQUEST)
 		}
 	}
 
-    $sheet_marker = new SheetMarker($xls, $conf->get("block_width"), $conf->get("block_height"), $conf->get("block_offsetx"), $conf->get("block_offsety"), $conf->get("block_size"));
+	$marker_window = new MarkerWindowWebUI(
+				$conf->get("block_width"), $conf->get("block_height"),
+				$conf->get("block_offsetx"), $conf->get("block_offsety"),
+				$conf->get("block_size"), $REQUEST['scale']);
+	$sheet_marker = new SheetCellFitMarker($xls, $marker_window);
 
 	$sn = 0;
 
@@ -204,13 +215,11 @@ function put_footer()
 	return $html;
 }
 
-function put_excel($xls)
+function put_excel($xls, $marker_window, $sheet_marker)
 {
 	global $field_index;
 	global $conf;
 	global $debug_mode;
-
-    $sheet_marker = new SheetMarker($xls, $conf->get("block_width"), $conf->get("block_height"), $conf->get("block_offsetx"), $conf->get("block_offsety"), $conf->get("block_size"));
 
 	$sid = sprintf("%05d", $conf->get("sid"));
 	$cid = strtok($conf->get("candidate_code"), "-");
@@ -223,21 +232,21 @@ function put_excel($xls)
 		$cid = sprintf("%05d", $cid);
 
 		// 調査シートHTML
-		$html .= "\n<hr style=\"page-break-after:always; visibility:hidden;\">\n\n";
-		$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"z-index: 3; position: relative; width: " . $sheet_marker->disp_sheet->sheet_width . "px; height: " . $sheet_marker->disp_sheet->sheet_height . "px; font-size: 12px; padding: 0px; border: 0px; margin: 0px; \">\n";
+		$html .= "\n<hr style=\"page-break-after:always; visibility:hidden;\" />\n\n";
+		$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"z-index: 3; position: relative; width: " . $sheet_marker->disp_sheet->marker_window->width . "px; height: " . $sheet_marker->disp_sheet->marker_window->height . "px; font-size: 12px; padding: 0px; border: 0px; margin: 0px; \">\n";
 
 		// marker: top - left
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->position_top_marker . "px; left: " . $sheet_marker->disp_sheet->position_left_marker . "px; width: " . $sheet_marker->disp_sheet->size_of_marker . "px; height: " . $sheet_marker->disp_sheet->size_of_marker . "px; z-index: 100; \">";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" alt=\"marker\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->position_y . "px; left: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->position_x . "px; width: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->width . "px; height: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->height . "px; z-index: 100; \" />";
 		// sheet ID: top
-		$html .= "<div style=\"position: absolute; top: " . $sheet_marker->disp_sheet->position_top_marker . "px; left: " . $sheet_marker->disp_sheet->position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-size: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $cid . "</font></div>\n";
+		$html .= "<div style=\"position: absolute; top: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->position_y . "px; left: " . $sheet_marker->disp_sheet->marker_window->position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-size: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $cid . "</font></div>\n";
 
 		// marker: top - right
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->position_top_marker . "px; left: " . $sheet_marker->disp_sheet->position_right_marker . "px; width: " . $sheet_marker->disp_sheet->size_of_marker . "px; height: " . $sheet_marker->disp_sheet->size_of_marker . "px; z-index: 100; \">\n";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" alt=\"marker\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->marker_window->topRightMarker->position_y . "px; left: " . $sheet_marker->disp_sheet->marker_window->topRightMarker->position_x . "px; width: " . $sheet_marker->disp_sheet->size_of_marker . "px; height: " . $sheet_marker->disp_sheet->size_of_marker . "px; z-index: 100; \" />\n";
 
 		// marker: bottom - left
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->position_bottom_marker . "px; left: " . $sheet_marker->disp_sheet->position_left_marker . "px; width: " . $sheet_marker->disp_sheet->size_of_marker . "px; height: " . $sheet_marker->disp_sheet->size_of_marker . "px; z-index: 100; \">";
+		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" alt=\"marker\" style=\"position: absolute; bottom: 0px; left: " . $sheet_marker->disp_sheet->marker_window->bottomLeftMarker->position_y . "px; width: " . $sheet_marker->disp_sheet->marker_window->bottomLeftMarker->width . "px; height: " . $sheet_marker->disp_sheet->marker_window->bottomLeftMarker->height . "px; z-index: 100; \" />";
 		// sheet ID: bottom
-		$html .= "<div style=\"position: absolute; top: " . $sheet_marker->disp_sheet->position_bottom_marker . "px; left: " . $sheet_marker->disp_sheet->position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-size: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $sid . "</font></div>\n";
+		$html .= "<div style=\"position: absolute; bottom: 0px; left: " . $sheet_marker->disp_sheet->marker_window->position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-size: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $sid . "</font></div>\n";
 
 		$cid = strtok("-");
 
@@ -265,16 +274,46 @@ function put_excel($xls)
 
 		// シートテーブル表示		
 		$html .= "<table class=\"sheet\" border=\"0\" cellpadding=\"0\"";
-		$html .= " cellspacing=\"0\" width=\"" . $sheet_marker->disp_sheet->tblwidth . "px\" height=\"" . $sheet_marker->disp_sheet->tblheight . "px\"";
-		$html .= " style=\"table-layout: fixed; border-collapse: collapse; table-layout: fixed; position: absolute; top: " . $sheet_marker->disp_sheet->offset_top_table . "px; left: " . $sheet_marker->disp_sheet->offset_left_table . "px; z-index: 10; \"";
+		$html .= " cellspacing=\"0\"";
+		$html .= " width=\"" . $sheet_marker->disp_sheet->sheetOnHtmlTable->width . "px\" height=\"" . $sheet_marker->disp_sheet->sheetOnHtmlTable->height . "px\"";
+		$html .= " style=\"table-layout: fixed; border-collapse: collapse; position: absolute; top: 0px; left: 0px; z-index: 10; \"";
 		$html .=" bgcolor=\"#FFFFFF\" >\n";
 
-		for ($r = 0; $r <= $sheet_marker->row_count; $r++) {
-			$trheight = $sheet_marker->disp_sheet->get_row_size($r);
-			$html .= "  <tr height=\"" . $trheight . "px\">" . "\n";
+		// table-layout: fixed の場合、<table>の最初の行のセル幅で幅が決まる。
+		// 最初の行にcolspanが含まれているとずれてしまうので、
+		// <th>を使って定義することで以降のセル幅を決めてしまう。
+		$html .= "  <tr>\n";
+		foreach (range($sheet_marker->topLeftMarker->colNum, $sheet_marker->topRightMarker->colNum) as $i) {
+			$thwidth  = $sheet_marker->disp_sheet->sheetOnHtmlTable->get_col_size($i);
+			$html .= "   <th style=\"width: ${thwidth}px; height: 0px; \"></th>\n";
+		}
+		$html .= "  </tr>\n";
 
-			for ($i = 0; $i <= $sheet_marker->col_count; $i++) {
-				$tdwidth  = $sheet_marker->disp_sheet->get_col_size($i);
+		$min_col_no = $sheet_marker->topLeftMarker->colNum;
+		$max_col_no = $sheet_marker->topRightMarker->colNum;
+		$min_row_no = $sheet_marker->topLeftMarker->rowNum;
+		$max_row_no = $sheet_marker->bottomLeftMarker->rowNum;
+		foreach (range($sheet_marker->topLeftMarker->rowNum, $sheet_marker->bottomLeftMarker->rowNum) as $r) {
+			$tdheight = $sheet_marker->disp_sheet->sheetOnHtmlTable->get_row_size($r);
+			$html .= "  <tr>\n";
+
+			foreach (range($sheet_marker->topLeftMarker->colNum, $sheet_marker->topRightMarker->colNum) as $i) {
+				$tdwidth  = $sheet_marker->disp_sheet->sheetOnHtmlTable->get_col_size($i);
+
+				// hide border of the cell to which the marker is adjacent
+				if ($r == $min_row_no + 1 && $i == $min_col_no + 1) {
+					$hide_border_adjacent_to_marker = "border-top-width: 0px; border-left-width: 0px;";
+				}
+				else if ($r == $min_row_no + 1 && $i == $max_col_no - 1) {
+					$hide_border_adjacent_to_marker = "border-top-width: 0px; border-right-width: 0px;";
+				}
+				else if ($r == $max_row_no - 1 && $i == $min_col_no + 1) {
+					$hide_border_adjacent_to_marker = "border-bottom-width: 0px; border-left-width: 0px;";
+				}
+				else {
+					$hide_border_adjacent_to_marker = "";
+				}
+				$hide_border_adjacent_to_marker = "";	// currently this feature is disabled
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
@@ -291,14 +330,14 @@ function put_excel($xls)
 				if (isset($xf['halign']) && $xf['halign'] != 0)
 					$align= "";
 				if ($align == "x") {
-					if ($xf['type'] == Type_RK) $align = " Align=\"right\"";
-					else if ($xf['type'] == Type_RK2) $align = " Align=\"right\"";
-					else if ($xf['type'] == Type_NUMBER) $align = " Align=\"right\"";
-					else if ($xf['type'] == Type_FORMULA && is_numeric($dispval)) $align = " Align=\"right\"";
-					else if ($xf['type'] == Type_FORMULA2 && is_numeric($dispval)) $align = " Align=\"right\"";
-					else if ($xf['type'] == Type_FORMULA && ($dispval=="TRUE" || $dispval=="FALSE")) $align = " Align=\"center\"";
-					else if ($xf['type'] == Type_FORMULA2 && ($dispval=="TRUE" || $dispval=="FALSE")) $align = " Align=\"center\"";
-					else if ($xf['type'] == Type_BOOLERR) $align = " Align=\"center\"";
+					if ($xf['type'] == Type_RK) $align = " align=\"right\"";
+					else if ($xf['type'] == Type_RK2) $align = " align=\"right\"";
+					else if ($xf['type'] == Type_NUMBER) $align = " align=\"right\"";
+					else if ($xf['type'] == Type_FORMULA && is_numeric($dispval)) $align = " align=\"right\"";
+					else if ($xf['type'] == Type_FORMULA2 && is_numeric($dispval)) $align = " align=\"right\"";
+					else if ($xf['type'] == Type_FORMULA && ($dispval=="TRUE" || $dispval=="FALSE")) $align = " align=\"center\"";
+					else if ($xf['type'] == Type_FORMULA2 && ($dispval=="TRUE" || $dispval=="FALSE")) $align = " align=\"center\"";
+					else if ($xf['type'] == Type_BOOLERR) $align = " align=\"center\"";
 					else $align= '';
 					if ($xf['format'] == "@") $align = "";
 				} else {
@@ -313,14 +352,19 @@ function put_excel($xls)
 				$loc = $sn . "-" . $r . "-" . $i;
 				if (isset($field_index[$loc])) {
 					$dispval = "";
-                    if ($debug_mode === 'true') {
-                        // debug for ocr test
-                        $dispval = "<div style='text-align: center;'>0</div>";
-                    }
+					if ($debug_mode === 'true') {
+						// debug for ocr test
+						$dispval = "<div style='text-align: center;'>0</div>";
+					}
+				}
+				if ($r == $min_row_no || $r == $max_row_no || $i == $min_col_no || $i == $max_col_no) {
+					$dispval = "";
 				}
 
 				$celattr =  $xls->getAttribute($sn, $r, $i);
-				$fontsize =  $celattr["font"]["height"] * $sheet_marker->marker_scale * $sheet_marker->scale / 16;
+				$fontsize =  floor($celattr["font"]["height"] * $sheet_marker->marker_scale / 16);
+				$fontsize .= "px";
+
 				if (isset($xls->celmergeinfo[$sn][$r][$i]['cond'])) {
 					if ($xls->celmergeinfo[$sn][$r][$i]['cond'] == 1) {
 						$colspan = $xls->celmergeinfo[$sn][$r][$i]['cspan'];
@@ -333,14 +377,24 @@ function put_excel($xls)
 
 						if ($rowspan > 1)
 							$rcspan .= " rowspan=\"" . $rowspan . "\"";
-						$class = " class=\"XFs" . $sn . "r" . $r . "c" . $i . "\"";
+						// do not apply any class to the most max or min row or column
+						if ($r == $min_row_no || $r == $max_row_no || $i == $min_col_no || $i == $max_col_no) {
+							$class = "";
+						} else {
+							$class = " class=\"XFs" . $sn . "r" . $r . "c" . $i . "\"";
+						}
 						$id = " id=\"". $sn . "-" . $r ."-" . $i . "\"";
-						$html .= " <td $class $rcspan $align style=\"font-size: " . $fontsize . "px;\">$dispval</td>\n";
+						$html .= "   <td $class $rcspan $align style=\"font-size: " . $fontsize . "; width: ${tdwidth}px; height: ${tdheight}px; ${hide_border} \">$dispval</td>\n";
 					}
 				} else {
-					$class = " class=\"XF" . $xfno . "\" ";
+					// do not apply any class to the most max or min row or column
+					if ($r == $min_row_no || $r == $max_row_no || $i == $min_col_no || $i == $max_col_no) {
+						$class = "";
+					} else {
+						$class = " class=\"XF" . $xfno . "\" ";
+					}
 					$id = " id=\"". $sn . "-" . $r . "-" . $i . "\"";
-					$html .= " <td nowrap=\"nowrap\" $class $align style=\"font-size: " . $fontsize . "px;\">$dispval</td>\n";
+					$html .= "   <td $class $align style=\"white-space: nowrap; font-size: " . $fontsize . "; width: ${tdwidth}px; height: ${tdheight}px; ${hide_border_adjacent_to_marker} \">$dispval</td>\n";
 				}
 			}
 			$html .= "</tr>\n";
@@ -355,7 +409,7 @@ function put_excel($xls)
 //
 // Railsスクリプトの作成
 //
-function put_rails($file_id)
+function put_rails($file_id, $sheet_marker)
 {
 	global $rails_env;
 	global $conf;
@@ -367,10 +421,18 @@ function put_rails($file_id)
 
 	$size = $conf->get("block_size") ? $conf->get("block_size") : 32;
 	$sheet_name = $conf->get("name");
-	eval('$no_of_columns = count(' . $conf->get("cell_width")  . ') - 2;');
-	eval('$no_of_rows    = count(' . $conf->get("cell_height") . ') - 2;');
-	$cell_width_ruby = php_hash_to_ruby_hash($conf->get("cell_width"));
-	$cell_height_ruby = php_hash_to_ruby_hash($conf->get("cell_height"));
+	$no_of_columns = $sheet_marker->col_count;
+	$no_of_rows = $sheet_marker->row_count;
+	$cell_width_ruby = php_hash_to_ruby_hash(
+		var_export_1line(
+			$sheet_marker->get_cells_width_array_with_marker()
+		)
+	);
+	$cell_height_ruby = php_hash_to_ruby_hash(
+		var_export_1line(
+			$sheet_marker->get_cells_height_array_with_marker()
+		)
+	);
 	$target = $conf->get("target") == "registered" ? 1 : 0;
 
 	//
@@ -390,22 +452,18 @@ function put_rails($file_id)
 	foreach ($fields_list as $fields) {
 		$cspan = isset($fields["colspan"]) ? $fields["colspan"] : 1;
 		$name = $fields["item_name"];
-		$col = $fields["col"];
-		$row = $fields["row"];
+		$col = $fields["col"] - $sheet_marker->topLeftMarker->colNum - 1;
+		$row = $fields["row"] - $sheet_marker->topLeftMarker->rowNum - 1;
 		$type = $fields["type"];
 		$cnt++;
 		$tgt_items .= "props << [\"{$name}\", " .
-			      	         "\"{$name}\", " .
-			      	         "{$cnt}, " .
-			      	         "\"{$type}\", " .
-			      	         "{$col}, " .
-			      	         "{$row}, " .
-			      	         "{$cspan}]\n";
+					 "\"{$name}\", " .
+					 "{$cnt}, " .
+					 "\"{$type}\", " .
+					 "{$col}, " .
+					 "{$row}, " .
+					 "{$cspan}]\n";
 	}
-
-	// カラム数補正
-	$tmp_no_of_columns = $no_of_columns + 1;
-	$tmp_no_of_rows = $no_of_rows + 1;
 
 	$tgt_script = <<< "STR"
 #!/usr/bin/ruby
@@ -437,7 +495,7 @@ end
 # create a default candidate (hardcoded)
 #
 @candidate = @group.candidates.build
-@candidate.candidate_code = "00000" 		# (string, not null)
+@candidate.candidate_code = "00000"		# (string, not null)
 @candidate.candidate_name = "一般報告者"	# (string, not null)
 @candidate.group_id = group			# (int, not null)
 @candidate.tel_number = "03-1111-1111"		# (string)
@@ -535,8 +593,8 @@ end
 @sheet.sheet_code = "%05d" % {$conf->get("sid")}
 @sheet.sheet_name = "自動生成シート" # string
 @sheet.survey_id = survey_id # integer
-@sheet.block_width = {$tmp_no_of_columns} || 0 # XXX
-@sheet.block_height = {$tmp_no_of_rows} || 0 # XXX
+@sheet.block_width = {$no_of_columns} || 0 # XXX
+@sheet.block_height = {$no_of_rows} || 0 # XXX
 @sheet.cell_width = "$cell_width_ruby" || 0 # XXX
 @sheet.cell_height = "$cell_height_ruby" || 0 # XXX
 @sheet.status = 1

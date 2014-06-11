@@ -145,6 +145,26 @@ class DispSheet {
         return $this->cells_width[$col];
     }
 
+    // return: from -1 to maxcel + 1
+    public function getCellNumX($position) {
+        return $this->getCellNum($this->cells_width, $position);
+    }
+    public function getCellNumY($position) {
+        return $this->getCellNum($this->cells_height, $position);
+    }
+    protected function getCellNum($cells, $position) {
+        if ($position < 0) {
+            return -1;
+        }
+        $width = 0;
+        foreach ($cells as $cellNum => $len) {
+            $width += $len;
+            if ($width > $position) {
+                return $cellNum;
+            }
+        }
+        return $cellNum + 1;
+    }
 }
 
 /* vim: set et fenc=utf-8 ff=unix sts=4 sw=4 ts=4 : */
