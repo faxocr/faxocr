@@ -4,10 +4,11 @@ bash "install static version of wkhtmltopdf" do
   user "root"
   group "root"
   code <<-EOH
-    wget -q https://wkhtmltopdf.googlecode.com/files/#{node[:faxocr][:wkhtmltopdf][:archive]}
+    wget -q http://downloads.sourceforge.net/project/wkhtmltopdf/0.12.0/#{node[:faxocr][:wkhtmltopdf][:archive]}
     tar xf #{node[:faxocr][:wkhtmltopdf][:archive]}
-    install -m 755 -o root -g root #{node[:faxocr][:wkhtmltopdf][:binary_filename]} #{node[:faxocr][:wkhtmltopdf][:install_path]}/wkhtmltopdf
-    rm  #{node[:faxocr][:wkhtmltopdf][:archive]}
+    install -m 755 -o root -g root wkhtmltox/bin/* #{node[:faxocr][:wkhtmltopdf][:install_path]}
+    rm #{node[:faxocr][:wkhtmltopdf][:archive]}
+    rm -r wkhtmltox
     EOH
   not_if { ::File.exists?("#{node[:faxocr][:wkhtmltopdf][:install_path]}/wkhtmltopdf") }
 end
