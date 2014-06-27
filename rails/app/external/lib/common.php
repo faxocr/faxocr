@@ -445,4 +445,18 @@ function get_scaling($w, $h, $lside)
 	return $scale;
 }
 
+function excel_peruser_factory($charset, $target_file)
+{
+	$xls = NEW Excel_Peruser;
+	$xls->setErrorHandling(1);
+	$xls->setInternalCharset($charset);
+	$result = $xls->fileread($target_file);
+
+	if ($xls->isError($result)) {
+		$errmsg = $result->getMessage();
+		$xls = null;
+	}
+	return array($xls, $errmsg);
+}
+
 ?>

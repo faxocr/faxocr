@@ -72,20 +72,9 @@ include( TMP_HTML_DIR . "tpl.header.html" );
 //
 // Excelファイル読み込み処理
 //
+$sheet = null;
 if ($tgt_file) {
-	global $xls, $sheet;
-	$xls = NEW Excel_Peruser;
-	$xls->setErrorHandling(1);
-	$xls->setInternalCharset($charset);
-	$result = $xls->fileread($tgt_file);
-
-	if ($xls->isError($result)) {
-		$errmsg = $result->getMessage();
-		$xls = null;
-	}
-
-	$sheet = new Sheet($xls);
-
+	list($xls, $errmsg) = excel_peruser_factory($charset, $tgt_file);
 	if ($xls) {
 		if (count($xls->boundsheets) != 1) {
 			$errmsg = "シートの数 (" . count($xls->boundsheets) .
@@ -95,6 +84,7 @@ if ($tgt_file) {
 	}
 
 	if ($xls) {
+		$sheet = new Sheet($xls);
 		if (($sheet->col_count + 1 < MIN_SHEET_WIDTH || $sheet->row_count + 1 < MIN_SHEET_HEIGHT) && ($sheet->row_count + 1 < MIN_SHEET_WIDTH || $sheet->col_count + 1 < MIN_SHEET_HEIGHT)) {
 			// シートサイズチェック
 			$errmsg = "シートのサイズが小さすぎます ".MIN_SHEET_WIDTH."x".MIN_SHEET_HEIGHT."以上にしてください";
@@ -140,13 +130,13 @@ if ($errmsg) {
 // Excelファイル表示処理
 if ($xls) {
 	put_css($xls);
-	put_excel($xls);
+	put_excel($xls, $sheet, $field_list, $field_width, $sheet_name, $file_id);
 	if ($conf_sw) {
 		$dirty_label = " disabled";
 	} else {
 		$dirty_label = count($field_list) > 0 ? "" : "disabled=\"disabled\"";
 	}
-	put_fields();
+	put_fields($field_list, $field_width);
 }
 
 //
@@ -159,12 +149,8 @@ die;
 //
 // ファイル表示エリア
 //
-function put_excel($xls)
+function put_excel($xls, $sheet, &$field_list, &$field_width, $sheet_name, $file_id)
 {
-    global $sheet;
-	global $field_list;
-	global $field_width;
-
 	// タブコントロール表示
 	// print "<div class=\"simpleTabs\">";
 	// print "<ul class=\"simpleTabsNavigation\">";
@@ -181,8 +167,6 @@ function put_excel($xls)
 	$sn = 0;
 	{
 		// ファイル名表示
-		global $sheet_name;
-		global $file_id;
 		print "<p>" . $sheet_name . "(" . $file_id . ")</p>";
 		print "<p style='color: #888888;'>()内は縮小前のサイズ</p>";
 
@@ -321,10 +305,8 @@ STR;
 //
 // ファイル修正エリア表示
 //
-function put_fields()
+function put_fields(&$field_list, &$field_width)
 {
-	global $field_list;
-	global $field_width;
 	$i = 1;
 
 	//

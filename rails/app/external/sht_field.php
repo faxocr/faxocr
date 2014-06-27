@@ -79,20 +79,9 @@ include( TMP_HTML_DIR . "tpl.header.html" );
 //
 // Excelファイル読み込み処理
 //
+$sheet = null;
 if ($tgt_file) {
-	global $xls, $sheet;
-	$xls = NEW Excel_Peruser;
-	$xls->setErrorHandling(1);
-	$xls->setInternalCharset($charset);
-	$result = $xls->fileread($tgt_file);
-
-	if ($xls->isError($result)) {
-		$errmsg = $result->getMessage();
-		$xls = null;
-	}
-
-	$sheet = new Sheet($xls);
-
+	list($xls, $errmsg) = excel_peruser_factory($charset, $tgt_file);
 	if ($xls) {
 		if (count($xls->boundsheets) != 1) {
 			$errmsg = "シートの数 (" . count($xls->boundsheets) .
@@ -102,6 +91,7 @@ if ($tgt_file) {
 	}
 
 	if ($xls) {
+		$sheet = new Sheet($xls);
 		if (($sheet->col_count + 1 < MIN_SHEET_WIDTH || $sheet->row_count + 1 < MIN_SHEET_HEIGHT) && ($sheet->row_count + 1 < MIN_SHEET_WIDTH || $sheet->col_count + 1 < MIN_SHEET_HEIGHT)) {
 			// シートサイズチェック
 			$xls = null;
@@ -128,7 +118,7 @@ if ($errmsg) {
 
 {
 	// ステータス表示
-	put_status();
+	put_status($file_id, $group_id, $sheet_id, $conf_sw);
 }
 
 // Excelファイル表示処理
@@ -137,7 +127,7 @@ if ($xls) {
 
 	print "<div style=\"margin: 20px 0 30px; text-align:center;\">読み取りたいセルをクリックし、フィールド指定して下さい。</div>\n";
 
-	put_excel($xls);
+	put_excel($xls, $sheet, $field_list, $field_width);
 	if ($conf_sw) {
 		$dirty_label = " disabled";
 	} else {
@@ -145,7 +135,7 @@ if ($xls) {
 	}
 
 	// 集計フィールド
-	put_fields();
+	put_fields($field_list, $field_width);
 
 	print "<div class=\"clearfix\" style=\"padding: 10px 0; margin-bottom: 30px;\">\n";
 	print "<form action=\"/external/sht_script/\" method=\"post\" id=\"form-save\">\n";
@@ -169,12 +159,8 @@ die;
 //
 // ファイル表示エリア
 //
-function put_excel($xls)
+function put_excel($xls, $sheet, &$field_list, &$field_width)
 {
-    global $sheet;
-	global $field_list;
-	global $field_width;
-
 	// タブコントロール表示
 	// print "<div class=\"simpleTabs\">";
 	// print "<ul class=\"simpleTabsNavigation\">";
@@ -311,10 +297,8 @@ STR;
 //
 // ファイル修正エリア表示
 //
-function put_fields()
+function put_fields(&$field_list, &$field_width)
 {
-	global $field_list;
-	global $field_width;
 	$i = 1;
 
 	//
@@ -372,13 +356,8 @@ function put_fields()
 //
 // ステータス操作エリア表示
 //
-function put_status()
+function put_status($file_id, $group_id, $sheet_id, $conf_sw)
 {
-	global $file_id;
-	global $group_id;
-	global $sheet_id;
-	global $conf_sw;
-
 	$status_label = $conf_sw ? "" : " disabled";
 
 	// XXX

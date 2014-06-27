@@ -58,7 +58,7 @@ if ($errmsg) {
 
 {
 	// ステータス表示
-	put_status();
+	put_status($file_id, $group_id, $sheet_id);
 }
 
 // サンプルファイル表示処理
@@ -89,12 +89,8 @@ die;
 //
 // ステータス操作エリア表示
 //
-function put_status()
+function put_status($file_id, $group_id, $sheet_id)
 {
-	global $file_id;
-	global $group_id;
-	global $sheet_id;
-
 	print <<< STR
 <script type="text/javascript">
 <!--

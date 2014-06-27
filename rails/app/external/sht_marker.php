@@ -38,6 +38,8 @@ if (isset($file_id) && $file_id) {
 	die;
 }
 
+$conf = new FileConf($file_id);
+
 //
 // ヘッダ処理
 //
@@ -49,17 +51,7 @@ include( TMP_HTML_DIR . "tpl.header.html" );
 
 // Excelファイル読み込み処理
 if ($tgt_file) {
-
-	$xls = NEW Excel_Peruser;
-	$xls->setErrorHandling(1);
-	$xls->setInternalCharset($charset);
-	$result = $xls->fileread($tgt_file);
-
-	if ($xls->isError($result)) {
-		$errmsg = $result->getMessage();
-		$xls = null;
-	}
-
+	list($xls, $errmsg) = excel_peruser_factory($charset, $tgt_file);
 	$sheet = new Sheet($xls);
 }
 
@@ -73,15 +65,10 @@ if ($errmsg) {
 }
 
 {
-	global $conf;
-
-	if (!$conf)
-		$conf = new FileConf($file_id);
-
 	$target = $conf->get("target") == "registered" ? 1 : 0;
 
 	// ステータス表示
-	put_status();
+	put_status($file_id, $group_id, $sheet_id);
 
 	// アクションボタン表示
 	$label_marker = "位置指定";
@@ -121,7 +108,7 @@ if ($xls) {
 
 	// シート表示
 	print "<center>\n";
-	put_excel($xls);
+	put_excel($xls, $sheet);
 	print "</center>\n";
 	print "<br />\n";
 }
@@ -262,9 +249,7 @@ include( TMP_HTML_DIR . "tpl.footer.html" );
 
 die;
 
-function put_excel($xls) {
-	global $sheet;
-
+function put_excel($xls, $sheet) {
 	// シート表示
 	// for ($sn = 0; $sn < 1; $sn++) {
 
@@ -360,12 +345,8 @@ function put_excel($xls) {
 //
 // ステータス操作エリア表示
 //
-function put_status()
+function put_status($file_id, $group_id, $sheet_id)
 {
-	global $file_id;
-	global $group_id;
-	global $sheet_id;
-
 	$status_label = file_exists(DST_DIR . $file_id . ".rb") ? "" : "disabled=\"disabled\"";
 
 	// XXX

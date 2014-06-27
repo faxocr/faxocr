@@ -56,7 +56,6 @@ if (isset($_REQUEST["target"])) {
 // Read Excelファイル処理
 //
 if ($tgt_file) {
-	global $xls;
 	$xls = NEW Excel_Reviser;
 	$xls->setErrorHandling(1);
 	$xls->setInternalCharset($charset);
@@ -139,7 +138,7 @@ flock($lockfp, LOCK_UN);
 fclose($lockfp);
 unlink(LOCK_FILE . $file_id);
 
-put_config($file_id, $_REQUEST);
+put_config($file_id, $_REQUEST, $target, $sheet_name, $list_colspan);
 
 // XXX: debugging purpose
 /*
@@ -181,12 +180,8 @@ function is_next($prev, $next)
 //
 // config出力
 //
-function put_config($file_id, $REQUEST)
+function put_config($file_id, $REQUEST, $target, $sheet_name, &$list_colspan)
 {
-	global $target;
-	global $sheet_name;
-	global $list_colspan;
-
 	$str_type = array(0 => "number",
 			  1 => "number",
 			  2 => "rating",

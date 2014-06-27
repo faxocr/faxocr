@@ -44,22 +44,15 @@ if (isset($file_id) && $file_id) {
 	die;
 }
 
+$conf = new FileConf($file_id);
+
 // Excelファイル読み込み処理
 if ($tgt_file) {
-
-	$xls = NEW Excel_Peruser;
-	$xls->setErrorHandling(1);
-	$xls->setInternalCharset($charset);
-	$result = $xls->fileread($tgt_file);
-
-	if ($xls->isError($result)) {
-		$errmsg = $result->getMessage();
-		$xls = null;
-	}
+	list($xls, $errmsg) = excel_peruser_factory($charset, $tgt_file);
 }
 
-put_config($file_id, $_REQUEST);
-get_config($file_id);
+put_config($file_id, $_REQUEST, $group_id, $sheet_id, $xls, $conf);
+$field_index = get_config($file_id, $conf);
 
 $marker_window = new MarkerWindowWebUI(
 			$conf->get("block_width"), $conf->get("block_height"),
@@ -67,7 +60,7 @@ $marker_window = new MarkerWindowWebUI(
 			$conf->get("block_size"), $_REQUEST['scale']);
 $sheet_marker = new SheetCellFitMarker($xls, $marker_window);
 
-put_rails($file_id, $sheet_marker);
+put_rails($file_id, $sheet_marker, $rails_env, $conf);
 
 //
 // HTMLファイル作成処理
@@ -75,7 +68,7 @@ put_rails($file_id, $sheet_marker);
 if ($xls) {
 	$html = put_header();
 	$html .= put_css($xls);
-	$html .= put_excel($xls, $marker_window, $sheet_marker);
+	$html .= put_excel($xls, $marker_window, $sheet_marker, $field_index, $conf, $debug_mode);
 	$html .= put_footer();
 	file_put_contents(DST_DIR . $file_id . ".html", $html);
 
@@ -95,17 +88,8 @@ file_put_contents("/tmp/faxocr.log",
 
 die;
 
-function get_config($file_id)
+function get_config($file_id, &$conf)
 {
-	global $field_index;
-	global $conf;
-
-	//
-	// 設定情報読込
-	//
-	if (!$conf)
-		$conf = new FileConf($file_id);
-
 	$xls_fields_list = $conf->array_getall("field");
 
 	$num = 0; // XXX: needed?
@@ -128,16 +112,8 @@ function get_config($file_id)
 //
 // config出力
 //
-function put_config($file_id, $REQUEST)
+function put_config($file_id, $REQUEST, $group_id, $sheet_id, $xls, &$conf)
 {
-	global $group_id;
-	global $sheet_id;
-	global $conf;
-	global $xls;
-	global $sheet_marker;
-
-	$conf = new FileConf($file_id);
-
 	if (isset($group_id))
 		$conf->set("gid", $group_id);
 
@@ -215,12 +191,8 @@ function put_footer()
 	return $html;
 }
 
-function put_excel($xls, $marker_window, $sheet_marker)
+function put_excel($xls, $marker_window, $sheet_marker, $field_index, &$conf, $debug_mode)
 {
-	global $field_index;
-	global $conf;
-	global $debug_mode;
-
 	$sid = sprintf("%05d", $conf->get("sid"));
 	$cid = strtok($conf->get("candidate_code"), "-");
 
@@ -409,15 +381,9 @@ function put_excel($xls, $marker_window, $sheet_marker)
 //
 // Railsスクリプトの作成
 //
-function put_rails($file_id, $sheet_marker)
+function put_rails($file_id, $sheet_marker, $rails_env, &$conf)
 {
-	global $rails_env;
-	global $conf;
-
 	$tgt_items = "";
-
-	if (!$conf)
-		$conf = new FileConf($file_id);
 
 	$size = $conf->get("block_size") ? $conf->get("block_size") : 32;
 	$sheet_name = $conf->get("name");
