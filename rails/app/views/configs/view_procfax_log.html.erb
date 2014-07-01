@@ -11,7 +11,7 @@
     <% count_se = contents.map{|l| l if l.include?("INFO: Number of error occurred processing sheet:")}.join.chomp.split(':')[-1] %>
     <% count_s = contents.map{|l| l if l.include?("INFO: Number of sheet processed:")}.join.split(':')[-1] %>
     <% count_s = count_s.to_i - count_se.to_i %>
-    <% str += File.basename(file).gsub(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/, '\1/\2/\3 \4:\5　') %>
+    <% str += File.basename(file).gsub(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{0,2})/, '\1/\2/\3 \4:\5　') %>
     <% str += "到着Fax " + count_f.to_s + "件 (Fax処理失敗 " + count_fe.to_s +
        " / シート処理失敗 " + count_se.to_s + ") →  " + count_s.to_s +
        " シート受理\n" %>
