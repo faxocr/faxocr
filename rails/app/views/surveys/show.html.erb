@@ -103,10 +103,10 @@ $('#panel_survey').slideUp('slow');
 
     <th width="48"><img src="/image/rightarrow.gif"></th>
     <th>
-<!--      <a onclick="show_reports();"> -->
+      <a onclick="show_reports();">
 	<img src="/image/icon-reports.gif"><br>
-	<font color="gray">集計レポート</font>
-<!--      </a> -->
+	集計レポート
+      </a>
     </th>
 
     <% if @current_user.has_survey_role(@current_group.id) %>
@@ -195,6 +195,7 @@ $('#panel_survey').slideUp('slow');
 <div align="right">
 <% if @current_user.has_survey_role(@current_group.id) %>
 <%= link_to '[編集]', group_survey_path(@group, @survey) + "/report" %>
+<%= link_to '[Faxプレビュー]', group_survey_path(@group, @survey) + "/report/" + @today + "/fax_preview" %>
 <% end %>
 </div>
 </div>

@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- coding: utf-8 -*-
 require File.expand_path('../../config/boot',  __FILE__)
 rails_prefix = RAILS_ROOT
 require "rubygems"
@@ -85,8 +86,8 @@ Time::DATE_FORMATS[:date_nomal] = "%Y/%m/%d"
 Time::DATE_FORMATS[:date_jp] = "%Y年%m月%d日"
 Time::DATE_FORMATS[:datetime_jp] = "%Y年%m月%d日 %k時%M分"
 Time::DATE_FORMATS[:time_jp] = "%k時%M分"
-erb = File.open(RAILS_ROOT + '/app/views/report/daily.html.erb') {|f| ERB.new(f.read)}
-erb.def_method(ReportHtml, 'render()', RAILS_ROOT + '/app/views/report/daily.html.erb')
+erb = File.open(RAILS_ROOT + '/app/views/report/fax_preview.html.erb') {|f| ERB.new(f.read)}
+erb.def_method(ReportHtml, 'render()', RAILS_ROOT + '/app/views/report/fax_preview.html.erb')
 
 rep = ReportHtml.new
 rep.set_datetime(datetime)

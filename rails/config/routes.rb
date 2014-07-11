@@ -22,6 +22,14 @@ ActionController::Routing::Routes.draw do |map|
                           :day => /[0-3]\d/},
         :day => nil,
         :month => nil
+      survey.connect "report/:year/:month/:day/fax_preview",
+        :controller => "report",
+        :action => "fax_preview",
+        :requirements => {:year => /(19|20)\d\d/,
+                          :month => /[01]?\d/,
+                          :day => /[0-3]\d/},
+        :day => nil,
+        :month => nil
       survey.connect "export/:year/:month/:day",
         :controller => "export",
         :action => "csv",

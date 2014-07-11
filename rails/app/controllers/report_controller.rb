@@ -42,6 +42,11 @@ class ReportController < ApplicationController
     @prefix_image = "/images/ocr"
   end
 
+  def fax_preview
+    daily
+    render :layout => false
+  end
+
 private
   def report_options
     if params.key?(:image)

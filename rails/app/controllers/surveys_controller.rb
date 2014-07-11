@@ -32,6 +32,7 @@ class SurveysController < ApplicationController
     @sheets = @survey.sheets
     sheet_ids = @survey.sheet_ids
     datetime = DateTime.now
+    @today = datetime.strftime("%Y/%m/%d")
     datetime = datetime - 1
     date_begin = datetime.strftime("%Y/%m/%d %H:%M:%S")
     @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids,
