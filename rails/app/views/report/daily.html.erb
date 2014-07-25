@@ -10,7 +10,7 @@ columns = []
 data_types = Hash.new
 sums = Hash.new
 survey_properties.each do |rp|
-  columns << rp.ocr_name
+  columns << rp.ocr_name_full
   data_types.store(rp.ocr_name, rp.data_type)
   sums.store(rp.ocr_name, 0)
 end
@@ -21,7 +21,7 @@ line_num = 1
     <th class="manage"></th>
     <th class="name">調査対象</th>
     <% for column in columns do %>
-    <th></th>
+    <th><%= column %></th>
     <% end %>
   </tr>
 <% @answer_sheets.each do |a| %>
