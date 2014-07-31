@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 class SheetPropertiesController < ApplicationController
   before_filter :verify_group_authority
   # GET /sheet_properties
