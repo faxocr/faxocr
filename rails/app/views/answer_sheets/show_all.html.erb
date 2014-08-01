@@ -1,0 +1,44 @@
+<h1 class="surveysobject">FAX受信調査シート</h1> 
+<p style="color: green"><%= flash[:notice] %></p>
+
+<h2 class="surveysobject_title">基本情報</h2>
+<table width="100%"><tr valign="top"><td align="left">
+<div>
+  <h3>受信日時</h3>
+  <%=h @answer_sheet.date.to_s(:datetime_jp) %>
+</div>
+<div>
+  <h3>送信FAX番号</h3>
+  <%=h @answer_sheet.sender_number %>
+</div>
+<div>
+  <h3>受信FAX番号</h3>
+  <%=h @answer_sheet.receiver_number %>
+</div>
+<div>
+  <h3>シートコード</h3>
+  <%=h @answer_sheet.analyzed_sheet_code %>
+</div>
+<div>
+  <h3>調査対象コード</h3>
+  <%=h @answer_sheet.analyzed_candidate_code %>
+</div>
+</td>
+<td>
+<div>
+  <h3>調査シート</h3>
+<% @classname = ''
+  if @sheet_orientation == :landscape
+    @classname = 'rotate90'
+  end
+%>
+<p class="<%= @classname %>">
+  <%= image_tag( image_thumb_all_answer_sheet_path(@answer_sheet), { :width => '500', :border => '0', :alt => 'faximg'} ) %>
+
+</p>
+</div>
+</td>
+</tr></table>
+
+<br/>
+</p>

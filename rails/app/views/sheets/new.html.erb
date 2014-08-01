@@ -1,3 +1,4 @@
 <h1>シートの新規登録</h1>
+<p style="color: green"><%= flash[:notice] %></p>
 <%= render :partial => "form_group" %>
 <%= link_to 'キャンセル', group_survey_sheets_path(@group, @survey) %>

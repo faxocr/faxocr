@@ -92,14 +92,8 @@ class SheetsController < ApplicationController
     @group = Group.find(params[:group_id])
     @survey = Survey.find(params[:survey_id])
     @sheet = Sheet.find(params[:id])
-    sheet_property = SheetProperty.find_by_sheet_id(params[:id])
-    sheet_ids = @survey.sheet_ids
-    answer_sheet = AnswerSheet.find_by_sheet_id(sheet_ids)
-    if sheet_property != nil || answer_sheet != nil 
-      flash[:notice] = "このシートは使用されているため削除できません"
-    else
-      @sheet.destroy
-    end
+    @sheet.destroy
+
     respond_to do |format|
       format.html { redirect_to group_survey_sheets_path(@group, @survey) }
       format.xml  { head :ok }

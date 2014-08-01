@@ -1,2 +1,3 @@
 <h1><%=h @sheet.sheet_name %>で使用する調査項目</h1>
+<p style="color: green"><%= flash[:notice] %></p>
 <%= render :partial => "sheet_properties/list" %>

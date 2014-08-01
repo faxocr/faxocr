@@ -2,7 +2,7 @@
 /*
  * Shinsai FaxOCR
  *
- * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
+ * Copyright (C) 2009-2013 National Institute of Public Health, Japan.
  * All rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -71,6 +71,10 @@ if (isset($_REQUEST["sname"])) {
 
 if (isset($_REQUEST["rails_env"])) {
 	$rails_env = $_REQUEST["rails_env"];
+}
+
+if (isset($_REQUEST["debug_mode"])) {
+	$debug_mode = $_REQUEST["debug_mode"];
 }
 
 if (isset($_REQUEST["msg"])) {

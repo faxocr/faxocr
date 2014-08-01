@@ -1,3 +1,4 @@
 <h1><%=h @survey.survey_name %>の調査項目</h1>
+<p style="color: green"><%= flash[:notice] %></p>
 <br>
 <%= render :partial => "survey_properties/list" %>

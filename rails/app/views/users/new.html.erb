@@ -1,3 +1,4 @@
-<h1>ユーザ作成</h1>
+<h1>ユーザ新規作成</h1>
+<p style="color: green"><%= flash[:notice] %></p>
 <%= render :partial => "users/form" %>
 <%= link_to 'キャンセル', group_users_path(@group) %>

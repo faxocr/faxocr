@@ -23,6 +23,9 @@ FAX_SUBJ=$2
 FAX_IMG=$3
 FAX_TO=$FAX_NO"@"$FAX_SEND_TARGET
 
+cd ~faxocr
+echo "`date +%Y/%m/%d\ %H:%M:%S` to=$FAX_NO subject=$FAX_SUBJ via=$FAX_SEND_TYPE" >> $DIR_FAX/Log/sendfax.log
+
 case "$FAX_SEND_TYPE" in
 bizfax)
     echo $BIZFAX_LOGIN_PASSWORD | xvfb-run -a $BIZFAX_PROGRAM "$BIZFAX_LOGIN_USER" "$FAX_NO" "$BIZFAX_FAX_SIZE" "$FAX_IMG"

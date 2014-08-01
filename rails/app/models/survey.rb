@@ -1,10 +1,14 @@
+# -*- coding: utf-8 -*-
+
+require 'rexml/text'
+
 class Survey < ActiveRecord::Base
   belongs_to  :group
 
-  has_many    :sheets
-  has_many    :survey_properties
+  has_many    :sheets, :dependent => :destroy
+  has_many    :survey_properties, :dependent => :destroy
 
-  has_many    :survey_candidates
+  has_many    :survey_candidates, :dependent => :destroy
   has_many    :candidates, :through => :survey_candidates
 
   STATUS = [["クローズ", 0], ["オープン", 1]]
@@ -90,8 +94,8 @@ class Survey < ActiveRecord::Base
       sheets.each do |sheet|
         srmlstr = srmlstr + "  <sheet>\n"
         srmlstr = srmlstr + "    <id>#{sheet.sheet_code}</id>\n"
-        srmlstr = srmlstr + "    <blockWidth>#{sheet.block_width}</blockWidth>\n"
-        srmlstr = srmlstr + "    <blockHeight>#{sheet.block_height}</blockHeight>\n"
+        srmlstr = srmlstr + "    <blockWidth>" + (sheet.block_width).to_s + "</blockWidth>\n"
+        srmlstr = srmlstr + "    <blockHeight>" + (sheet.block_height).to_s + "</blockHeight>\n"
         srmlstr = srmlstr + "    <cellWidth>\n"
         eval(sheet.cell_width).sort.each do |cell_no,cell_width|
           srmlstr = srmlstr + "      <cellAttribute number=\"#{cell_no}\" length=\"#{cell_width}\"/>\n"
@@ -105,33 +109,34 @@ class Survey < ActiveRecord::Base
         srmlstr = srmlstr + "    <properties>\n"
         srmlstr = srmlstr + "      <blockOcr"
         srmlstr = srmlstr + " name=\"echo_request_and_send_analyzed_data\""
-        srmlstr = srmlstr + " x=\"#{sheet.block_width}\""
-        srmlstr = srmlstr + " y=\"#{sheet.block_height}\""
+        srmlstr = srmlstr + " x=\"" + (sheet.block_width).to_s + "\""
+        srmlstr = srmlstr + " y=\"" + (sheet.block_height).to_s + "\""
         srmlstr = srmlstr + " colspan=\"1\""
         srmlstr = srmlstr + " option=\"rating\""
         srmlstr = srmlstr + "/>\n"
         if sheet.sheet_properties != nil
           sheet.sheet_properties.each do |property|
+            escaped_ocr_name = REXML::Text::normalize(property.survey_property.ocr_name, nil, nil)
             if property.survey_property.data_type == "image"
               srmlstr = srmlstr + "      <blockImg"
-              srmlstr = srmlstr + " name=\"#{property.survey_property.ocr_name}\""
-              srmlstr = srmlstr + " x=\"#{property.position_x}\""
-              srmlstr = srmlstr + " y=\"#{property.position_y}\""
+              srmlstr = srmlstr + " name=\"#{escaped_ocr_name}\""
+              srmlstr = srmlstr + " x=\"" + (property.position_x).to_s + "\""
+              srmlstr = srmlstr + " y=\"" + (property.position_y).to_s + "\""
               srmlstr = srmlstr + " colspan=\"#{property.colspan}\""
               srmlstr = srmlstr + " margin=\"15\""
               srmlstr = srmlstr + "/>\n"                
             else
               srmlstr = srmlstr + "      <blockOcr"
-              srmlstr = srmlstr + " name=\"#{property.survey_property.ocr_name}\""
-              srmlstr = srmlstr + " x=\"#{property.position_x}\""
-              srmlstr = srmlstr + " y=\"#{property.position_y}\""
+              srmlstr = srmlstr + " name=\"#{escaped_ocr_name}\""
+              srmlstr = srmlstr + " x=\"" + (property.position_x).to_s + "\""
+              srmlstr = srmlstr + " y=\"" + (property.position_y).to_s + "\""
               srmlstr = srmlstr + " colspan=\"#{property.colspan}\""
               srmlstr = srmlstr + " option=\"#{property.survey_property.data_type}\""
               srmlstr = srmlstr + "/>\n"
               srmlstr = srmlstr + "      <blockImg"
-              srmlstr = srmlstr + " name=\"#{property.survey_property.ocr_name}\""
-              srmlstr = srmlstr + " x=\"#{property.position_x}\""
-              srmlstr = srmlstr + " y=\"#{property.position_y}\""
+              srmlstr = srmlstr + " name=\"#{escaped_ocr_name}\""
+              srmlstr = srmlstr + " x=\"" + (property.position_x).to_s + "\""
+              srmlstr = srmlstr + " y=\"" + (property.position_y).to_s + "\""
               srmlstr = srmlstr + " colspan=\"#{property.colspan}\""
               srmlstr = srmlstr + " margin=\"15\""
               srmlstr = srmlstr + "/>\n"

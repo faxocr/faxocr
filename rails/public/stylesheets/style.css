@@ -255,6 +255,11 @@ form{margin:0;padding:0;}
         color:#1d7877;
 }
 
+#contents_1c h1.admin {
+        background:url('../image/back_title_1column_red.gif') no-repeat 0 0;
+        color:#fa5f0a;
+}
+
 #contents .article{
         margin:0;
         padding:0 15px;
@@ -560,6 +565,10 @@ div.surveysobject_new {
 	text-align: right;
 }
 
+table.surveysobject th, 
+table.surveysobject td {
+	padding: 5px;
+}
 th.surveysobject {
 	color: #ffffff;
 	background-color: #cccc88;
@@ -571,5 +580,78 @@ tr.surveysobject_dark {
 	background-color: #f5f5f5;
 }
 td.surveysobject_manage {
+	white-space: nowrap;
 	text-align: center;
+}
+
+table.surveysobject {
+	border-collapse:collapse;
+	width: 100%;
+	font-size: 10pt;
+}
+
+div.surveysobject_new {
+	text-align: right;
+}
+
+/* report */
+table.report {
+	border-collapse:collapse;
+	width: 100%;
+	margin-top: 10px;
+	font-size: 10pt;
+}
+
+table.report tr {
+	background-color: #eeeeee;
+	text-align: center;
+}
+
+table.report tr.dark {
+	background-color: #f5f5f5;
+}
+
+table.report tr.summary {
+	border-top: 1px solid #DDDDDD;
+}
+
+table.report th {
+	color: #ffffff;
+	background-color: #cccc88;
+}
+
+table.report th.manage {
+	width: 30px;
+}
+
+table.report th.name {
+	width: 200px;
+}
+
+table.report td {
+	padding: 3px 0;
+}
+
+.rotate90 {
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    /* for ie */
+    filter: progid: DXImageTransform.Microsoft.BasicImage(rotation=3, mirror=1);
+    transform-origin: 250px 250px;
+    -webkit-transform-origin: 250px 250px;
+    -moz-transform-origin: 250px 250px;
+    -ms-transform-origin: 250px 250px;
+}
+
+.debug {
+    background-color: #F2DEDE;
+    border: 1px solid #EED3D7;
+    margin: 5px 0;
+    padding: 10px;
+    color: #B94A48;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
 }

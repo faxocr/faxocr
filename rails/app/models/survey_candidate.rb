@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 class SurveyCandidate < ActiveRecord::Base
   belongs_to :survey
   belongs_to :candidate

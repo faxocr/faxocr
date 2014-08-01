@@ -1,6 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
 
-  map.resources :configs, :collection => { :index => :get, :view_system_config => :get, :update => :post, :database => :get, :procfax => :get, :procfax_exec => :post, :getfax_exec => :post, :cron => :get, :note => :get, :note_update => :post, :sendtestfax => :get, :sendtestfax_exec => :post, :viewmaildir => :get }
+  map.resources :configs, :collection => { :index => :get, :view_system_config => :get, :update => :post, :database => :get, :view_procfax_log => :get, :procfax_exec => :post, :getfax_exec => :post, :cron => :get, :note => :get, :note_update => :post, :view_sendfax_log => :get, :sendtestfax_exec => :post, :view_faxmail_queue => :get, :view_answer_sheet => :get }
 
   map.resources :role_mappings
 
@@ -22,6 +22,14 @@ ActionController::Routing::Routes.draw do |map|
                           :day => /[0-3]\d/},
         :day => nil,
         :month => nil
+      survey.connect "report/:year/:month/:day/fax_preview",
+        :controller => "report",
+        :action => "fax_preview",
+        :requirements => {:year => /(19|20)\d\d/,
+                          :month => /[01]?\d/,
+                          :day => /[0-3]\d/},
+        :day => nil,
+        :month => nil
       survey.connect "export/:year/:month/:day",
         :controller => "export",
         :action => "csv",
@@ -35,11 +43,20 @@ ActionController::Routing::Routes.draw do |map|
     group.resources :users, :member => {:edit_self => :get, :update_self => :post}
   end
 
+  map.contact '/answer_sheets', :controller => 'answer_sheets', :action => 'index_all'
+  map.resources :answer_sheets, 
+    :collection => { :index_all => :get }, 
+    :member => { :show_all => :get, :image_thumb_all => :get }
+
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
   #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'
   # Keep in mind you can assign values other than :controller and :action
+
+  map.connect 'groups/:group_id/surveys/:id/report',
+    :controller => "surveys",
+    :action => "report"
 
   #
   # PHP driver (Target registration)
@@ -55,6 +72,15 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'external/reg_exec',
     :controller => 'external',
     :action => 'reg_exec'
+
+  # PHP driver (Sheet registration Debug)
+  map.connect 'external/sheet_checker',
+    :controller => 'external',
+    :action => 'sheet_checker'
+
+  map.connect 'external/sht_field_checker',
+    :controller => 'external',
+    :action => 'sht_field_checker'
 
   #
   # PHP driver (Sheet registration)

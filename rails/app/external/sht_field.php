@@ -2,7 +2,7 @@
 /*
  * Shinsai FaxOCR
  *
- * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
+ * Copyright (C) 2009-2013 National Institute of Public Health, Japan.
  * All rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@
 require_once "config.php";
 require_once "init.php";
 require_once "lib/common.php";
+require_once "lib/sheet.php";
 require_once "contrib/peruser.php";
 
 // require_once "lib/file_conf.php";
@@ -78,66 +79,32 @@ include( TMP_HTML_DIR . "tpl.header.html" );
 //
 // Excelファイル読み込み処理
 //
+$sheet = null;
 if ($tgt_file) {
-	global $xls;
-	$xls = NEW Excel_Peruser;
-	$xls->setErrorHandling(1);
-	$xls->setInternalCharset($charset);
-	$result = $xls->fileread($tgt_file);
-
-	if ($xls->isError($result)) {
-		$errmsg = $result->getMessage();
-		$xls = null;
-	}
-
+	list($xls, $errmsg) = excel_peruser_factory($charset, $tgt_file);
 	if ($xls) {
 		if (count($xls->boundsheets) != 1) {
-			$errmsg = "シートの数 (" . count($xls->boundsheets) .
+			$errmsg .= "シートの数 (" . count($xls->boundsheets) .
 				  ") が、多すぎます";
 			$xls = null;
 		}
 	}
 
 	if ($xls) {
-		// 各 cell のサイズからテーブルの大きさを求める
-		$sn = 0;
-		$tblwidth = 0;
-		$tblheight = 0;
-		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$tblwidth += floor($xls->getColWidth($sn, $i));
-		}
-		for ($i = 0; $i <= $xls->maxrow[$sn]; $i++) {
-			$tblheight += floor($xls->getRowHeight($sn, $i));
-		}
-
-		if (0) { // 長方形版では以下のコードは用いない
-			// cellのサイズの縦横比が10%以上はエラー
-			$cellaspect_range = 0.1;
-			$cellaspect = $xls->getColWidth($sn, 0) / $xls->getRowHeight($sn, 0);
-			if ($cellaspect != 1) {
-				// cellが厳密に正方形ではない場合メッセージのみ表示
-				$errmsg = "";
-			}
-			if (($celaspect < 1 - $cellaspect_range) && ($celaspect > 1 + $cellaspect_range)) {
-				$xls = null;
-				$errmsg = "セルが正方形になっていません";
-			} else if (($xls->getColWidth($sn, 0) * ($xls->maxcell[$sn]+1)) != $tblwidth) {
-				$xls = null;
-				$errmsg = "セルはすべて同じサイズにしてください";
-			} else if (($xls->getRowHeight($sn, 0) * ($xls->maxrow[$sn]+1)) != $tblheight) {
-				$xls = null;
-				$errmsg = "セルはすべて同じサイズにしてください";
-			}
-		}
-		if (($xls->maxcell[$sn]+1 <= MIN_SHEET_WIDTH || $xls->maxrow[$sn]+1 <= MIN_SHEET_HEIGHT) && ($xls->maxrow[$sn]+1 <= MIN_SHEET_WIDTH || $xls->maxcell[$sn]+1 <= MIN_SHEET_HEIGHT)) {
+		$sheet = new Sheet($xls);
+		if (($sheet->col_count + 1 < MIN_SHEET_WIDTH || $sheet->row_count + 1 < MIN_SHEET_HEIGHT) && ($sheet->row_count + 1 < MIN_SHEET_WIDTH || $sheet->col_count + 1 < MIN_SHEET_HEIGHT)) {
+			// シートサイズチェック
+			$xls .= null;
+			$errmsg .= "シートのサイズが小さすぎます。".MIN_SHEET_WIDTH."x".MIN_SHEET_HEIGHT."以上にしてください。\n";
+		} else if (($sheet->col_count + 1 > MAX_SHEET_WIDTH || $sheet->row_count + 1 > MAX_SHEET_HEIGHT) && ($sheet->row_count + 1 > MAX_SHEET_WIDTH || $sheet->col_count + 1 > MAX_SHEET_HEIGHT)) {
 			// シートサイズチェック
 			$xls = null;
-			$errmsg = "シートのサイズが小さすぎます ".MIN_SHEET_WIDTH."x".MIN_SHEET_HEIGHT."以上にしてください";
-		} else if (($xls->maxcell[$sn]+1 >= MAX_SHEET_WIDTH || $xls->maxrow[$sn]+1 >= MAX_SHEET_HEIGHT) && ($xls->maxrow[$sn]+1 >= MAX_SHEET_WIDTH || $xls->maxcell[$sn]+1 >= MAX_SHEET_HEIGHT)) {
-
-			// シートサイズチェック
-			$xls = null;
-			$errmsg = "シートのサイズが大きすぎます ".MAX_SHEET_WIDTH."x".MAX_SHEET_HEIGHT."以下にしてください";
+			$errmsg .= "シートのサイズが大きすぎます。".MAX_SHEET_WIDTH."x".MAX_SHEET_HEIGHT."以下にしてください。\n";
+		}
+		// セルサイズチェック
+		if ( ($sheet->min_cell_width != 0 && ($sheet->min_cell_width * $sheet->scale) <= MIN_CELL_WIDTH) || ($sheet->min_cell_height != 0 &&($sheet->min_cell_height * $sheet->scale) <= MIN_CELL_HEIGHT) ) {
+			// 厳密にはマーカー指定時のサイズによって決まる
+			$errmsg .= "セルのサイズが小さすぎます。".MIN_CELL_WIDTH."px x ".MIN_CELL_HEIGHT."px以上にしてください。\n";
 		}
 	}
 }
@@ -151,44 +118,35 @@ if ($errmsg) {
 
 {
 	// ステータス表示
-	print "<table width=\"100%\">\n";
-	print "<tr>\n";
-
-	print "<td>\n";
-	print "<form enctype=\"multipart/form-data\" method=\"post\" " . "action=\"/external/sht_field/\">\n";
-	print "対象ファイル： <input id=\"file_upfile\" type=\"file\" name=\"file[upfile]\" size=\"60\" />\n";
-	print "<input id=\"gid\" name=\"gid\" type=\"hidden\" value=\"" . $group_id . "\" />\n";
-	print "<input id=\"sid\" name=\"sid\" type=\"hidden\" value=\"" . $sheet_id . "\" />\n";
-	print "<input type=\"submit\" value=\"再読み込み\" />\n";
-	print "</form>\n";
-	print "</td>\n";
-
-	print "<td align=\"right\" width=\"450\">\n";
-	put_status();
-	print "</td>\n";
-	print "</tr></table>\n";
-	print "<br />\n";
+	put_status($file_id, $group_id, $sheet_id, $conf_sw);
 }
 
 // Excelファイル表示処理
 if ($xls) {
 	put_css($xls);
-	put_excel($xls);
+
+	print "<div style=\"margin: 20px 0 30px; text-align:center;\">読み取りたいセルをクリックし、フィールド指定して下さい。</div>\n";
+
+	put_excel($xls, $sheet, $field_list, $field_width);
 	if ($conf_sw) {
 		$dirty_label = " disabled";
 	} else {
 		$dirty_label = count($field_list) > 0 ? "" : "disabled=\"disabled\"";
 	}
-	put_fields();
 
+	// 集計フィールド
+	put_fields($field_list, $field_width);
+
+	print "<div class=\"clearfix\" style=\"padding: 10px 0; margin-bottom: 30px;\">\n";
 	print "<form action=\"/external/sht_script/\" method=\"post\" id=\"form-save\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sname\" value=\"" . $sheet_name . "\" />\n";
 	print "<input type=\"hidden\" name=\"target\" value=\"" . $target . "\" />\n";
-	print "<button type=\"button\" id=\"sbmt\" onclick=\"this.disabled=true; pack_fields();\" {$dirty_label}>保存</button>\n";
+	//	print "<button type=\"button\" id=\"sbmt\" onclick=\"this.disabled=true; pack_fields();\" {$dirty_label}>保存</button>\n";
 	print "</form>\n";
+	print "</div>\n";
 }
 
 //
@@ -201,13 +159,8 @@ die;
 //
 // ファイル表示エリア
 //
-function put_excel($xls)
+function put_excel($xls, $sheet, &$field_list, &$field_width)
 {
-	global $field_list;
-	global $field_width;
-	global $tblwidth;
-	global $tblheight;
-
 	// タブコントロール表示
 	// print "<div class=\"simpleTabs\">";
 	// print "<ul class=\"simpleTabsNavigation\">";
@@ -223,34 +176,27 @@ function put_excel($xls)
 	// for ($sn = 0; $sn < $xls->sheetnum; $sn++) {
 	$sn = 0;
 	{
-		$scale = get_scaling($tblwidth, $tblheight, 940);
-		$tblwidth_scaled = floor($tblwidth * $scale);
-		$tblheight_scaled = floor($tblheight * $scale);
-
 		// シートテーブル表示
 		print <<< STR
-		\n<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="${tblwidth_scaled}" bgcolor="#FFFFFF" style="table-layout:fixed; border-collapse: collapse;">\n
+		\n<table class="sheet_field" border="0" cellpadding="0" cellspacing="0" width="{$sheet->disp->tblwidth}" bgcolor="#FFFFFF" style="table-layout:fixed; border-collapse: collapse;">\n
 STR;
 
 		print "<tr>\n";
-		for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-			$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
+		for ($i = 0; $i <= $sheet->col_count; $i++) {
+			$tdwidth  = $sheet->disp->get_col_size($i);
 			print "<th height=\"0\" width=\"$tdwidth\"></th>";
 		}
 		print "\n</tr>\n";
-		if (!isset($xls->maxrow[$sn]))
-			$xls->maxrow[$sn] = 0;
-		for ($r = 0; $r <= $xls->maxrow[$sn]; $r++) {
-			$trheight = floor($xls->getRowHeight($sn, $r) * $scale);
+		for ($r = 0; $r <= $sheet->row_count; $r++) {
+			$trheight = $sheet->disp->get_row_size($r);
 
 			print "  <tr height=\"" . $trheight . "\">" . "\n";
 
-			for ($i = 0; $i <= $xls->maxcell[$sn]; $i++) {
-				$tdwidth  = floor($xls->getColWidth($sn, $i) * $scale);
+			for ($i = 0; $i <= $sheet->col_count; $i++) {
+                $tdwidth  = $sheet->disp->get_col_size($i);
 
 				$dispval = $xls->dispcell($sn, $r, $i);
 				$dispval = strconv($dispval);
-				$dispval = htmlspecialchars($dispval);
 
 				if (isset($xls->hlink[$sn][$r][$i])) {
 					$dispval = "<a href=\"" . $xls->hlink[$sn][$r][$i] . "\">" . $dispval . "</a>";
@@ -292,6 +238,8 @@ STR;
 					$bgcolor = 0;
 				}
 
+				$celattr =  $xls->getAttribute($sn, $r, $i);
+				$fontsize =  $celattr["font"]["height"] * $sheet->scale / 16;
 				if (isset($xls->celmergeinfo[$sn][$r][$i]["cond"])) {
 					if ($xls->celmergeinfo[$sn][$r][$i]["cond"] == 1) {
 						$colspan = $xls->celmergeinfo[$sn][$r][$i]["cspan"];
@@ -318,7 +266,7 @@ STR;
 						}
 						$class = " class=\"XFs" . $sn . "r" . $r . "c" . $i . "\"";
 						$id = " id=\"". $sn . "-" . $r ."-" . $i . "\"";
-						print " <td $class $id $name $rcspan $align>". $dispval . "</td>\n";
+						print " <td $class $id $name $rcspan $align style=\"font-size: " . $fontsize . "px;\">". $dispval . "</td>\n";
 					}
 				} else {
 					if ($bgcolor == 1 && !is_null($dispval)) {
@@ -334,7 +282,7 @@ STR;
 					}
 					$class = " class=\"XF" . $xfno . "\" ";
 					$id = " id=\"". $sn . "-" . $r . "-" . $i . "\"";
-					print " <td nowrap=\"nowrap\" $class $id $align>". $dispval . "</td>\n";
+					print " <td nowrap=\"nowrap\" $class $id $align style=\"font-size: " . $fontsize . "px;\">". $dispval . "</td>\n";
 				}
 			}
 			print "</tr>\n";
@@ -349,10 +297,8 @@ STR;
 //
 // ファイル修正エリア表示
 //
-function put_fields()
+function put_fields(&$field_list, &$field_width)
 {
-	global $field_list;
-	global $field_width;
 	$i = 1;
 
 	//
@@ -410,32 +356,22 @@ function put_fields()
 //
 // ステータス操作エリア表示
 //
-function put_status()
+function put_status($file_id, $group_id, $sheet_id, $conf_sw)
 {
-	global $file_id;
-	global $group_id;
-	global $sheet_id;
-	global $conf_sw;
-
 	$status_label = $conf_sw ? "" : " disabled";
 
-	$style = array();
-	$style["normal"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffffff;padding:1px;color:gray\"";
-	$style["gray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#bbbbbb;padding:1px\"";
-	$style["lgray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#dddddd;padding:1px\"";
-	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
-
 	// XXX
-	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
+	print "<div class=\"statusMenu clearfix\">\n";
 	print "<form action=\"/external/sht_marker/\" method=\"post\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
-	print "<div ${style["pink"]}><span>フィールド指定</span></div>\n";
-	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; this.form.submit();\" " . $status_label . ">マーカー指定</button></div>\n";
-	print "<div ${style["gray"]}><span>シート確認</span></div>\n";
-	print "<div ${style["gray"]}><span>シート登録</span></div>\n";
+	print "<div class=\"upload\"><button type=\"button\" id=\"\" onclick=\"this.disabled=false; go_sheet_upload(); return false;\" >再読み込み</button></div>\n";
+	print "<div class=\"field current\">&gt;<button type=\"button\" disabled=\"disabled\">フィールド指定</button></div>\n";
+	print "<div class=\"marker\">&gt;<button type=\"button\" id=\"next\" onclick=\"this.disabled=true; pack_fields();\" " . $status_label . ">マーカー指定</button></div>\n";
+	print "<div class=\"verify disable\">&gt;<button type=\"button\" disabled=\"disabled\">シート確認</button></div>\n";
+	print "<div class=\"commit disable\">&gt;<button type=\"button\" disabled=\"disabled\">シート登録</button></div>\n";
 
 	print "</form>\n";
 	print "</div>\n";

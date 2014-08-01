@@ -2,14 +2,18 @@
 # See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 ja:
+  date:
+    order: [:year, :month, :day]
   activerecord:
     models:
-      user: "ユーザー"
+      user: "ユーザ"
     attributes:
       user:
-        login_name: "ログイン名"
+        login_name: "ユーザ名"
         full_name: "担当者名"
         password: "ログインパスワード"
+      group:
+        group_name: "グループ名"
     errors:
       template:
         header: "{{model}}でエラーが発生しました"

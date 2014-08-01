@@ -1,0 +1,86 @@
+<%
+  report_header = @survey.report_header
+  @place_holder.each do |k, v|
+      report_header = report_header.sub(/%%#{k}%%/, v)
+  end
+%>
+<%= report_header %>
+<%
+
+# Collect
+survey_properties = SurveyProperty.find_all_by_survey_id(@survey.id,
+  :order => 'view_order')
+columns = []
+data_types = Hash.new
+sums = Hash.new
+survey_properties.each do |rp|
+  columns << rp.ocr_name
+  data_types.store(rp.ocr_name, rp.data_type)
+  sums.store(rp.ocr_name, 0)
+end
+
+line_num = 1
+@answer_sheets.each do |a|
+%>
+  <tr>
+    <td><%= line_num %></td>
+    <td><%= a.candidate.candidate_name %><br><%= a.candidate.tel_number %><br>
+	<% if a.date != nil %>
+		(<%= a.date.to_s(:date_nomal) %>)
+	<% end %>
+	</td>
+
+<%
+
+  for column in columns do
+    rp = AnswerSheetProperty.find(:first,
+      :conditions => ['answer_sheet_id = ? and ocr_name = ?', a.id, column])
+    cell_str = rp != nil ? rp.ocr_value : '-'
+    cell_img = rp != nil ? rp.ocr_image : nil
+
+    if data_types[column] == 'number' && cell_str =~ /^[0-9]+$/
+      sums[column] = sums[column] + cell_str.to_i
+    end
+
+    if data_types[column] == 'image' || @all_image
+		if cell_img != nil
+			cell_item = '<img src="' + @prefix_image + '/' +cell_img + '" height="30"/>'
+		else
+			cell_item = '-'
+		end
+    else
+		if cell_str != ""
+			cell_item = cell_str
+		else
+			cell_item = '&nbsp;'
+		end
+    end
+%>
+    <td align="center"><%= cell_item %></td>
+<%
+  end
+%>
+  </tr>
+<%
+  line_num = line_num + 1
+end
+%>
+
+<!-- Sum -->
+<% unless @all_image %>
+<tr>
+    <td colspan="2">計</td>
+
+<%
+for column in columns do
+  cell_item = (data_types[column] == 'number') ? sums[column] : '&nbsp;'
+%>
+    <td align="center"><%= cell_item %></td>
+<%
+end
+%>
+  </tr>
+<% end %>
+
+
+<%= @survey.report_footer %>

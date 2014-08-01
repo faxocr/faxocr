@@ -1,21 +1,139 @@
 <h1 class="surveysobject"><%= @survey.survey_name %>
 (<%=h Survey::STATUS[@survey.status][0] %>)</h1> 
+<p style="color: green"><%= flash[:notice] %></p>
 
+<script type="text/javascript">
+<!--
+function show_sheets() {
+$('#panel_sheets').slideDown('slow');
+close_candidate();
+close_properties();
+close_reports();
+close_survey();
+}
+
+function close_sheets() {
+$('#panel_sheets').slideUp('slow');
+}
+
+function show_candidate() {
+$('#panel_candidate').slideDown('slow');
+close_sheets();
+close_properties();
+close_reports();
+close_survey();
+}
+
+function close_candidate() {
+$('#panel_candidate').slideUp('slow');
+}
+
+function show_properties() {
+$('#panel_properties').slideDown('slow');
+close_sheets();
+close_candidate();
+close_reports();
+close_survey();
+}
+
+function close_properties() {
+$('#panel_properties').slideUp('slow');
+}
+
+function show_reports() {
+$('#panel_report').slideDown('slow');
+close_sheets();
+close_candidate();
+close_properties();
+close_survey();
+}
+
+function close_reports() {
+$('#panel_report').slideUp('slow');
+}
+
+function show_survey() {
+$('#panel_survey').slideDown('slow');
+close_sheets();
+close_candidate();
+close_properties();
+close_reports();
+}
+
+function close_survey() {
+$('#panel_survey').slideUp('slow');
+}
+
+-->
+</script>
+
+<center>
+<table border="0">
+  <tr>
+    <th>
+      <a onclick="show_sheets();">
+	<img src="/image/icon-pdf.gif"><br>
+	配布シート
+      </a>
+    </th>
+
+    <th width="48"><img src="/image/rightarrow.gif"></th>
+    <th>
+      <a onclick="show_candidate();">
+	<img src="/image/icon-targets.gif"><br>
+	配布対象
+      </a>
+    </th>
+
+    <th width="48"><img src="/image/rightarrow.gif"></th>
+    <th>
+      <% link_to group_survey_answer_sheets_path(@group, @survey) do %>
+      <img src="/image/icon-faxes.gif"><br>
+      受信Fax一覧
+      <% end %>
+    </th>
+
+    <th width="48"><img src="/image/rightarrow.gif"></th>
+    <th>
+      <a onclick="show_properties();">
+	<img src="/image/icon-database.gif"><br>
+	調査項目
+      </a>
+    </th>
+
+    <th width="48"><img src="/image/rightarrow.gif"></th>
+    <th>
+      <a onclick="show_reports();">
+	<img src="/image/icon-reports.gif"><br>
+	集計レポート
+      </a>
+    </th>
+
+    <% if @current_user.has_survey_role(@current_group.id) %>
+    <th width="48"><img src="/image/dot.gif"></th>
+    <th>
+      <a onclick="show_survey();">
+	<img src="/image/icon-config.gif"><br>
+	シート設定
+      </a>
+    </th>
+    <% end %>
+
+    </tr>
+</table>
+</center>
+
+<div id="panel_sheets" style="display:none">
+<h2 class="surveysobject_title">配布シート</h2>
+<%= render :partial => "sheets/list" %>
 <div align="right">
 <% if @current_user.has_survey_role(@current_group.id) %>
-<%= link_to '[設定]', edit_group_survey_path(@group, @survey) %>
+<%= link_to '[一覧管理]', group_survey_sheets_path(@group, @survey) %>
 <% end %>
 </div>
-
-<p>
-<h2 class="surveysobject_title">24時間以内に受信したFAX</h2>
-<%= render :partial => "answer_sheets/list" %>
-<div align="right">
-<%= link_to '[全件管理]', group_survey_answer_sheets_path(@group, @survey) %>
 </div>
-</p>
 
-<p>
+<div id="panel_candidate" style="display:none">
 <h2 class="surveysobject_title">調査対象</h2>
 <%= render :partial => "survey_candidates/list" %>
 <div align="right">
@@ -23,19 +141,9 @@
 <%= link_to '[一覧管理]', group_survey_survey_candidates_path(@group, @survey) %>
 <% end %>
 </div>
-</p>
-
-<p>
-<h2 class="surveysobject_title">シート</h2>
-<%= render :partial => "sheets/list" %>
-<div align="right">
-<% if @current_user.has_survey_role(@current_group.id) %>
-<%= link_to '[一覧管理]', group_survey_sheets_path(@group, @survey) %>
-<% end %>
 </div>
-</p>
 
-<p>
+<div id="panel_properties" style="display:none">
 <h2 class="surveysobject_title">調査項目</h2>
 <div align="right">
 <%= render :partial => "survey_properties/list" %>
@@ -43,9 +151,9 @@
 <%= link_to '[一覧管理]', group_survey_survey_properties_path(@group, @survey) %>
 <% end %>
 </div>
-</p>
+</div>
 
-<p>
+<div id="panel_report" style="display:none">
 <h2 class="surveysobject_title">集計レポート</h2>
 
 <table class="surveysobject">
@@ -86,7 +194,23 @@
 
 <div align="right">
 <% if @current_user.has_survey_role(@current_group.id) %>
-<%= link_to '[編集]', edit_group_survey_path(@group, @survey) %>
+<%= link_to '[編集]', group_survey_path(@group, @survey) + "/report" %>
+<%= link_to '[Faxプレビュー]', group_survey_path(@group, @survey) + "/report/" + @today + "/fax_preview" %>
 <% end %>
+</div>
+</div>
+
+<div id="panel_survey" style="display:none; border-style:none; padding:20px;">
+<div style="border-style:none; background-color:#eeeeff; padding:20px">
+<h3>シート設定</h3>
+<%= render :partial => "form" %>
+</div>
+</div>
+
+<p>
+<h3 class="surveysobject_title">最新ファックス</h3>
+<%= render :partial => "answer_sheets/list" %>
+<div align="right">
+<%= link_to '[全件管理]', group_survey_answer_sheets_path(@group, @survey) %>
 </div>
 </p>

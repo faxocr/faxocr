@@ -2,7 +2,7 @@
 /*
  * Shinsai FaxOCR
  *
- * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
+ * Copyright (C) 2009-2013 National Institute of Public Health, Japan.
  * All rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -58,13 +58,7 @@ if ($errmsg) {
 
 {
 	// ステータス表示
-	print "<table width=\"100%\">\n";
-	print "<td align=\"right\"></td>\n";
-	print "<td align=\"right\"\"  width=\"450px\">";
-	put_status();
-	print "</td>\n";
-	print "</tr></table>\n";
-	print "<br />\n";
+	put_status($file_id, $group_id, $sheet_id);
 }
 
 // サンプルファイル表示処理
@@ -95,12 +89,8 @@ die;
 //
 // ステータス操作エリア表示
 //
-function put_status()
+function put_status($file_id, $group_id, $sheet_id)
 {
-	global $file_id;
-	global $group_id;
-	global $sheet_id;
-
 	print <<< STR
 <script type="text/javascript">
 <!--
@@ -117,25 +107,20 @@ function go_next() {
 
 STR;
 
-	$style = array();
-	$style["normal"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffffff;padding:1px;color:gray\"";
-	$style["gray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#bbbbbb;padding:1px\"";
-	$style["lgray"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#dddddd;padding:1px\"";
-	$style["pink"] = "style=\"border-style:solid;border-width:1px;border-color:#dddddd;background-color:#ffdddd;padding:1px\"";
-
 	// XXX
 	// action=\"/external\sht_commit/\"
-	print "<div style=\"border-style:solid;border-color:#dddddd;border-width:1px;padding:2px;\" class=\"statusMenu\">\n";
+	print "<div class=\"statusMenu clearfix\">\n";
 
 	print "<form method=\"POST\" id=\"form-status\">\n";
 	print "<input type=\"hidden\" name=\"fileid\" value=\"" . $file_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
-	print "<div ${style["gray"]}><span>フィールド指定</span></div>\n";
-	print "<div ${style["gray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_prev();\">マーカー指定</button></div>\n";
-	print "<div ${style["pink"]}><span>シート確認</span></div>\n";
-	print "<div ${style["lgray"]}><button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_next();\">シート登録</button></div>\n";
+	print "<div class=\"upload disable\"><button type=\"button\" disabled=\"disabled\">再読み込み</button></div>\n";
+	print "<div class=\"field disable\">&gt;<button type=\"button\" disabled=\"disabled\">フィールド指定</button></div>\n";
+	print "<div class=\"marker\">&gt;<button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_prev();\">マーカー指定</button></div>\n";
+	print "<div class=\"verify current\">&gt;<button type=\"button\" disabled=\"disabled\">シート確認</button></div>\n";
+	print "<div class=\"commit\">&gt;<button type=\"button\" id=\"next\" onclick=\"this.disabled=true; go_next();\">シート登録</button></div>\n";
 
 	print "</form>\n";
 	print "</div>\n";

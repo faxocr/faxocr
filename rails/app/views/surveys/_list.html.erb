@@ -8,6 +8,7 @@
 <table class="surveysobject">
   <tr class="surveysobject">
     <th class="surveysobject">ステータス</th>
+    <th class="surveysobject">作成日時</th>
     <th class="surveysobject">名称</th>
     <th class="surveysobject">受信調査シート</th>
 	<% if params[:controller] == "surveys" %>
@@ -22,9 +23,16 @@
   <% else %>
   <tr class="surveysobject_dark">
   <% end %>
-   	<td class="surveysobject"><%=h Survey::STATUS[survey.status][0] %></td>
-   	<td class="surveysobject"><%= link_to survey.survey_name, group_survey_path(@group, survey) %></td>
-   	<td class="surveysobject"><%= link_to '表示', group_survey_answer_sheets_path(@group, survey) %></td>
+   	<% faxcount = 0 %>
+	<% if survey.sheets != nil %>
+		<% survey.sheets.each do |sheet| %>
+			<% faxcount = faxcount + sheet.answer_sheets.length %>
+		<% end %>
+   	<% end %>
+   	<td align="center" class="surveysobject"><%=h Survey::STATUS[survey.status][0] %></td>
+	<td align="center" class="surveysobject"><%=h survey.created_at.strftime("%Y年%m月%d日") %></td>
+   	<td align="left" class="surveysobject"><%= link_to survey.survey_name, group_survey_path(@group, survey) %></td>
+   	<td class="surveysobject" align="center"><%= link_to faxcount.to_s + "件", group_survey_answer_sheets_path(@group, survey) %></td>
 	<% if params[:controller] == "surveys" %>
     <% if @current_user.has_survey_role(@group.id) %>
     <td class="surveysobject_manage"><%= link_to '削除', group_survey_path(@group, survey), :confirm => '削除してもよろしいですか？', :method => :delete %></td>

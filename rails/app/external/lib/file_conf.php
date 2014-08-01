@@ -2,7 +2,7 @@
 /*
  * Shinsai FaxOCR
  *
- * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
+ * Copyright (C) 2009-2013 National Institute of Public Health, Japan.
  * All rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -180,12 +180,18 @@ class FileConfFile {
 		}
 
 		$fp = fopen($conf_path, "w");
+		if ($fp == FALSE) {
+			return ERROR;
+		}
 
 		for ($cnt = 0; $cnt < count($lines); $cnt++) {
 			fwrite($fp, $lines[$cnt]);
 		}
 
-		fclose($fp);
+		$r = fclose($fp);
+		if ($r == FALSE) {
+			return ERROR;
+		}
 
 		foreach ($this->set_confs as $conf_key => $conf_value) {
 			$this->get_confs[$conf_key] = $conf_value;
@@ -209,6 +215,9 @@ class FileConfFile {
 		}
 
 		$fp = fopen($conf_path, "w");
+		if ($fp == FALSE) {
+			return ERROR;
+		}
 
 		for ($cnt = 0; $cnt < count($lines); $cnt++) {
 			$line = explode(",", $lines[$cnt]);
@@ -218,7 +227,10 @@ class FileConfFile {
 			}
 		}
 
-		fclose($fp);
+		$r = fclose($fp);
+		if ($r == FALSE) {
+			return ERROR;
+		}
 
 		return NOERR;
 	}
@@ -293,6 +305,9 @@ class FileConfFile {
 		}
 
 		$fp = fopen($conf_path, "w");
+		if ($fp == FALSE) {
+			return ERROR;
+		}
 
 		foreach ($lines as $line) {
 			fwrite($fp, $line);
@@ -324,7 +339,10 @@ class FileConfFile {
 			}
 		}
 
-		fclose($fp);
+		$r = fclose($fp);
+		if ($r == FALSE) {
+			return ERROR;
+		}
 
 		$set_array_items = array();
 		$set_array_confs = array();

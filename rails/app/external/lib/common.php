@@ -2,7 +2,7 @@
 /*
  * Shinsai FaxOCR
  *
- * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
+ * Copyright (C) 2009-2013 National Institute of Public Health, Japan.
  * All rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -298,6 +298,7 @@ function strconv($str)
 	global $charset;
 
 	$str = htmlentities($str, ENT_QUOTES, $charset);
+	$str = str_replace("\n", "<br />\n", $str);
 	$str = str_replace('&conint;', mb_convert_encoding("∮", $charset, "utf-8"), $str);
 	$str = str_replace('&ang90;', mb_convert_encoding("∟", $charset, "utf-8"), $str);
 	$str = str_replace('&becaus;', mb_convert_encoding("∵", $charset, "utf-8"), $str);
@@ -443,6 +444,20 @@ function get_scaling($w, $h, $lside)
 	}
 	
 	return $scale;
+}
+
+function excel_peruser_factory($charset, $target_file)
+{
+	$xls = NEW Excel_Peruser;
+	$xls->setErrorHandling(1);
+	$xls->setInternalCharset($charset);
+	$result = $xls->fileread($target_file);
+
+	if ($xls->isError($result)) {
+		$errmsg = $result->getMessage();
+		$xls = null;
+	}
+	return array($xls, $errmsg);
 }
 
 ?>

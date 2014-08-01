@@ -21,7 +21,7 @@ class ConfigsController < ApplicationController
 
     flash[:notice] = '設定を更新しました'
 
-    redirect_to configs_path
+    redirect_to view_system_config_configs_path
   end
 
   def database
@@ -29,7 +29,8 @@ class ConfigsController < ApplicationController
     @raw_config = File.read(@config_file_path)
   end
 
-  def procfax
+  def view_procfax_log
+    @page_size = page_size
     @logdir_path = "#{Rails.root}/../Faxsystem/Log/*"
     @files = Dir.glob(@logdir_path).sort.reverse
   end
@@ -63,7 +64,7 @@ class ConfigsController < ApplicationController
     when nil
       flash[:notice] = 'getfaxコマンドの実行に失敗しました' + "(エラーコード #{$?})"
     end
-    redirect_to viewmaildir_configs_path
+    redirect_to view_faxmail_queue_configs_path
   end
 
   def cron
@@ -91,6 +92,12 @@ class ConfigsController < ApplicationController
     redirect_to note_configs_path
   end
 
+  def view_sendfax_log
+    @page_size = page_size
+    @log_file_path = "#{Rails.root}/../Faxsystem/Log/sendfax.log"
+    @raw_config = `tail -10 #{@log_file_path}`
+  end
+
   def sendtestfax_exec
     @script_path = "#{Rails.root}/../bin/sendfax"
     @fax_data_pdf = "#{Rails.root}/../etc/test.pdf"
@@ -99,7 +106,7 @@ class ConfigsController < ApplicationController
 
     if /[^0-9-]/ =~ @dest_fax_num
       flash[:notice] = '電話番号には、半角数値と「-」のみをお使いください'
-      redirect_to sendtestfax_configs_path
+      redirect_to view_sendfax_log_configs_path
       return
     end
 
@@ -112,11 +119,15 @@ class ConfigsController < ApplicationController
       flash[:notice] = '送信に失敗しました' + "(エラーコード #{$?})"
     end
 
-    redirect_to sendtestfax_configs_path
+    redirect_to view_sendfax_log_configs_path
   end
 
-  def viewmaildir
-    @raw_config = `ls -lt #{Rails.root}/../Maildir/new`
+  def view_faxmail_queue
+    @raw_config = `ls -lt #{Rails.root}/../Maildir/new | tail -n +2 | cat -n`
+
+    if @raw_config.length == 0
+      @raw_config = "[No new Fax]"
+    end
 
     @config_file_path = "#{Rails.root}/../etc/faxocr.conf"
     @result = system("sh -c '. " + @config_file_path + '; test "$FAX_RECV_SETTING" = "pop3" && exit 0; exit 1 \'')
@@ -131,6 +142,15 @@ class ConfigsController < ApplicationController
     end
   end
 
+  def view_answer_sheet
+    # index for all user
+    group_id = 1
+    survey_id = 1
+    @group = Group.find(group_id)
+    @survey = @group.surveys.find(survey_id)
+    sheet_ids = @survey.sheet_ids
+    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids, :order => 'date desc')
+  end
 
 private
   def administrator_only

@@ -1,2 +1,3 @@
-<h1><%=h @group.group_name %> ユーザー設定</h1>
+<h1><%=h @group.group_name %> ユーザ設定</h1>
+<p style="color: green"><%= flash[:notice] %></p>
 <%= render :partial => "users/list" %>

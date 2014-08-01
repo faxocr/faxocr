@@ -1,7 +1,0 @@
-<h1>処理待ちFaxメール一覧</h1>
-<% if @fetchmail_enabled == 1 -%>
-<%= button_to "Fax取得(fetchmail)実行", getfax_exec_configs_path %>
-<% end -%>
-<textarea readonly style="width: 100%; height: 400px;">
-<%= @raw_config %>
-</textarea>

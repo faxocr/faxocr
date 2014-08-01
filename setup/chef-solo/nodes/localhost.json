@@ -1,0 +1,38 @@
+{
+	"apache": {
+		"contact": "root"
+	},
+	"postfix": {
+		"main": {
+			"smtpd_use_tls": "no",
+			"mynetworks": "127.0.0.1/8 [::1]/128"
+		}
+	},
+	"mysql": {
+		"server_root_password": "faxocrmysql",
+		"server_repl_password": "faxocrmysql",
+		"server_debian_password": "faxocrmysql",
+		"bind_address": "localhost"
+	},
+	"apache-conf": {
+		"type": "normal"
+	},
+	"faxocr": {
+		"setup_mode": "initial_setup",
+		"rails_base_version": "rails2",
+		"rails_mode": "production",
+		"passenger_version": "4.0.45"
+	},
+	"run_list": [
+		"recipe[apache2::default]",
+		"recipe[xml]",
+		"recipe[mysql::server]",
+		"recipe[php]",
+		"recipe[postfix::server]",
+		"recipe[postfix::aliases]",
+		"recipe[python]",
+		"recipe[imagemagick]",
+		"recipe[faxocr::default]",
+		"recipe[faxocr::final]"
+	]
+}

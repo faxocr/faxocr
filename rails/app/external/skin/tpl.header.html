@@ -33,9 +33,13 @@
 
 <div id="nav">
 	<ul class="clearfix">
-		<li><a href="/faxocr">戻る</a></li>
+		<li><a href="/faxocr">トップページ</a></li>
 	</ul>
 </div>
+
+<?php if ($debug_mode === 'true') : ?>
+<div class="debug">デバッグモード</div>
+<?php endif; ?>
 
 <!-- container STR -->
 <div id="container" class="clearfix">

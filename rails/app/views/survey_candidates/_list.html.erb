@@ -1,7 +1,7 @@
 <div class="surveysobject_new">
 <% if params[:controller] == "survey_candidates" %>
 <% if @current_user.has_survey_role(@group.id) %>
-<%= link_to 'サーベイに調査対象を追加', new_group_survey_survey_candidate_path(@group, @survey) %>
+<%= link_to '調査対象を追加', new_group_survey_survey_candidate_path(@group, @survey) %>
 <% end %>
 <% end %>
 </div>

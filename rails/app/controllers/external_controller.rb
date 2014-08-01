@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+require "net/smtp"
+
 class ExternalController < ApplicationController
 
-  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec, :sht_field, :sht_script, :sht_marker, :sht_config, :sht_verify, :sht_commit]
+  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec, :sht_field, :sht_script, :sht_marker, :sht_config, :sht_verify, :sht_commit, :sht_field_checker]
 
   # file size limit
   # @@size_limit = 60000
@@ -19,7 +21,7 @@ class ExternalController < ApplicationController
 
     # PHP CLI SAPIの呼び出しとなるため、HTML出力が無い
     @html = "<PRE>\n"
-    @html += `cd ./app/external; php contrib/test.php`
+    @html += `cd ./app/external; php contrib/test.php debug_mode=\"#{debug_mode}\"`
     @html += "<PRE>\n"
 
     render :dummy
@@ -87,7 +89,7 @@ class ExternalController < ApplicationController
       #  "Temp file: " + @tname
       # @html = `cd ./app/external; php reg_upload.php`
       # @html = `echo php reg_upload.php file=\"#{@tname}\"`
-      @html = `cd ./app/external; php reg_upload.php gid=\"#{@gid}\" file=\"#{@tname}\" rails_env=\"#{RAILS_ENV}\"`
+      @html = `cd ./app/external; php reg_upload.php gid=\"#{@gid}\" file=\"#{@tname}\" rails_env=\"#{RAILS_ENV}\" debug_mode=\"#{debug_mode}\"`
       render :dummy
     else
       # @html = "GID: " + @gid + "\n<BR>"
@@ -107,6 +109,57 @@ class ExternalController < ApplicationController
     redirect_to group_candidates_url(@group)
   end
 
+  # Debug
+  # http://server_addr:3000/external/sheet_checker
+  def sheet_checker
+    # 生成したpdfは、public/external/pdfに入れる方針で
+    @limit = (@@size_limit / 1024).to_s + "K"
+
+    @debug_mode = debug_mode;
+
+    @action = "/external/sht_field_checker/"
+  end
+
+  # Debug
+  def sht_field_checker
+    @tname = params[:file_id]
+
+    @msg = flash[:notice]
+
+    if not @tname.nil? then
+      @html = `cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\"`
+      render :dummy
+      return
+    else
+      if params[:file].nil? then
+        redirect_to :controller => 'external', :action => 'sheet_checker'
+        return
+      else
+        @filename = params[:file]['upfile'].original_filename
+        @size = params[:file]['upfile'].size
+        @tname = "Debug-" + Time.now().strftime("%Y%m%d%H%M")
+      end
+    end
+
+    if 0 < @size && @size <= @@size_limit && /(\.xlsx?)$/ =~ @filename then
+      ext = $1
+      outputFileName = "#{RAILS_ROOT}/files/#{@tname}"
+      outputFileNameWithExt = outputFileName + ext
+      File.open(outputFileNameWithExt, "wb") {
+        |f| f.write(params[:file]['upfile'].read)
+      }
+      if ext == ".xlsx" then
+        `unoconv -f xls #{outputFileNameWithExt}`
+      end
+      @filename.slice!(/\.\w+$/)
+      @html = `cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" sname=\"#{@filename}\" debug_mode=\"#{debug_mode}\"`
+      render :dummy
+    else
+      flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
+      redirect_to :controller => 'faxocr'
+    end
+  end
+
   # http://server_addr:3000/external/sheet/1234/5678
   def sheet
 
@@ -116,6 +169,8 @@ class ExternalController < ApplicationController
     @sid = params[:survey_id]
 
     @limit = (@@size_limit / 1024).to_s + "K"
+
+    @debug_mode = debug_mode;
 
     @action = "/external/sht_field/"
 
@@ -136,7 +191,7 @@ class ExternalController < ApplicationController
     @msg = flash[:notice]
 
     if not @tname.nil? then
-      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" msg=\"#{@msg}\" target=\"#{@target}\"`
+      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" msg=\"#{@msg}\" target=\"#{@target}\" debug_mode=\"#{debug_mode}\"`
       render :dummy
       return
     else
@@ -169,7 +224,7 @@ class ExternalController < ApplicationController
       # @html = `cd ./app/external; php reg_upload.php`
       # @html = `echo php reg_upload.php file=\"#{@tname}\"`
       @filename.slice!(/\.\w+$/)
-      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" target=\"#{@target}\" sname=\"#{@filename}\"`
+      @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" target=\"#{@target}\" sname=\"#{@filename}\" debug_mode=\"#{debug_mode}\"`
       render :dummy
     else
       flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
@@ -188,7 +243,7 @@ class ExternalController < ApplicationController
     params.each {|key, value|
       @param_str += key + "=\"" + value + "\" "
     }
-    @errmsg = `cd ./app/external; php sht_script.php #{@param_str} file_id=#{@fileid}`
+    @errmsg = `cd ./app/external; php sht_script.php #{@param_str} file_id=#{@fileid} debug_mode=\"#{debug_mode}\"`
     # flash[:notice] = @errmsg
     # flash[:notice] = "セーブしました"
 
@@ -197,7 +252,7 @@ class ExternalController < ApplicationController
     # @html += "<PRE>\n"
     # render :dummy
 
-    redirect_to :controller => 'external', :action => 'sht_field', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid}
+    redirect_to :controller => 'external', :action => 'sht_marker', :params => {:gid => @gid, :sid => @sid, :file_id => @fileid}
   end
 
   def sht_marker
@@ -210,7 +265,7 @@ class ExternalController < ApplicationController
     @file = @file.nil? ? params[:file_id] : @file
     # @group = Group.find(params[:gid])
 
-    @html = `cd ./app/external; php sht_marker.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\"`
+    @html = `cd ./app/external; php sht_marker.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\"`
     render :dummy
   end
 
@@ -260,7 +315,7 @@ class ExternalController < ApplicationController
       @ret = `rm -f #{@file_prefix}-*.pdf`
       @ret = `rm -f doc_data.txt`
     else
-      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{RAILS_ENV}\"`
+      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{RAILS_ENV}\" debug_mode=\"#{debug_mode}\"`
       # flash[:notice] = @errmsg
       # flash[:notice] = "セーブしました"
     end
@@ -275,7 +330,7 @@ class ExternalController < ApplicationController
     @file = params[:fileid]
     @msg = flash[:notice]
 
-    @html = `cd ./app/external; php sht_verify.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\"`
+    @html = `cd ./app/external; php sht_verify.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\"`
     render :dummy
   end
 
@@ -287,6 +342,13 @@ class ExternalController < ApplicationController
     @group = Group.find(params[:gid])
 
     @result = `ruby #{RAILS_ROOT}/files/#{@file}.rb #{RAILS_ROOT} #{@gid}`
+
+    if debug_mode == 'true'
+      @file_prefix = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}"
+      @debug = `cd #{RAILS_ROOT}/files/`
+      @debug = `convert #{@file_prefix}.pdf #{@file_prefix}.tif`
+      sendmail "#{@file_prefix}.tif"
+    end
 
     flash[:notice] = "シートを登録しました"
     redirect_to group_url(@group)
@@ -331,6 +393,49 @@ class ExternalController < ApplicationController
     send_file(@file_png,
               {:filename => "#{@gid}-#{@sid}.png",
                 :type => "application/png"})
+  end
+
+  private
+
+  def sendmail(file_name)
+    from = 'faxocr@localhost'
+    to = 'faxocr@localhost'
+    subject = 'Debug Mode'
+    body = 'everynet.jp'
+    host = "localhost"
+    port = 25
+
+    body = <<EOT
+From: #{from}
+To: #{to.to_a.join(",\n ")}
+Subject: #{NKF.nkf("-WMm0", subject)}
+Date: #{Time::now.strftime("%a, %d %b %Y %X %z")}
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="boundary.faxocr.debug"
+X-MPlus-MsgType: 1
+X-MPlus-MsgNo: 347601
+X-MPlus-ReceiverUserID: 90016528
+X-MPlus-CallerTelNo: 05000000000
+X-MPlus-UniDTWhenThisWasSent: 1395122105
+
+--boundary.faxocr.debug
+Content-Type: text/plain; charset=ISO-2022-JP
+Content-Transfer-Encoding: 7bit
+
+#{NKF.nkf("-Wjm0", body)}
+
+--boundary.faxocr.debug
+Content-Type: application/octet-stream; name="#{File.basename(file_name)}"
+Content-Disposition: attachment; name="#{File.basename(file_name)}"; filename="#{File.basename(file_name)}"
+Content-Transfer-Encoding: base64
+
+#{[File.open(file_name).readlines.join('')].pack('m')}
+--boundary.faxocr.debug--
+EOT
+ 
+    Net::SMTP.start(host, port) do |smtp|
+      smtp.send_mail body, from, to
+    end
   end
 
 end

@@ -28,10 +28,11 @@ class SurveysController < ApplicationController
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:id])
     @survey_candidates = @survey.survey_candidates
-    @survey_properties = @survey.survey_properties
+    @survey_properties = @survey.survey_properties.all(:order => "view_order")
     @sheets = @survey.sheets
     sheet_ids = @survey.sheet_ids
     datetime = DateTime.now
+    @today = datetime.strftime("%Y/%m/%d")
     datetime = datetime - 1
     date_begin = datetime.strftime("%Y/%m/%d %H:%M:%S")
     @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids,
@@ -61,6 +62,12 @@ class SurveysController < ApplicationController
     respond_to do |format|
       format.html # new.html.erb
     end
+  end
+
+  # GET /surveys/1/report
+  def report
+    @group = Group.find(params[:group_id])
+    @survey = @group.surveys.find(params[:id])
   end
 
   # POST /surveys
@@ -106,14 +113,8 @@ class SurveysController < ApplicationController
   def destroy
     @group = Group.find(params[:group_id])
     @survey = Survey.find(params[:id])
-    sheet = Sheet.find_by_survey_id(params[:id])
-    survey_candidate = SurveyCandidate.find_by_survey_id(params[:id])
-    survey_property = SurveyProperty.find_by_survey_id(params[:id])
-    if sheet != nil || survey_candidate != nil || survey_property != nil
-      flash[:notice] = "このサーベイは使用されているため削除できません"
-    else
-      @survey.destroy
-    end
+    @survey.destroy
+
     respond_to do |format|
       format.html { redirect_to group_surveys_path(@group) }
       format.xml  { head :ok }

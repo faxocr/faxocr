@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 class AnswerSheetsController < ApplicationController
-  before_filter :verify_group_authority
+  before_filter :verify_group_authority, :except => [:index_all]
+
   # GET /answer_sheets
   # GET /answer_sheets.xml
   def index
@@ -15,6 +16,20 @@ class AnswerSheetsController < ApplicationController
     end
   end
 
+  def index_all
+    # index for all user
+    group_id = 1
+    survey_id = 1
+    @group = Group.find(group_id)
+    @survey = @group.surveys.find(survey_id)
+    sheet_ids = @survey.sheet_ids
+    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids, :order => 'date desc')
+
+    respond_to do |format|
+      format.html # index_all.html.erb
+    end
+  end
+
   # GET /answer_sheets/1
   # GET /answer_sheets/1.xml
   def show
@@ -23,12 +38,13 @@ class AnswerSheetsController < ApplicationController
 
     begin
     @answer_sheet = AnswerSheet.find(params[:id])
-    @answer_sheet_properties = @answer_sheet.answer_sheet_properties
+    @answer_sheet_properties = @answer_sheet.answer_sheet_properties.find(:all, :joins=>"INNER JOIN survey_properties ON answer_sheet_properties.ocr_name = survey_properties.ocr_name AND survey_properties.survey_id = " + @survey.id.to_s, :order => "view_order").sort_by{|asp| asp.ocr_value}
     sheets = @survey.sheets
     sheet = sheets.find(@answer_sheet.sheet_id)
     rescue
       sheet = nil
     end
+    @sheet_orientation = (sheet.block_width > sheet.block_height) ? :landscape : :portrait 
 
     #
     # Finds prev and next
@@ -92,6 +108,67 @@ class AnswerSheetsController < ApplicationController
     end
   end
 
+  def show_all
+    # index for all user
+    group_id = 1
+    survey_id = 1
+    @group = Group.find(group_id)
+    @survey = @group.surveys.find(survey_id)
+
+    begin
+      @answer_sheet = AnswerSheet.find(params[:id])
+      @answer_sheet_properties = @answer_sheet.answer_sheet_properties.find(:all, :joins=>"INNER JOIN survey_properties ON answer_sheet_properties.ocr_name = survey_properties.ocr_name AND survey_properties.survey_id = " + @survey.id.to_s, :order => "view_order")
+      sheets = @survey.sheets
+      sheet = sheets.find(@answer_sheet.sheet_id)
+    rescue
+      sheet = nil
+    end
+    @sheet_orientation = (sheet.block_width > sheet.block_height) ? :landscape : :portrait 
+
+    # Finds prev and next
+    @answer_sheets = AnswerSheet.find_all_by_sheet_id(@survey.sheet_ids, :order => 'date desc')
+    nsheets = @answer_sheets.length
+    case nsheets
+    when 0
+      @s_prev = nil
+      @s_next = nil
+    when 1
+      @s_prev = nil
+      @s_next = nil
+    when 2
+      if @answer_sheets.first == sheet
+        @s_prev = @answer_sheets.last
+	@s_next = nil
+      else
+        @s_prev = nil
+	@s_next = @answer_sheets.first
+      end
+    else
+      flag = nil
+      @s_prev = nil
+      @s_next = nil
+      @answer_sheets.each do |s|
+        if flag == true
+	  @s_prev = s
+	  break
+	end
+	if s == @answer_sheet
+          flag = true
+	else
+          @s_next = s
+	end
+      end
+    end
+
+    if sheet == nil
+      redirect_to(group_survey_answer_sheets_url(@group, @survey))
+    else
+      respond_to do |format|
+        format.html # show_all.html.erb
+      end
+    end
+  end
+
   def image
     @answer_sheet = AnswerSheet.find(params[:id])
     @answer_sheet_properties = @answer_sheet.answer_sheet_properties
@@ -134,6 +211,30 @@ class AnswerSheetsController < ApplicationController
     send_file(@filename,
               :type => 'image/png',
               :disposition => 'inline')
+  end
+
+  def image_thumb_all
+    @answer_sheet = AnswerSheet.find(params[:id])
+    @answer_sheet_properties = @answer_sheet.answer_sheet_properties
+
+    # index for all user
+    group_id = 1
+    survey_id = 1
+    @group = Group.find(group_id)
+    @survey = @group.surveys.find(survey_id)
+
+    sheets = @survey.sheets
+    sheet = sheets.find(@answer_sheet.sheet_id)
+    if sheet == nil
+      redirect_to(group_survey_answer_sheets_url(@group, @survey))
+    end
+
+    @filename = "#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}".gsub('.png', '_thumb.png')
+    if !File.exists?(@filename)
+      @filename = "#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}"
+    end
+
+    send_file(@filename, :type => 'image/png', :disposition => 'inline')
   end
 
   # GET /answer_sheets/new

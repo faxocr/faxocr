@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 class AnswerSheet < ActiveRecord::Base
-  has_many :answer_sheet_properties
+  has_many :answer_sheet_properties, :dependent => :destroy
 
   belongs_to :sheet
   belongs_to :candidate

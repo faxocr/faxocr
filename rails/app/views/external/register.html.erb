@@ -32,10 +32,9 @@
 	<!-- contents STR -->
 	<div id="contents_1c">
 <br>
-<p style="color: green"><%= flash[:notice] %></p>
-
 
 <h1>調査対象 一括取込</h1>
+<p style="color: green"><%= flash[:notice] %></p>
 
 <br>
 <form action="<%= @action %>" method="post" enctype="multipart/form-data" name="upfm">
@@ -50,7 +49,6 @@
 <div align="left">
 <ul>
   <li> 調査対象ファイルのテンプレートは、<a href="../target.xls">こちら</a>です。</li>
-  <li> 本システムは、Office 2003以前のExcel(.xls)専用で、.xlsxには未対応です。</li>
   <li> アップロード可能なファイルサイズは、<b><%= @limit %></b>バイトまでです。</li>
 <br>
 </ul>

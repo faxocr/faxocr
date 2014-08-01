@@ -2,7 +2,7 @@
 /*
  * Shinsai FaxOCR
  *
- * Copyright (C) 2009-2011 National Institute of Public Health, Japan.
+ * Copyright (C) 2009-2013 National Institute of Public Health, Japan.
  * All rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -54,11 +54,15 @@ $link_label = "";
 // マーカー色指定 (マーカーモード用)
 define("COLOR_FILL", 22);
 
-// 調査シートの最大/最小サイズ
+// 調査シートの最大/最小サイズ(セルの数)
 define("MAX_SHEET_WIDTH", 18);
 define("MAX_SHEET_HEIGHT", 30);
 define("MIN_SHEET_WIDTH", 6);
 define("MIN_SHEET_HEIGHT", 10);
+
+// 調査シートの最小サイズ(px)
+define("MIN_CELL_WIDTH", 30);
+define("MIN_CELL_HEIGHT", 30);
 
 
 ///////////////////////////////////////////////////////
@@ -152,7 +156,7 @@ define("MYSQL_DB_SERVER_NAME", "localhost");
 // データベース名
 define("MYSQL_DB_NAME", "ezcloud");
 
-// アクセスユーザー名
+// アクセスユーザ名
 define("MYSQL_DB_USER_NAME", "cloud");
 
 // アクセスパスワード

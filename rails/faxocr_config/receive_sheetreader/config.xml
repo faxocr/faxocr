@@ -24,7 +24,7 @@
 				image_prefix = ARGV[1] || "./"
 				echo_prefix = ARGV[2] || "./"
 				config_db = rails_prefix + "/config/database.yml"
-				db_env = "development"
+				db_env = ENV['RAILS_ENV'] || "development"
 				ActiveRecord::Base.configurations = YAML.load_file(config_db)
 				ActiveRecord::Base.establish_connection(db_env)
 				Dir.glob(rails_prefix + '/app/models/*.rb').each do |model|
@@ -47,7 +47,7 @@
 				#PROPERTIES#
 				echo_request = 0
 				props.each do |prop|
-				  if prop[0] == "echo_request_and_send_analyzed_data" && prop[1] == "○"
+				  if prop[0] == "echo_request_and_send_analyzed_data" && prop[1] == "×"
 				  echo_request = 1
 				  end
 				end
@@ -72,7 +72,7 @@
 					f.write "<tr><th colspan=3 bgcolor=\"#aaaaaa\">シート情報</th></tr>\n"
 					f.write "<tr><th>調査対象コード</th><td colspan=2>#{answer_sheet.analyzed_candidate_code}</td></tr>\n"
 					f.write "<tr><th>シートコード</th><td colspan=2>#{answer_sheet.analyzed_sheet_code}</td></tr>\n"
-					f.write "<tr><th>サーベイ</th><td colspan=2>#{survey_object.survey_name}</td></tr>\n"
+					f.write "<tr><th>調査</th><td colspan=2>#{survey_object.survey_name}</td></tr>\n"
 					f.write "<tr><th>シート</th><td colspan=2>#{sheet_object.sheet_name}</td></tr>\n"
 					f.write "<tr bgcolor=\"#aaaaaa\">\n"
 					f.write "<th bgcolor=\"#aaaaaa\">項目</th>\n"
@@ -93,8 +93,8 @@
 					f.write "<tr><td colspan=3><img width=\"500\" src=\"#{image_prefix}#SHEETIMAGE#\"></td></tr>\n"
 					f.write "</table></body></html>\n"
 					f.close
-					system("wkhtmltopdf --page-size A4 --encoding utf-8 #{echo_prefix}.html #{echo_prefix}.pdf")
-					exit(1)
+					system("wkhtmltopdf --quiet --page-size A4 --encoding utf-8 #{echo_prefix}.html #{echo_prefix}.pdf")
+					exit(8)
 				end
 				]]>
 			</code>

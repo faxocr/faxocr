@@ -1,0 +1,26 @@
+<h1>Fax送信履歴 (直近<%= @page_size %>件)</h1>
+<p style="color: green"><%= flash[:notice] %></p>
+
+<br>
+
+<% form_tag('/configs/sendtestfax_exec', {:method => 'post'}) do %>
+<center>
+  <textarea readonly style="width: 95%; height: 250px;"><%= @raw_config %></textarea>
+</center>
+
+  <br>
+  <center>
+  <div style="width:80%; border-style:solid; border-color:gray; background-color: lavender; border-width:1px; padding: 10px 5px 10px 20px; border-radius:5px;">
+    <div align="left">
+      <font color="#1d7877">テストFax送信</font>
+    </div>
+  <div align="right">
+  <span>  送信先FAX番号
+    <%= text_field :dest_fax_num, '' %>
+  <!-- (数字のみを入力してください)-->
+  </span>
+  <%= submit_tag '送信', :onclick => "DisableButton(this);" %><br>
+  </div>
+  </div>
+  </center>
+<% end %>

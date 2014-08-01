@@ -1,4 +1,5 @@
 <h1 class="surveysobject">FAX受信調査シート</h1> 
+<p style="color: green"><%= flash[:notice] %></p>
 <table><tr><td>
 <h2 class="surveysobject_title">基本情報</h2>
 </td><td>
@@ -32,7 +33,12 @@
 <td>
 <div>
   <h3>調査シート</h3>
-<p style="-webkit-transform: rotate(-90deg); -webkit-transform-origin:250px 250px;">
+<% @classname = ''
+  if @sheet_orientation == :landscape
+    @classname = 'rotate90'
+  end
+%>
+<p class="<%= @classname %>">
   <%= link_to image_tag(image_thumb_group_survey_answer_sheet_path(@group, @survey, @answer_sheet), { :width => '500', :border => '0', :alt => 'faximg'}), image_group_survey_answer_sheet_path(@group, @survey, @answer_sheet) %>
 
 </p>

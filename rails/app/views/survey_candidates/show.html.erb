@@ -1,13 +1,8 @@
-<p>
-  <b>Survey Name:</b>
-  <%=h Survey.find(@survey_candidate.survey_id).survey_name %>
-</p>
+<h1><%=h Survey.find(@survey_candidate.survey_id).survey_name %> - <%=h @survey_candidate.candidate.candidate_name %></h1>
+<p style="color: green"><%= flash[:notice] %></p>
 
-<p>
-  <b>Candidate Name:</b>
-  <%=h Candidate.find(@survey_candidate.candidate_id).candidate_name %>
-</p>
+<h2 class="surveysobject">役割</h2>
+<div><%=h @survey_candidate.printable_role %></div>
 
-
-<%= link_to 'Edit', edit_group_survey_survey_candidate_path(@group, @survey, @survey_candidate) %> |
-<%= link_to 'Back', group_survey_survey_candidates_path(@group, @survey) %>
+<%= link_to '編集', edit_group_survey_survey_candidate_path(@group, @survey, @survey_candidate) %> |
+<%= link_to '戻る', group_survey_survey_candidates_path(@group, @survey) %>

@@ -45,7 +45,7 @@ protected
       elsif @authorized_groups.length > 1
         session[:wait_group_selection] = true
         #session[:return_uri] = request.request_uri
-        flash[:notice] = "ユーザー #{@current_user.full_name} は、複数のグループに属しています。一つを選択して下さい。"
+        flash[:notice] = "ユーザ #{@current_user.full_name} は、複数のグループに属しています。一つを選択して下さい。"
         redirect_to :controller => 'faxocr', :action => 'group_select'
         return
       else
@@ -166,6 +166,20 @@ protected
   def access_violation
     # This code is not fully correct, need to be fixed
     send_data("Permission denied.", :status => "403 Forbidden")
+  end
+
+  def debug_mode
+    value = `. #{Rails.root}/../etc/faxocr.conf; echo $DEBUG_MODE`
+    value.chomp
+  end
+
+  def page_size
+    value = `. #{Rails.root}/../etc/faxocr.conf; echo $PAGE_SIZE`
+    value.chomp
+    if value.to_i == 0
+      value = 10
+    end
+    value
   end
 
 end

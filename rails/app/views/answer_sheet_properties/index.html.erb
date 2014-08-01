@@ -1,3 +1,4 @@
 <h1><%= @survey.survey_name %> のFAX 調査項目一覧</h1>
+<p style="color: green"><%= flash[:notice] %></p>
 <br>
 <%= render :partial => "list" %>

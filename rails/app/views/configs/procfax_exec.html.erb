@@ -1,5 +1,6 @@
 <h1>procfax実行ログ</h1>
-<div><%= link_to "戻る", procfax_configs_path %></div>
+<p style="color: green"><%= flash[:notice] %></p>
+<div><%= link_to "戻る", view_procfax_log_configs_path %></div>
 <p>実行結果: 
 <% if (@result) %>
 成功

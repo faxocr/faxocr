@@ -1,3 +1,4 @@
 <h1><%=h @sheet.sheet_name %>で使用する調査項目の編集</h1>
+<p style="color: green"><%= flash[:notice] %></p>
 <%= render :partial => "form_group" %>
 <%= link_to 'キャンセル', group_survey_sheet_sheet_property_path(@group, @survey, @sheet, @sheet_property) %> 

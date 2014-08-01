@@ -88,14 +88,8 @@ class GroupsController < ApplicationController
   # DELETE /groups/1.xml
   def destroy
     @group = Group.find(params[:id])
-    candidate = Candidate.find_by_group_id(params[:id])
-    role_mapping = RoleMapping.find_by_group_id(params[:id])
-    survey = Survey.find_by_group_id(params[:id])
-    if candidate != nil || role_mapping != nil || survey != nil
-      flash[:notice] = "このグループは使用されているため削除できません"
-    else
-      @group.destroy
-    end
+    @group.destroy
+
     respond_to do |format|
       format.html { redirect_to(groups_url) }
       format.xml  { head :ok }
@@ -106,32 +100,36 @@ class GroupsController < ApplicationController
     @group = Group.find(params[:id])
     @surveys = @group.surveys
     datetime = DateTime.now
+
     @repyears = []
     i = 2
-    while i >= 0 do      
+    while i >= 0 do
       tmpdatetime = datetime - (365 * i)
       repyear = [tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%Y")]
       @repyears << repyear
       i -= 1
     end
+
     @repmonths = []
     datetime = DateTime.now
-    i = 6
-    while i >= 0 do      
+    i = 5
+    while i >= 0 do
       tmpdatetime = datetime - (31 * i)
       repmonth = [tmpdatetime.strftime("%m"), tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%m")]
       i -= 1
       @repmonths << repmonth
     end
+
     @repdays = []
     datetime = DateTime.now
     i = 6
-    while i >= 0 do      
+    while i >= 0 do
       tmpdatetime = datetime - i
       repday = [tmpdatetime.strftime("%d"), tmpdatetime.strftime("%Y"), tmpdatetime.strftime("%m"), tmpdatetime.strftime("%d")]
       i -= 1
       @repdays << repday
     end
+
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @group }

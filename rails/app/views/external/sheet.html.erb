@@ -21,7 +21,7 @@
 <!-- nav STR -->
 <div id="nav">
 	<ul class="clearfix">
-		<li><a href="/faxocr/">戻る</a></li>
+		<li><a href="/faxocr/">トップページ</a></li>
 </ul>
 </div>
 <!-- nav END -->
@@ -32,10 +32,13 @@
 	<!-- contents STR -->
 	<div id="contents_1c">
 <br>
-<p style="color: green"><%= flash[:notice] %></p>
-
 
 <h1>調査シート登録</h1>
+<p style="color: green"><%= flash[:notice] %></p>
+
+<% if @debug_mode == "true" %>
+<div class="debug">デバッグモード</div>
+<% end %>
 
 <br>
 <form action="<%= @action %>" method="post" enctype="multipart/form-data" name="upfm">
@@ -52,7 +55,6 @@
 <br>
 <div align="left">
 <ul>
-  <li> 本システムは、Office 2003以前のExcel(.xls)専用で、.xlsxには未対応です。</li>
   <li> アップロード可能なファイルサイズは、<b><%= @limit %></b>バイトまでです。</li>
 <br>
 </ul>

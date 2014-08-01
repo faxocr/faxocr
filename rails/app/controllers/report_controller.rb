@@ -10,6 +10,7 @@ class ReportController < ApplicationController
     date_begin = "#{year}/#{month}/#{day} 00:00:00"
     date_end =  "#{year}/#{month}/#{day} 23:59:59"
     
+    @group = Group.find(params[:group_id])
     @survey = Survey.find(params[:survey_id])
     unless @survey
       # No survey found (@survey = nil)
@@ -25,7 +26,7 @@ class ReportController < ApplicationController
     @survey_candidates.each do |survey_candidate|
       if survey_candidate.has_receivereport_role
         @answer_sheet = AnswerSheet.find_by_sheet_id_and_candidate_id(sheet_ids, survey_candidate.candidate_id,
-        :conditions => ['date <= ?', date_end],
+        :conditions => ['date >= ? and date <= ?', date_begin, date_end],
         :order => 'date desc')
         if @answer_sheet == nil
           @answer_sheet = AnswerSheet.new
@@ -39,6 +40,11 @@ class ReportController < ApplicationController
     @place_holder.store('MONTH', month)
     @place_holder.store('DAY', day)
     @prefix_image = "/images/ocr"
+  end
+
+  def fax_preview
+    daily
+    render :layout => false
   end
 
 private

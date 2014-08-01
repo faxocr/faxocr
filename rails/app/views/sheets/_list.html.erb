@@ -1,9 +1,11 @@
 <div class="surveysobject_new">
+<!-- 
 <% if params[:controller] == "sheets" %>
 <% if @current_user.has_survey_role(@group.id) %>
 <%= link_to '[シートの新規登録]', new_group_survey_sheet_path(@group, @survey) %>
 <% end %>
 <% end %>
+ -->
 </div>
 <table class="surveysobject">
   <tr class="surveysobject">
@@ -34,7 +36,10 @@
 	<% if params[:controller] == "sheets" %>
     <% if @current_user.has_survey_role(@group.id) %>
     <td class="surveysobject_manage">
+      <% file_zip = "#{RAILS_ROOT}/files/#{@group.id.to_s}-#{sheet.id.to_s}.zip" %>
+      <% if File.exist?(file_zip) %>
 <a href=<%="\"/external/download_zip/" + @group.id.to_s + "/" + sheet.id.to_s + "\""%> >[PDF]</a>
+      <% end %>
 <%= link_to '[編集]', group_survey_sheet_path(@group, @survey, sheet) %>
 <%= link_to '[削除]', group_survey_sheet_path(@group, @survey, sheet), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
     <% else %>
@@ -42,7 +47,10 @@
     <% end %>
     <% else %>
     <td class="surveysobject_manage">
+      <% file_zip = "#{RAILS_ROOT}/files/#{@group.id.to_s}-#{sheet.id.to_s}.zip" %>
+      <% if File.exist?(file_zip) %>
       <a href=<%="\"/external/download_zip/" + @group.id.to_s + "/" + sheet.id.to_s + "\""%> >[PDF]</a>
+      <% end %>
     </td>
     <% end %>
   </tr>
