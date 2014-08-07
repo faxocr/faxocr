@@ -8,15 +8,6 @@ bash "change ruby and gem to ruby1.8 base" do
   action :nothing
 end
 
-bash "downgrading gem to version 1.3.7" do
-  cwd "#{node[:faxocr][:home_dir]}/rails"
-  code <<-EOH
-    gem1.8 install rubygems-update -v=1.3.7
-    update_rubygems
-    EOH
-  only_if { node[:faxocr][:rails_base_version] == "rails2" }
-end
-
 bash "installing bundler and bundle install" do
   cwd "#{node[:faxocr][:home_dir]}/rails"
   code <<-EOH
