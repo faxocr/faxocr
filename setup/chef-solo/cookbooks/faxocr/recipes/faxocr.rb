@@ -5,10 +5,6 @@ git "cloning faxocr" do
   action :sync
   user "root"
   group "root"
-  case node[:faxocr][:rails_base_version]
-  when "rails2_latest"
-    revision "rails2_3_18"
-  end
 end
 
 bash "change the owner of faxocr's home directory to faxocr" do
