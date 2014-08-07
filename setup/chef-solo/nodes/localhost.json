@@ -4,6 +4,7 @@
 	},
 	"postfix": {
 		"main": {
+			"smtp_use_tls": "no",
 			"smtpd_use_tls": "no",
 			"mynetworks": "127.0.0.1/8 [::1]/128"
 		}
