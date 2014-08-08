@@ -52,3 +52,24 @@
 [submodule "setup/chef-solo/cookbooks/yum"]
 	path = setup/chef-solo/cookbooks/yum
 	url = git://github.com/opscode-cookbooks/yum.git
+[submodule "setup/chef-solo/cookbooks/iptables"]
+	path = setup/chef-solo/cookbooks/iptables
+	url = git://github.com/opscode-cookbooks/iptables.git
+[submodule "setup/chef-solo/cookbooks/chef-sugar"]
+	path = setup/chef-solo/cookbooks/chef-sugar
+	url = git://github.com/sethvargo/chef-sugar.git
+[submodule "setup/chef-solo/cookbooks/yum-mysql-community"]
+	path = setup/chef-solo/cookbooks/yum-mysql-community
+	url = git://github.com/opscode-cookbooks/yum-mysql-community.git
+[submodule "setup/chef-solo/cookbooks/iis"]
+	path = setup/chef-solo/cookbooks/iis
+	url = git://github.com/opscode-cookbooks/iis.git
+[submodule "setup/chef-solo/cookbooks/yum-epel"]
+	path = setup/chef-solo/cookbooks/yum-epel
+	url = git://github.com/opscode-cookbooks/yum-epel.git
+[submodule "setup/chef-solo/cookbooks/logrotate"]
+	path = setup/chef-solo/cookbooks/logrotate
+	url = git://github.com/stevendanna/logrotate.git
+[submodule "setup/chef-solo/cookbooks/pacman"]
+	path = setup/chef-solo/cookbooks/pacman
+	url = git://github.com/jesseadams/pacman.git

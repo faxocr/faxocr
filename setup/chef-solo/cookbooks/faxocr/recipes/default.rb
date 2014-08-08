@@ -20,5 +20,3 @@ include_recipe "faxocr::crontab"
 include_recipe "faxocr::writable-dir-by-apache"
 include_recipe "faxocr::rails"
 include_recipe "faxocr::apache-conf"
-include_recipe "faxocr::passenger"
-
