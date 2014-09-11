@@ -43,6 +43,7 @@ class Sheet {
     public $tblheight;      // height of the sheet
     public $cells_width;    // arrray
     public $cells_height;   // arrray
+    public $cells_colrowspan;  // hash
     public $row_count; // セル数(縦)
     public $col_count; // セル数(横)
 
@@ -79,6 +80,19 @@ class Sheet {
 
             if ($this->min_cell_height == 0 || $this->min_cell_height > $this->xls->getRowHeight($this->sn, $i)) {
                 $this->min_cell_height = $this->xls->getRowHeight($this->sn, $i);
+            }
+        }
+
+        for ($col = 0; $col <= $this->xls->maxcell[$this->sn]; $col++) {
+            for ($row = 0; $row <= $this->xls->maxrow[$this->sn]; $row++) {
+                $colspan = $this->xls->celmergeinfo[$this->sn][$row][$col]['cspan'];
+                if (isset($colspan) && $colspan > 1) {
+			        $this->cells_colrowspan['colspan'][$row][$col] = $colspan;
+                }
+                $rowspan = $this->xls->celmergeinfo[$this->sn][$row][$col]['rspan'];
+                if (isset($rowspan) && $rowspan > 1) {
+			        $this->cells_colrowspan['rowspan'][$row][$col] = $rowspan;
+                }
             }
         }
 

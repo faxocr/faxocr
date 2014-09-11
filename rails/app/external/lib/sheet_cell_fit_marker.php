@@ -110,6 +110,35 @@ class SheetCellFitMarker {
         );
     }
 
+    public function get_cells_colspan_array_with_marker() {
+        $result = array();
+        foreach (range($this->topLeftMarker->colNum, $this->topRightMarker->colNum) as $col) {
+            foreach (range($this->topLeftMarker->rowNum, $this->bottomLeftMarker->rowNum) as $row) {
+                $colspan = $this->sheet->cells_colrowspan['colspan'][$row][$col];
+                if (isset($colspan) && $colspan > 1) {
+                    $key_name = sprintf("%d_%d", $row - $this->topLeftMarker->rowNum - 1, $col - $this->topLeftMarker->colNum - 1);
+                    $result[$key_name] = $colspan;
+                }
+            }
+
+        }
+        return $result;
+    }
+
+    public function get_cells_rowspan_array_with_marker() {
+        $result = array();
+        foreach (range($this->topLeftMarker->colNum, $this->topRightMarker->colNum) as $col) {
+            foreach (range($this->topLeftMarker->rowNum, $this->bottomLeftMarker->rowNum) as $row) {
+                $rowspan = $this->sheet->cells_colrowspan['rowspan'][$row][$col];
+                if (isset($rowspan) && $rowspan > 1) {
+                    $key_name = sprintf("%d_%d", $row - $this->topLeftMarker->rowNum - 1, $col - $this->topLeftMarker->colNum - 1);
+                    $result[$key_name] = $rowspan;
+                }
+            }
+        }
+        return $result;
+    }
+
 //// private functions ////////////////////////////////////////////////
 
     private function calc_tblwidth() {
