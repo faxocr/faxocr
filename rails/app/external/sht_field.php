@@ -56,19 +56,21 @@ if (file_exists(DST_DIR . $file_id . ARRAY_CONF_EXT)) {
 // ヘッダ処理
 //
 //$header_opt = "<base target=\"/external/sht_field/\">\n";
+$header_opt .= '<link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.8.1/themes/cupertino/jquery-ui.css" />' . "\n";
 $header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/jqcontextmenu.css\" type=\"text/css\" />\n";
 $header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/flexigrid.css\" type=\"text/css\" />\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.4.1.min.js\"></script>\n";
+$header_opt .= '<script type="text/javascript" src="http://code.jquery.com/ui/1.8.1/jquery-ui.min.js"></script>' . "\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jqcontextmenu.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/flexigrid.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetlist.js\"></script>\n";
 
 $body_opt .= "<ul id=\"contextmenu\" class=\"jqcontextmenu\">\n";
 $body_opt .= "<li>　フィールド名 <input id=\"field\" size=\"10\" value=\"\" /></li>\n";
-$body_opt .= "<li><a onclick=\"cell_type[targetid] = 1;\">数字</a></li>\n";
-$body_opt .= "<li><a onclick=\"cell_type[targetid] = 2;\">○×△</a></li>\n";
-$body_opt .= "<li><a onclick=\"cell_type[targetid] = 3;\">画像</a></li>\n";
-$body_opt .= "<li class=\"btGray\"><a onclick=\"cell_type[targetid] = -1;SheetFieldProcessor.reset();\">リセット</a></li>\n";
+$body_opt .= "<li><a onclick=\"set_data_to_mutiple_cells(1); \">数字</a></li>\n";
+$body_opt .= "<li><a onclick=\"set_data_to_mutiple_cells(2); \">○×△</a></li>\n";
+$body_opt .= "<li><a onclick=\"set_data_to_mutiple_cells(3); \">画像</a></li>\n";
+$body_opt .= "<li class=\"btGray\"><a onclick=\"clear_data_to_mutiple_cells(-1);SheetFieldProcessor.reset(); \">リセット</a></li>\n";
 $body_opt .= "</ul>\n";
 $body_opt .= "<ul id=\"fieldreset\" class=\"jqcontextmenu\">\n";
 $body_opt .= "<li style=\"z-index:10\"><a onclick=\";\">リセット</a></li>\n";

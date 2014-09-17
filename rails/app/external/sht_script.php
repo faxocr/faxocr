@@ -24,6 +24,7 @@ require_once 'config.php';
 require_once 'init.php';
 require_once 'lib/common.php';
 require_once 'lib/file_conf.php';
+require_once 'lib/sheet_field.php';
 require_once 'contrib/reviser.php';
 
 // XXX
@@ -214,6 +215,7 @@ function put_config($file_id, $REQUEST, $target, $sheet_name, &$list_colspan)
 
 	// XLSフィールド情報REQUEST取得
 	$conf->array_destroy("field");
+	$span_info = get_span_info_from_field_ids($REQUEST);
 	foreach ($REQUEST as $item => $val) {
 		preg_match("/field-(\d+)-(\d+)-(\d+)-(\d+)/", $item, $loc);
 
@@ -234,6 +236,9 @@ function put_config($file_id, $REQUEST, $target, $sheet_name, &$list_colspan)
 					continue;
 
 				$xls_fields["colspan"] = $list_colspan[$location];
+			}
+			if (isset($span_info["colspan"][$xls_fields["row"]][$xls_fields["col"]])) {
+				$xls_fields["colspan"] = $span_info["colspan"][$xls_fields["row"]][$xls_fields["col"]];
 			}
 
 			// XLSフィールド情報保存

@@ -46,7 +46,20 @@ jQuery(document).ready(function($) {
 		SHEET.setFlexiInSetup();
 	}
 
-	$('.sheet_field td').addcontextmenu('contextmenu');
+	$('.sheet_field').selectable({
+		filter: 'td',
+		selecting: function (event, ui) {
+			// Disabling multiple selection when clicking with ctrl or meta key
+			var current_element = this;
+			if (event.metaKey) {
+				$(".ui-selected", this).each(function() {
+					if (this != current_element) {
+						$(this).removeClass('ui-selected');
+					}
+				});
+			}
+		},
+	});
 	cell_type = new Array();
 
 	cellBgColorManager = new SheetCellBackgroundColor();
@@ -55,7 +68,6 @@ jQuery(document).ready(function($) {
 	document.onkeydown = on_keydown;
 
 	targetid = FieldList.init();
-
 	// set callback function when clicking the marker button
 	StatusMenu.MarkerButton.setCallbackHandler('click', function (e) {
 		this.disabled=true;
@@ -759,3 +771,19 @@ SHEET = {
 		});
 	}
 };
+
+function set_data_to_mutiple_cells(type_id) {
+	var field_data = $("#field").val();
+	$(".ui-selected").each(function() {
+		cell_type[this.id] = type_id;
+		set_field($(this), field_data, this.id);
+	});
+}
+
+function clear_data_to_mutiple_cells(type_id) {
+	$(".ui-selected").each(function() {
+		cell_type[this.id] = type_id;
+		reset_field(this.id);
+	});
+}
+// vim: set noet fenc=utf-8 ff=unix sts=0 sw=8 ts=8 :
