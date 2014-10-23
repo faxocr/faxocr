@@ -21,7 +21,6 @@
 
 var cell_sw;
 var cell_type;
-var field;
 var targetid;
 var dirty = false;
 var $ = jQuery;
