@@ -103,12 +103,12 @@ jQuery(document).ready(function($) {
 	var targettd = $('#field_list td');
 	targetid = targettd.attr('name');
 	if (targettd.length == 1 && targetid == 0) {
-		btn = $('.statusMenu .marker button').attr('disabled', true);
+		$('.statusMenu .marker button').attr('disabled', true);
 	} else {
-		btn = $('.statusMenu .marker button').attr('disabled', false);
+		$('.statusMenu .marker button').attr('disabled', false);
 	}
 
-	btn = $('.statusMenu button:disabled');
+	var btn = $('.statusMenu button:disabled');
 	btn.parent().addClass('disable');
 });
 
@@ -159,7 +159,7 @@ function reset_field () {
 	var targettd = $('#field_list td');
 	targetid = targettd.attr('name');
 	if (targettd.length = 1 && targetid == 0) {
-		btn = $('.statusMenu .marker button').attr('disabled', true);
+		$('.statusMenu .marker button').attr('disabled', true);
 		$('.statusMenu .marker').addClass('disable');
 	}
 }
