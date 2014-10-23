@@ -371,7 +371,7 @@ function put_status($file_id, $group_id, $sheet_id, $conf_sw)
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
-	print "<div class=\"upload\"><button type=\"button\" id=\"\" onclick=\"this.disabled=false; go_sheet_upload(); return false;\" >再読み込み</button></div>\n";
+	print "<div class=\"upload\"><button type=\"button\" id=\"\" onclick=\"this.disabled=false; StatusMenu.ReloadButton.reloadSheetExcelFile(); return false;\" >再読み込み</button></div>\n";
 	print "<div class=\"field current\">&gt;<button type=\"button\" disabled=\"disabled\">フィールド指定</button></div>\n";
 	print "<div class=\"marker\">&gt;<button type=\"button\" id=\"next\" onclick=\"this.disabled=true; pack_fields();\" " . $status_label . ">マーカー指定</button></div>\n";
 	print "<div class=\"verify disable\">&gt;<button type=\"button\" disabled=\"disabled\">シート確認</button></div>\n";

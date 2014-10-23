@@ -54,12 +54,6 @@ function isset(data) {
 	};
 })(jQuery);
 
-function go_sheet_upload() {
-	gid = $("#form-status input[name=gid]").val();
-	sid = $("#form-status input[name=sid]").val();
-	location.href = "/external/sheet/" + gid + "/" + sid + "/";
-}
-
 
 // initialization
 jQuery(document).ready(function($) {
@@ -103,13 +97,10 @@ jQuery(document).ready(function($) {
 	var targettd = $('#field_list td');
 	targetid = targettd.attr('name');
 	if (targettd.length == 1 && targetid == 0) {
-		$('.statusMenu .marker button').attr('disabled', true);
+		StatusMenu.MarkerButton.makeItUnClickable();
 	} else {
-		$('.statusMenu .marker button').attr('disabled', false);
+		StatusMenu.MarkerButton.makeItClickable();
 	}
-
-	var btn = $('.statusMenu button:disabled');
-	btn.parent().addClass('disable');
 });
 
 //
@@ -159,8 +150,7 @@ function reset_field () {
 	var targettd = $('#field_list td');
 	targetid = targettd.attr('name');
 	if (targettd.length = 1 && targetid == 0) {
-		$('.statusMenu .marker button').attr('disabled', true);
-		$('.statusMenu .marker').addClass('disable');
+		StatusMenu.MarkerButton.makeItUnClickable();
 	}
 }
 
@@ -201,8 +191,7 @@ function add_column(html, width) {
 	$('#field_list').flexReload();
 	dirty = true;
 
-	$('.statusMenu .marker button').attr('disabled', false);
-	$('.statusMenu .marker').removeClass('disable');
+	StatusMenu.MarkerButton.makeItClickable();
 }
 
 //
@@ -239,8 +228,7 @@ function delColumn(target, idx) {
 	$('#field_list').flexReload();
 	dirty = true;
 
-	$('.statusMenu .marker button').attr('disabled', false);
-	$('.statusMenu .marker').removeClass('disable');
+	StatusMenu.MarkerButton.makeItClickable();
 
 	$('#fieldreset li a').unbind('click');
 }
@@ -282,8 +270,7 @@ function del_column(target, index) {
 	dirty = true;
 	$('#field_list').flexReload();
 
-	$('.statusMenu .marker button').attr('disabled', false);
-	$('.statusMenu .marker').removeClass('disable');
+	StatusMenu.MarkerButton.makeItClickable();
 }
 
 //
@@ -361,8 +348,7 @@ function field_click() {
 				  htmlval + '</div>');
 			$('#' + targetid).html('<b>' + inputVal + '</b>');
 
-			$('.statusMenu .marker button').attr('disabled', false);
-			$('.statusMenu .marker').removeClass('disable');
+			StatusMenu.MarkerButton.makeItClickable();
 		});
 	}
 }
@@ -391,7 +377,7 @@ function on_keydown(e) {
 	}
 
 	if (ctrl) {
-		dirty = !$('.statusMenu .marker button').attr('disabled');
+		dirty = !StatusMenu.MarkerButton.isUnClickable();
 
 		keychar = String.fromCharCode(keycode).toUpperCase();
 
@@ -466,10 +452,54 @@ function on_keyup(e) {
 		set_field($target);
 		targetid = null;
 
-		$('.statusMenu .marker button').attr('disabled', false);
-		$('.statusMenu .marker').removeClass('disable');
+		StatusMenu.MarkerButton.makeItClickable();
 	}
 }
+
+/**
+ * Status menu class
+ * @class StatusMenu
+ */
+var StatusMenu = {
+	/**
+	 * Marker button class
+	 * @class MarkerButton
+	 */
+	MarkerButton: {
+		/**
+		 * Make the button clickable
+		 */
+		makeItClickable: function() {
+			$('.statusMenu .marker button').attr('disabled', false);
+			$('.statusMenu .marker').removeClass('disable');
+		},
+		/**
+		 * Make the button un-clickable
+		 */
+		makeItUnClickable: function() {
+			$('.statusMenu .marker button').attr('disabled', true);
+			$('.statusMenu .marker').addClass('disable');
+		},
+		/**
+		 * Get whether the marker button is UNclickable or not.
+		 * @return {boolean}
+		 */
+		isUnClickable: function() {
+			return $('.statusMenu .marker button').attr('disabled');
+		},
+	},
+	ReloadButton: {
+		/**
+		 * Go to the page of reselecting an excel file
+		 */
+		reloadSheetExcelFile: function() {
+			var gid = $("#form-status input[name=gid]").val();
+			var sid = $("#form-status input[name=sid]").val();
+			location.href = "/external/sheet/" + gid + "/" + sid + "/";
+		},
+
+	},
+};
 
 var SHEET = SHEET || {};// namespace
 
