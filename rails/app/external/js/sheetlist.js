@@ -121,7 +121,7 @@ function set_field (target) {
 	}
 
 	field = field.replace(/<[^>]*>?/g, '');
-	target = $('#' + targetid).html('<b>' + field + '</b>');
+	$('#' + targetid).html('<b>' + field + '</b>');
 
 	var targettd = $('td[name="' + targetid + '"]');
 	if (targettd.length) {
@@ -334,7 +334,7 @@ function field_click() {
 			+ '; " />'
 		);
 
-		target = $('#active');
+		var target = $('#active');
 		target.focus();
 		target.blur(function() {
 			var inputVal = $(this).val();
@@ -399,7 +399,7 @@ function on_keydown(e) {
 
 	// Tab
 	if (keycode == '9') {
-		target = $('#active');
+		var target = $('#active');
 		if (shift) {
 			target_next = target.parent().prev();
 			if (target_next.length) {
@@ -518,9 +518,6 @@ SHEET = {
 		});
 
 		$('.hDivBox th').addcontextmenu('fieldreset');
-		$('.hDivBox th').click(function() {
-			target = $(this);
-		});
 		$('#field_list td').click(field_click);
 
 		$('#bt-password').click(function() {
