@@ -509,9 +509,9 @@ SHEET = {
 			resizable:false,
 			height:70,
 			onDragCol: function() {
-				ths = $('.hDiv th');
+				var ths = $('.hDiv th');
 				ths.each(function(num) {
-					th = $(this);
+					var th = $(this);
 					th.find('div:first').text(++num);
 				});
 			}
