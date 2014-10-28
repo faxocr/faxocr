@@ -111,10 +111,7 @@ var jquerycontextmenu = {
 						jquerycontextmenu.hidebox($, $('.jqcontextmenu'));
 						if (targetid) {
 //							$("#" + targetid).css('background-color', ctbl[sval]);
-							if (cell_sw[targetid] == 1) {
-								$("#" + targetid).removeClass('enter-selected');
-								$("#" + targetid).addClass('click-selected');
-							}
+							SheetCell.clickSelected(targetid, cellBgColorManager);
 						}
 //						sval = 0;
 						targetid = null;

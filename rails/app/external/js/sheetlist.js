@@ -19,27 +19,12 @@
  *
  */
 
-var cell_sw;
+var cellBgColorManager;	// global: also referenced from jqcontextmenu
 var cell_type;
 var targetid;
 var dirty = false;
 var $ = jQuery;
 
-function HexToR(h) {
-	return parseInt((cutHex(h)).substring(0, 2), 16);
-}
-
-function HexToG(h) {
-	return parseInt((cutHex(h)).substring(2, 4), 16);
-}
-
-function HexToB(h) {
-	return parseInt((cutHex(h)).substring(4, 6), 16);
-}
-
-function cutHex(h) {
-	return (h.charAt(0) == '#') ? h.substring(1, 7) : h;
-}
 
 // existence check
 function isset(data) {
@@ -64,31 +49,7 @@ jQuery(document).ready(function($) {
 	$('.sheet_field td').addcontextmenu('contextmenu');
 	cell_type = new Array();
 
-	// 各セルの背景色を取得し格納
-	cell_sw = new Array();
-	var elements = document.getElementsByTagName('*');
-	for (var elm_cnt = 0; elm_cnt < elements.length; elm_cnt++) {
-		if (elements[elm_cnt].className == 'sheet_field') {
-			var table = elements[elm_cnt];
-			var tds = table.getElementsByTagName('td');
-			for (var tb_cnt = 0; tb_cnt < tds.length; tb_cnt++) {
-				var tbg = $(tds[tb_cnt]).css('background-color');
-				h = cutHex(tbg);
-				if (h == tbg) {
-					rgb = (tbg == 'rgb(255, 255, 255)') ? 255 * 3 :
-					(tbg == 'rgba(0, 0, 0, 0)') ? 255 * 3 :
-					(tbg == 'transparent') ? 255 * 3 : 1;
-				} else {
-					r = HexToR(tbg);
-					g = HexToG(tbg);
-					b = HexToB(tbg);
-					rgb = r + g + b;
-					rgb = rgb ? rgb : 255 * 3;
-				}
-				cell_sw[tds[tb_cnt].getAttribute('id')] = (rgb == 255 * 3) ? 0 : 1;
-			}
-		}
-	}
+	cellBgColorManager = new SheetCellBackgroundColor();
 
 	document.onkeyup = on_keyup;
 	document.onkeydown = on_keydown;
@@ -206,12 +167,8 @@ function delColumn(target, idx) {
 	$('.cDrag div').eq(idx).remove();
 	$('.hDiv th').eq(idx).remove();
 	targettd.remove();
-	$('#' + targetid).html('');
-	$('#' + targetid).removeClass('enter-selected');
-	$('#' + targetid).removeClass('click-selected');
-	$('#' + targetid).addClass('not-selected');
-	cell_sw[targetid] = 0;
-
+	SheetCell.clearHtmlText(targetid, cellBgColorManager);
+	SheetCell.notSelected(targetid, cellBgColorManager);
 
 	ths = $('.hDiv th');
 	ths.each(function(num) {
@@ -249,11 +206,8 @@ function del_column(target, index) {
 	targetid = targettd.attr('name');
 
 	targettd.remove();
-	$('#' + targetid).html('');
-	$('#' + targetid).removeClass('enter-selected');
-	$('#' + targetid).removeClass('click-selected');
-	$('#' + targetid).addClass('not-selected');
-	cell_sw[targetid] = 0;
+	SheetCell.clearHtmlText(targetid, cellBgColorManager);
+	SheetCell.notSelected(targetid, cellBgColorManager);
 
 	ths = $('.hDiv th');
 	ths.each(function(num) {
@@ -345,7 +299,7 @@ function field_click() {
 			$(this).parent().removeClass('on')
 			    .html('<div style="width: ' + width + 'px" >' +
 				  htmlval + '</div>');
-			$('#' + targetid).html('<b>' + inputVal + '</b>');
+			SheetCell.setHtmlText(targetid, '<b>' + inputVal + '</b>');
 
 			StatusMenu.MarkerButton.makeItClickable();
 		});
@@ -443,10 +397,7 @@ function on_keyup(e) {
 		}
 
 		jquerycontextmenu.hidebox($, $('.jqcontextmenu'));
-		$('#' + targetid).removeClass('not-selected');
-		$('#' + targetid).removeClass('click-selected');
-		$target = $('#' + targetid).addClass('enter-selected');
-		cell_sw[targetid] = 1;
+		$target = SheetCell.enterSelected(targetid, cellBgColorManager);
 
 		set_field($target);
 		targetid = null;
@@ -454,6 +405,162 @@ function on_keyup(e) {
 		StatusMenu.MarkerButton.makeItClickable();
 	}
 }
+
+/**
+ * Cell background color management
+ * @class SheetCellBackgroundColor
+ */
+var SheetCellBackgroundColor = function () {
+	/**
+	 * @property {Array} cell_sw
+	 */
+	this.cell_sw = new Array();
+
+	this.setBgColorFlagForAllCells();
+};
+
+SheetCellBackgroundColor.prototype = {
+	/**
+	 * Store flags to cell_sw where the cell's bg color is set or not
+	 * @public
+	 */
+	setBgColorFlagForAllCells: function () {
+		// 各セルの背景色を取得し格納
+		var elements = document.getElementsByTagName('*');
+		for (var elm_cnt = 0; elm_cnt < elements.length; elm_cnt++) {
+			if (elements[elm_cnt].className == 'sheet_field') {
+				var table = elements[elm_cnt];
+				var tds = table.getElementsByTagName('td');
+				for (var tb_cnt = 0; tb_cnt < tds.length; tb_cnt++) {
+					var tbg = $(tds[tb_cnt]).css('background-color');
+					var h = this.cutHex(tbg);
+					if (h == tbg) {
+						var rgb = (tbg == 'rgb(255, 255, 255)') ? 255 * 3 :
+						(tbg == 'rgba(0, 0, 0, 0)') ? 255 * 3 :
+						(tbg == 'transparent') ? 255 * 3 : 1;
+					} else {
+						var r = this.HexToR(tbg);
+						var g = this.HexToG(tbg);
+						var b = this.HexToB(tbg);
+						var rgb = r + g + b;
+						rgb = rgb ? rgb : 255 * 3;
+					}
+					this.cell_sw[tds[tb_cnt].getAttribute('id')] = (rgb == 255 * 3) ? 0 : 1;
+				}
+			}
+		}
+	},
+	/**
+	 * Set the information that the cell's bg color is set.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @public
+	 */
+	set: function (targetid) {
+		this.cell_sw[targetid] = 1;
+	},
+	/**
+	 * Clear the information that the cell's bg color is set.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @public
+	 */
+	clear: function (targetid) {
+		this.cell_sw[targetid] = 0;
+	},
+	/**
+	 * Get the information whether the cell's bg color is set or not.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @return {boolean}
+	 * @public
+	 */
+	isSet: function (targetid) {
+		return this.cell_sw[targetid] == 1 ? true : false;
+	},
+	/**
+	 * @private
+	 */
+	HexToR: function (h) {
+		return parseInt((cutHex(h)).substring(0, 2), 16);
+	},
+	/**
+	 * @private
+	 */
+	HexToG: function (h) {
+		return parseInt((cutHex(h)).substring(2, 4), 16);
+	},
+	/**
+	 * @private
+	 */
+	HexToB: function (h) {
+		return parseInt((cutHex(h)).substring(4, 6), 16);
+	},
+	/**
+	 * @private
+	 */
+	cutHex: function (h) {
+		return (h.charAt(0) == '#') ? h.substring(1, 7) : h;
+	},
+};
+
+/**
+ * Sheet Cell Operation Class
+ * @class SheetCell
+ */
+// used also in jqcontextmenu
+var SheetCell = {
+	/**
+	 * Make the cell's state enter-selected.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @param {} cellBgColorManager Object to SheetCellBackgroundColorManager class
+	 * @return {} jQuery object
+	 */
+	enterSelected: function (targetid, cellBgColorManager) {
+		cellBgColorManager.set(targetid);
+		$('#' + targetid).removeClass('not-selected');
+		$('#' + targetid).removeClass('click-selected');
+		return $('#' + targetid).addClass('enter-selected');
+	},
+	/**
+	 * Make the cell's state click-selected.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @param {} cellBgColorManager Object to SheetCellBackgroundColorManager class
+	 */
+	clickSelected: function (targetid, cellBgColorManager) {
+		if (cellBgColorManager.isSet(targetid)) {
+			//$("#" + targetid).removeClass('not-selected');
+			$("#" + targetid).removeClass('enter-selected');
+			$("#" + targetid).addClass('click-selected');
+		}
+		//cellBgColorManager.set();
+	},
+	/**
+	 * Make the cell's state not-selected.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @param {} cellBgColorManager Object to SheetCellBackgroundColorManager class
+	 */
+	notSelected: function (targetid, cellBgColorManager) {
+		$('#' + targetid).removeClass('enter-selected');
+		$('#' + targetid).removeClass('click-selected');
+		$('#' + targetid).addClass('not-selected');
+		cellBgColorManager.clear(targetid);
+	},
+	/**
+	 * Set the cell's contents.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @param {string} text Html text
+	 * @return {} jQuery object
+	 */
+	setHtmlText: function (targetid, html) {
+		return $('#' + targetid).html(html);
+	},
+	/**
+	 * Clear the cell's contents.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @return {} jQuery object
+	 */
+	clearHtmlText: function (targetid) {
+		return $('#' + targetid).html('');
+	},
+};
 
 /**
  * Status menu class
