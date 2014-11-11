@@ -171,7 +171,7 @@ var jquerycontextmenu = {
 			targetid = this.id;
 
 			// sval = (defaultbg === '#FFFFFF') ? 0 : 5;
-			set_field($(this));
+			SheetFieldProcessor.set($(this));
 
 			return false;
 		});
