@@ -21,6 +21,12 @@
 
 var cellBgColorManager;	// global: also referenced from jqcontextmenu
 var cell_type;
+var enum_cell_type = {
+	'number': 0,
+	'rating': 1,
+	'image': 2,
+	'reset': -1,
+};
 var targetid;
 var dirty = false;
 var $ = jQuery;
@@ -59,12 +65,71 @@ jQuery(document).ready(function($) {
 				});
 			}
 		},
+		start: function () {
+			// destory is neccessary to assign a targetid of field name whenever it is called
+			$.contextMenu('destroy', '.ui-selected:first');
+		},
+		stop: function (event, ui) {
+			// setup a context menu for currently selected cells
+			var targetId = $('.ui-selected:first').attr('id');
+			$.contextMenu({
+				selector: '.ui-selected:first',
+				trigger: 'left',
+				callback: function (key, options) {
+					var fieldNameValueFromUser = $.contextMenu.getInputValues(options)['fieldname'];
+					set_data_to_mutiple_cells(
+						enum_cell_type[key],
+						fieldNameValueFromUser
+					);
+				},
+				items: {
+					'fieldname': {
+						name:'フィールド名',
+						type:'text',
+						value:targetId,
+						events: {
+							keyup: function(e) {
+								// unfocus if return key is pressed
+								if (e.keyCode == 13) {
+									this.blur();
+								}
+							},
+						},
+					},
+					'number': {
+						name:'数字',
+					},
+					'rating': {
+						name:'○☓△✓',
+					},
+					'image': {
+						name:'画像',
+					},
+					'sep1': "---------",
+					'reset': {
+						name:'リセット',
+						callback: function (key, options) {
+							clear_data_to_mutiple_cells(enum_cell_type['reset']);
+						},
+					},
+				},
+				events: {
+					show: function (opt) {
+						var $this = this;
+						var targetId = $this.attr('id');
+						// set default field value whenever contextMenu is showen
+						$.contextMenu.setInputValues(opt, {'fieldname': targetId});
+					},
+				},
+			});
+			// show a contextMenu as soon as after cells were selected
+			$('.ui-selected:first').contextMenu();
+		},
 	});
 	cell_type = new Array();
 
 	cellBgColorManager = new SheetCellBackgroundColor();
 
-	document.onkeyup = on_keyup;
 	document.onkeydown = on_keydown;
 
 	targetid = FieldList.init();
@@ -118,50 +183,8 @@ function on_keydown(e) {
 			new FieldForm().submit();
 		}
 	}
-
-	// Tab
-	if (keycode == '9') {
-		if (shift) {
-			return FieldList.moveFocusPrev();
-		} else {
-			return FieldList.moveFocusNext();
-		}
-	}
 }
 
-// keyリリース時
-function on_keyup(e) {
-	var keycode,
-	    shift;
-
-	if (e != null) {
-		// Mozilla(Firefox, NN) and Opera
-		keycode = e.which;
-		shift = (typeof e.modifiers == 'undefined') ?
-		    e.shiftKey : e.modifiers & Event.SHIFT_MASK;
-	} else {
-		// Internet Explorer
-		keycode = event.keyCode;
-		shift = event.shiftKey;
-	}
-
-	// Enter
-	if (keycode == '13') {
-
-		if (!targetid) {
-			$('#active').blur();
-			return true;
-		}
-
-		jquerycontextmenu.hidebox($, $('.jqcontextmenu'));
-		$target = SheetCell.enterSelected(targetid, cellBgColorManager);
-
-		SheetFieldProcessor.set($target);
-		targetid = null;
-
-		StatusMenu.MarkerButton.makeItClickable();
-	}
-}
 
 /**
  * Main sheet field processor
@@ -173,35 +196,22 @@ var SheetFieldProcessor = {
 	 * @param {} target jQuery object of clicked cell
 	 *
 	 */
-	set: function (target) {
-		var field = $('#field').val();
-
-		if (!targetid) {
-			var idx = target.index();
-			target = $('#field_list td').eq(idx);
-
-			$('#fieldreset li a').bind('click', function(e) {
-				e.preventDefault();
-				SheetFieldProcessor._delColumn(target, idx);
-			});
-
-			return false;
-		}
-
+	set: function (target, field) {
 		field = field.replace(/<[^>]*>?/g, '');
-		$('#' + targetid).html('<b>' + field + '</b>');
+		var targetId = target.attr('id');
+		$('#' + targetId).html('<b>' + field + '</b>');
 
-		var retVal = FieldList.addOrSetContents(targetid, field);
+		var retVal = FieldList.addOrSetContents(targetId, field);
 		if (retVal == true) {
 			return false;
 		}
-		SheetFieldProcessor._add_column(field, 80);
+		SheetFieldProcessor._add_column(field, targetId, 80);
 	},
 	/**
 	 * Actions when reset is clicked for the sheet cell
 	 */
-	reset: function () {
-		var targettd = $('td[name="' + targetid + '"]');
+	reset: function (targetId) {
+		var targettd = $('td[name="' + targetId + '"]');
 
 		if (isset(targettd)) {
 			var index = targettd.index() + 1;
@@ -216,10 +226,10 @@ var SheetFieldProcessor = {
 	/**
 	 * @private
 	 */
-	_add_column: function (html, width) {
+	_add_column: function (html, targetId, width) {
 		var tagStrippedHtml = html.replace(/<[^>]*>?/g, '');
 
-		FieldList.addColumn(tagStrippedHtml, width);
+		FieldList.addColumn(tagStrippedHtml, targetId, width);
 		$('#field_list').flexReload();
 		dirty = true;
 
@@ -263,8 +273,6 @@ var SheetFieldProcessor = {
 		dirty = true;
 
 		StatusMenu.MarkerButton.makeItClickable();
-
-		$('#fieldreset li a').unbind('click');
 	},
 
 };
@@ -538,6 +546,7 @@ var FieldList = {
 	 * Initialize
 	 */
 	init: function () {
+		$('#field_list td').keydown(FieldList._key_events_in_field_list);
 		return FieldList.applyFieldListStatusToMarkerButton();
 	},
 	/**
@@ -560,7 +569,7 @@ var FieldList = {
 	 * @param {number} width width of the contents
 	 * @public
 	 */
-	addColumn: function (html, width) {
+	addColumn: function (html, targetid, width) {
 		var num;
 
 		var dupColumn = function (origElement, callback) {
@@ -706,6 +715,11 @@ var FieldList = {
 			// update marker button.
 			StatusMenu.MarkerButton.makeItClickable();
 		});
+		target.keydown(function(e) {
+			if (e.keyCode == 13) {
+				target.blur();
+			}
+		});
 	},
 	getFocusedFieldObject: function () {
 		return $('#active');
@@ -739,6 +753,22 @@ var FieldList = {
 			return false;
 		}
 	},
+	/**
+	 * Key event handler
+	 * @private
+	 */
+	_key_events_in_field_list: function (e) {
+		var keycode = e.which;
+		var shift = (typeof e.modifiers == 'undefined') ?
+		    e.shiftKey : e.modifiers & Event.SHIFT_MASK;
+		if (keycode == '9') {
+			if (shift) {
+				return FieldList.moveFocusPrev();
+			} else {
+				return FieldList.moveFocusNext();
+			}
+		}
+	},
 };
 
 var SHEET = SHEET || {};// namespace
@@ -758,7 +788,22 @@ SHEET = {
 			}
 		});
 
-		$('.hDivBox th').addcontextmenu('fieldreset');
+		$.contextMenu({
+			selector: '.hDivBox th',
+			trigger: 'left',
+			items: {
+				'reset': {
+					name:'リセット',
+					icon:'delete',
+					callback: function (key, options) {
+						// get the name of target id
+						var targetId = $('#field_list td').eq(options.$trigger.index()).attr('name');
+						SheetFieldProcessor.reset(targetId); // XXX: may be jquery object instead of targetId?
+					},
+				},
+			},
+
+		});
 		$('#field_list td').click(FieldList.editContents);
 
 		$('#bt-password').click(function() {
@@ -772,18 +817,17 @@ SHEET = {
 	}
 };
 
-function set_data_to_mutiple_cells(type_id) {
-	var field_data = $("#field").val();
+function set_data_to_mutiple_cells(type_id, field_data) {
 	$(".ui-selected").each(function() {
 		cell_type[this.id] = type_id;
-		set_field($(this), field_data, this.id);
+		SheetFieldProcessor.set($(this), field_data);
 	});
 }
 
 function clear_data_to_mutiple_cells(type_id) {
 	$(".ui-selected").each(function() {
 		cell_type[this.id] = type_id;
-		reset_field(this.id);
+		SheetFieldProcessor.reset(this.id);
 	});
 }
 // vim: set noet fenc=utf-8 ff=unix sts=0 sw=8 ts=8 :
