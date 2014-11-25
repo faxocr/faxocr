@@ -149,6 +149,7 @@ function on_keydown(e) {
 	    keychar,
 	    frm,
 	    target_next;
+	var isIe = false;
 
 	if (e != null) {
 		// Mozilla(Firefox, NN) and Opera
@@ -159,6 +160,7 @@ function on_keydown(e) {
 		    e.shiftKey : e.modifiers & Event.SHIFT_MASK;
 	} else {
 		// Internet Explorer
+		isIe = true;
 		keycode = event.keyCode;
 		ctrl = event.ctrlKey;
 		shift = event.shiftKey;
@@ -181,6 +183,13 @@ function on_keydown(e) {
 				return false;
 			}
 			new FieldForm().submit();
+		}
+	}
+	if (isIe == true && keycode == 9) {
+		if (shift) {
+			return FieldList.moveFocusPrev();
+		} else {
+			return FieldList.moveFocusNext();
 		}
 	}
 }
@@ -761,7 +770,7 @@ var FieldList = {
 		var keycode = e.which;
 		var shift = (typeof e.modifiers == 'undefined') ?
 		    e.shiftKey : e.modifiers & Event.SHIFT_MASK;
-		if (keycode == '9') {
+		if (keycode == '9') {	// Tab key
 			if (shift) {
 				return FieldList.moveFocusPrev();
 			} else {
