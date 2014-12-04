@@ -80,12 +80,15 @@ include( TMP_HTML_DIR . "tpl.header.html" );
 // Excelファイル読み込み処理
 //
 $sheet = null;
+$errmsg = array();
 if ($tgt_file) {
-	list($xls, $errmsg) = excel_peruser_factory($charset, $tgt_file);
+	list($xls, $errmsg_tmp) = excel_peruser_factory($charset, $tgt_file);
+	if (isset($errmsg_tmp) && !empty($errmsg_tmp)) {
+		array_push($errmsg, $errmsg_tmp);
+	}
 	if ($xls) {
 		if (count($xls->boundsheets) != 1) {
-			$errmsg .= "シートの数 (" . count($xls->boundsheets) .
-				  ") が、多すぎます";
+			array_push($errmsg, "シートの数 (" . count($xls->boundsheets) . ") が、多すぎます");
 			$xls = null;
 		}
 	}
@@ -95,24 +98,25 @@ if ($tgt_file) {
 		if (($sheet->col_count + 1 < MIN_SHEET_WIDTH || $sheet->row_count + 1 < MIN_SHEET_HEIGHT) && ($sheet->row_count + 1 < MIN_SHEET_WIDTH || $sheet->col_count + 1 < MIN_SHEET_HEIGHT)) {
 			// シートサイズチェック
 			$xls .= null;
-			$errmsg .= "シートのサイズが小さすぎます。".MIN_SHEET_WIDTH."x".MIN_SHEET_HEIGHT."以上にしてください。\n";
+			array_push($errmsg, "シートのサイズが小さすぎます。".MIN_SHEET_WIDTH."x".MIN_SHEET_HEIGHT."以上にしてください。");
 		} else if (($sheet->col_count + 1 > MAX_SHEET_WIDTH || $sheet->row_count + 1 > MAX_SHEET_HEIGHT) && ($sheet->row_count + 1 > MAX_SHEET_WIDTH || $sheet->col_count + 1 > MAX_SHEET_HEIGHT)) {
 			// シートサイズチェック
 			$xls = null;
-			$errmsg .= "シートのサイズが大きすぎます。".MAX_SHEET_WIDTH."x".MAX_SHEET_HEIGHT."以下にしてください。\n";
+			array_push($errmsg, "シートのサイズが大きすぎます。".MAX_SHEET_WIDTH."x".MAX_SHEET_HEIGHT."以下にしてください。");
 		}
 		// セルサイズチェック
 		if ( ($sheet->min_cell_width != 0 && ($sheet->min_cell_width * $sheet->scale) <= MIN_CELL_WIDTH) || ($sheet->min_cell_height != 0 &&($sheet->min_cell_height * $sheet->scale) <= MIN_CELL_HEIGHT) ) {
 			// 厳密にはマーカー指定時のサイズによって決まる
-			$errmsg .= "セルのサイズが小さすぎます。".MIN_CELL_WIDTH."px x ".MIN_CELL_HEIGHT."px以上にしてください。\n";
+			array_push($errmsg, "セルのサイズが小さすぎます。".MIN_CELL_WIDTH."px x ".MIN_CELL_HEIGHT."px以上にしてください。");
 		}
 	}
 }
-
 // エラーメッセージ処理
-if ($errmsg) {
+if (!empty($errmsg)) {
 	print "<blockquote><font color=\"red\"><strong>";
-	print strconv($errmsg);
+	foreach ($errmsg as $msg) {
+		print strconv($msg) . "<br />\n";
+	}
 	print "</strong></font></blockquote>";
 }
 

@@ -298,7 +298,6 @@ function strconv($str)
 	global $charset;
 
 	$str = htmlentities($str, ENT_QUOTES, $charset);
-	$str = str_replace("\n", "<br />\n", $str);
 	$str = str_replace('&conint;', mb_convert_encoding("∮", $charset, "utf-8"), $str);
 	$str = str_replace('&ang90;', mb_convert_encoding("∟", $charset, "utf-8"), $str);
 	$str = str_replace('&becaus;', mb_convert_encoding("∵", $charset, "utf-8"), $str);
