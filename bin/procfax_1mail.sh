@@ -142,7 +142,7 @@ do
 	#
 	resized_tiff_file="$FAX_BACKUP_DIR"/"$src_fax_number"_"$dest_fax_number"_"$DATE"_"$TIME"_"$pid"_"$sheet_count".TIF
 
-	convert -resample 200 "$a_tiff_file" "$resized_tiff_file"
+	convert -type GrayScale -resample 200 "$a_tiff_file" "$resized_tiff_file"
 	show_cmd_result $? resizing tiff "file($resized_tiff_file)"
 
 	#
