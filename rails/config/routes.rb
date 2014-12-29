@@ -125,6 +125,10 @@ ActionController::Routing::Routes.draw do |map|
     :controller => 'external',
     :action => 'download_zip'
 
+  map.connect 'external/download_html/:group_id/:survey_id',
+    :controller => 'external',
+    :action => 'download_html'
+
   map.connect 'external/getimg/:group_id/:survey_id',
     :controller => 'external',
     :action => 'getimg'
@@ -169,9 +173,13 @@ ActionController::Routing::Routes.draw do |map|
     :controller => "util",
     :action => "survey_fax_numbers"
 
-  map.connect "util/sheet/:survey_code/srml",
+  map.connect "util/sheet/:sheet_code/srml",
     :controller => "util",
-    :action => "srml"
+    :action => "get_one_srml_entry"
+
+  map.connect "util/sheet/srml",
+    :controller => "util",
+    :action => "get_srml_contents"
 
   # Sample of named route:
   #   map.purchase 'products/:id/purchase', :controller => 'catalog', :action => 'purchase'

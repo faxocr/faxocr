@@ -314,6 +314,7 @@ class ExternalController < ApplicationController
       @ret = `cp #{@file_prefix}-00001.pdf #{@file_prefix}.pdf`
       @ret = `rm -f #{@file_prefix}-*.pdf`
       @ret = `rm -f doc_data.txt`
+      @ret = `cp -p #{@file_html} #{@file_prefix}.html`
     else
       @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{RAILS_ENV}\" debug_mode=\"#{debug_mode}\"`
       # flash[:notice] = @errmsg
@@ -382,6 +383,17 @@ class ExternalController < ApplicationController
     send_file(@file_zip,
               {:filename => "#{@gid}-#{@sid}.zip",
                 :type => "application/zip"})
+  end
+
+  def download_html
+
+    @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
+    @sid = params[:survey_id]
+    @file_html = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.html"
+
+    send_file(@file_html,
+              {:filename => "#{@gid}-#{@sid}.html",
+                :type => "text/html"})
   end
 
   def getimg
