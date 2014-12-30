@@ -344,7 +344,7 @@ function put_excel($xls, $marker_window, $sheet_marker, $field_index, &$conf, $d
 						if ($colspan > 1) {
 							$rcspan = " colspan=\"" . $colspan . "\"";
 						} else {
-							//$rcspan = " width=\"" . $tdwidth . "\"";
+							$rcspan = "";
 						}
 
 						if ($rowspan > 1)
