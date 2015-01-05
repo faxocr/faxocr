@@ -1,7 +1,7 @@
 
 %w{netpbm autoconf gocr ttf-vlgothic ttf-kochi-gothic xvfb
 	libglib2.0-0 libsoup2.4-dev python-webkit python-jswebkit unoconv fetchmail sendemail
-  make mpack git subversion zip bzip2 pdftk parallel
+  make mpack git subversion zip bzip2 pdftk parallel cron
 }.each do |pkg|
 	package pkg do
   	action :install
