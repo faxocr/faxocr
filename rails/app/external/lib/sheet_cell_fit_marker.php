@@ -179,7 +179,7 @@ class DispSheetCellFitMarker {
         $this->set_border_for_cells_properties($sheet_marker);
         $this->adjust_width($sheet_marker);
         $this->adjust_height($sheet_marker);
-        $this->sheetOnHtmlTable->width = $this->calc_tblwidth($sheet_marker) + $this->sum_of_col_borders($sheet_marker);;
+        $this->sheetOnHtmlTable->width = $this->calc_tblwidth($sheet_marker);
         $this->sheetOnHtmlTable->height = $this->calc_tblheight($sheet_marker) + $this->sum_of_row_borders($sheet_marker);
 
         $this->size_of_marker = $this->sheetOnHtmlTable->cells_height[$sheet_marker->topLeftMarker->rowNum];
@@ -260,8 +260,13 @@ class DispSheetCellFitMarker {
     }
     private function calc_max_border_width($sheet_marker) {
         $first_col_flag = true;
+        // initizlize the array for result
+        foreach ($sheet_marker->cells_width as $col_num => $col_size) {
+            $left_border_width[$col_num] = 0;
+        }
+        $left_border_width[$col_num + 1] = 0;
+        // main process
         foreach ($sheet_marker->cells_height as $row_num => $row_size) {
-            $left_border_width[$row_num] = 0;
             foreach ($sheet_marker->cells_width as $col_num => $col_size) {
                 if ($first_col_flag == true) {
                     $first_col_flag = false;
@@ -278,8 +283,8 @@ class DispSheetCellFitMarker {
                 }
             }
         }
-        $left_border_width[$col_num + 1] = 0;
-        foreach ($sheet_marker->cells_width as $col_num => $col_size) {
+        // process most right cells of all rows
+        foreach ($sheet_marker->cells_height as $row_num => $row_size) {
             $left_border_width[$col_num + 1] = max(
                 $left_border_width[$col_num + 1],
                 $this->cells_properties['border_right_width'][$row_num][$col_num]
@@ -312,9 +317,14 @@ class DispSheetCellFitMarker {
     }
     private function calc_max_border_height($sheet_marker) {
         $first_row_flag = true;
+        // initizlize the array for result
         foreach ($sheet_marker->cells_height as $row_num => $row_size) {
             $top_border_height[$row_num] = 0;
-            foreach ($sheet_marker->cells_width as $col_num => $col_size) {
+        }
+        $top_border_height[$row_num + 1] = 0;
+        // main process
+        foreach ($sheet_marker->cells_width as $col_num => $col_size) {
+            foreach ($sheet_marker->cells_height as $row_num => $row_size) {
                 if ($first_row_flag == true) {
                     $first_row_flag = false;
                     $top_border_height[$row_num] = max(
@@ -330,7 +340,7 @@ class DispSheetCellFitMarker {
                 }
             }
         }
-        $top_border_height[$row_num + 1] = 0;
+        // process bottom cells of all cols
         foreach ($sheet_marker->cells_width as $col_num => $col_size) {
             $top_border_height[$row_num + 1] = max(
                 $top_border_height[$row_num + 1],
