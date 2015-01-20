@@ -19,28 +19,18 @@
  *
  */
 
-var cell_sw;
+var cellBgColorManager;	// global: also referenced from jqcontextmenu
 var cell_type;
-var field;
+var enum_cell_type = {
+	'number': 0,
+	'rating': 1,
+	'image': 2,
+	'reset': -1,
+};
 var targetid;
 var dirty = false;
 var $ = jQuery;
 
-function HexToR(h) {
-	return parseInt((cutHex(h)).substring(0, 2), 16);
-}
-
-function HexToG(h) {
-	return parseInt((cutHex(h)).substring(2, 4), 16);
-}
-
-function HexToB(h) {
-	return parseInt((cutHex(h)).substring(4, 6), 16);
-}
-
-function cutHex(h) {
-	return (h.charAt(0) == '#') ? h.substring(1, 7) : h;
-}
 
 // existence check
 function isset(data) {
@@ -54,12 +44,6 @@ function isset(data) {
 	};
 })(jQuery);
 
-function go_sheet_upload() {
-	gid = $("#form-status input[name=gid]").val();
-	sid = $("#form-status input[name=sid]").val();
-	location.href = "/external/sheet/" + gid + "/" + sid + "/";
-}
-
 
 // initialization
 jQuery(document).ready(function($) {
@@ -68,304 +52,94 @@ jQuery(document).ready(function($) {
 		SHEET.setFlexiInSetup();
 	}
 
-	$('.sheet_field td').addcontextmenu('contextmenu');
+	$('.sheet_field').selectable({
+		filter: 'td',
+		selecting: function (event, ui) {
+			// Disabling multiple selection when clicking with ctrl or meta key
+			var current_element = this;
+			if (event.metaKey) {
+				$(".ui-selected", this).each(function() {
+					if (this != current_element) {
+						$(this).removeClass('ui-selected');
+					}
+				});
+			}
+		},
+		start: function () {
+			// destory is neccessary to assign a targetid of field name whenever it is called
+			$.contextMenu('destroy', '.ui-selected:first');
+		},
+		stop: function (event, ui) {
+			// setup a context menu for currently selected cells
+			var targetId = $('.ui-selected:first').attr('id');
+			$.contextMenu({
+				selector: '.ui-selected:first',
+				trigger: 'left',
+				callback: function (key, options) {
+					var fieldNameValueFromUser = $.contextMenu.getInputValues(options)['fieldname'];
+					set_data_to_mutiple_cells(
+						enum_cell_type[key],
+						fieldNameValueFromUser
+					);
+				},
+				items: {
+					'fieldname': {
+						name:'フィールド名',
+						type:'text',
+						value:targetId,
+						events: {
+							keyup: function(e) {
+								// unfocus if return key is pressed
+								if (e.keyCode == 13) {
+									this.blur();
+								}
+							},
+						},
+					},
+					'number': {
+						name:'数字',
+					},
+					'rating': {
+						name:'○☓△✓',
+					},
+					'image': {
+						name:'画像',
+					},
+					'sep1': "---------",
+					'reset': {
+						name:'リセット',
+						callback: function (key, options) {
+							clear_data_to_mutiple_cells(enum_cell_type['reset']);
+						},
+					},
+				},
+				events: {
+					show: function (opt) {
+						var $this = this;
+						var targetId = $this.attr('id');
+						// set default field value whenever contextMenu is showen
+						$.contextMenu.setInputValues(opt, {'fieldname': targetId});
+					},
+				},
+			});
+			// show a contextMenu as soon as after cells were selected
+			$('.ui-selected:first').contextMenu();
+		},
+	});
 	cell_type = new Array();
 
-	// 各セルの背景色を取得し格納
-	cell_sw = new Array();
-	var elements = document.getElementsByTagName('*');
-	for (var elm_cnt = 0; elm_cnt < elements.length; elm_cnt++) {
-		if (elements[elm_cnt].className == 'sheet_field') {
-			var table = elements[elm_cnt];
-			var tds = table.getElementsByTagName('td');
-			for (var tb_cnt = 0; tb_cnt < tds.length; tb_cnt++) {
-				var tbg = $(tds[tb_cnt]).css('background-color');
-				h = cutHex(tbg);
-				if (h == tbg) {
-					rgb = (tbg == 'rgb(255, 255, 255)') ? 255 * 3 :
-					(tbg == 'rgba(0, 0, 0, 0)') ? 255 * 3 :
-					(tbg == 'transparent') ? 255 * 3 : 1;
-				} else {
-					r = HexToR(tbg);
-					g = HexToG(tbg);
-					b = HexToB(tbg);
-					rgb = r + g + b;
-					rgb = rgb ? rgb : 255 * 3;
-				}
-				cell_sw[tds[tb_cnt].getAttribute('id')] = (rgb == 255 * 3) ? 0 : 1;
-			}
-		}
-	}
+	cellBgColorManager = new SheetCellBackgroundColor();
 
-	document.onkeyup = on_keyup;
 	document.onkeydown = on_keydown;
 
-	var targettd = $('#field_list td');
-	targetid = targettd.attr('name');
-	if (targettd.length == 1 && targetid == 0) {
-		btn = $('.statusMenu .marker button').attr('disabled', true);
-	} else {
-		btn = $('.statusMenu .marker button').attr('disabled', false);
-	}
-
-	btn = $('.statusMenu button:disabled');
-	btn.parent().addClass('disable');
+	targetid = FieldList.init();
+	// set callback function when clicking the marker button
+	StatusMenu.MarkerButton.setCallbackHandler('click', function (e) {
+		this.disabled=true;
+		new FieldForm().submit();
+	});
 });
 
-//
-// セル指定クリック時関数
-//
-function set_field (target) {
-	var field = $('#field').val();
-
-	if (!targetid) {
-		var idx = target.index();
-		target = $('#field_list td').eq(idx);
-
-		$('#fieldreset li a').bind('click', function(e) {
-			e.preventDefault();
-			delColumn(target, idx);
-		});
-
-		return false;
-	}
-
-	field = field.replace(/<[^>]*>?/g, '');
-	target = $('#' + targetid).html('<b>' + field + '</b>');
-
-	var targettd = $('td[name="' + targetid + '"]');
-	if (targettd.length) {
-		targettd.find('div').text(field);
-		return;
-	}
-
-	add_column(field, 80);
-}
-
-//
-// セルリセット時関数(jqcontextmenuよりcall)
-//
-function reset_field () {
-	var targettd = $('td[name="' + targetid + '"]');
-
-	if (isset(targettd)) {
-		var index = targettd.index() + 1;
-		target = $('.hDivBox th:nth-child(' + index + ')');
-		if (target.length) {
-			del_column(targettd, index);
-		}
-	}
-
-	var targettd = $('#field_list td');
-	targetid = targettd.attr('name');
-	if (targettd.length = 1 && targetid == 0) {
-		btn = $('.statusMenu .marker button').attr('disabled', true);
-		$('.statusMenu .marker').addClass('disable');
-	}
-}
-
-//
-// 「集計フィールド」追加時関数
-//
-function add_column(html, width) {
-	var tr, newtr, td, newtd, num, th, newth, newdiv;
-
-	html = html.replace(/<[^>]*>?/g, '');
-
-	tr = $('.nDiv tr:last');
-	newtr = tr.clone(true);
-	tr.after(newtr);
-
-	td = $('.cDrag div:last');
-	newtd = td.clone(true);
-	td.after(newtd);
-
-	num = $('.hDiv th').length + 1;
-	th = $('.hDiv th:last');
-	newth = th.clone(true);
-	newdiv = document.createElement('div');
-	newth.wrapInner(newdiv);
-	newth.find('div').css('width', width + 'px')
-	    .text(num);
-	th.after(newth);
-
-	td = $('.bDiv td:last');
-	newtd = td.clone(true);
-	newtd.attr('name', targetid);
-	newtd.wrapInner(document.createElement('div'));
-	newtd.find('div').css('width', width + 'px')
-	    .html(html); // ここが効く
-
-	td.after(newtd);
-
-	$('#field_list').flexReload();
-	dirty = true;
-
-	$('.statusMenu .marker button').attr('disabled', false);
-	$('.statusMenu .marker').removeClass('disable');
-}
-
-//
-// 「集計フィールド」削除関数
-//
-function delColumn(target, idx) {
-	var targettd = $('#field_list td').eq(idx);
-
-	// global
-	targetid = targettd.attr('name');
-
-	$('.nDiv tr').eq(idx).remove();
-	$('.cDrag div').eq(idx).remove();
-	$('.hDiv th').eq(idx).remove();
-	targettd.remove();
-	$('#' + targetid).html('');
-	$('#' + targetid).removeClass('enter-selected');
-	$('#' + targetid).removeClass('click-selected');
-	$('#' + targetid).addClass('not-selected');
-	cell_sw[targetid] = 0;
-
-
-	ths = $('.hDiv th');
-	ths.each(function(num) {
-		th = $(this);
-		th.find('div:first').text(++num);
-	});
-
-	var cmd_c = '<input type="hidden" name="cell-' + targetid +
-	    '-clear" value="" />';
-	var form = $('form#form-save');
-	form.append(cmd_c);
-
-	$('#field_list').flexReload();
-	dirty = true;
-
-	$('.statusMenu .marker button').attr('disabled', false);
-	$('.statusMenu .marker').removeClass('disable');
-
-	$('#fieldreset li a').unbind('click');
-}
-
-//
-// 「集計フィールド」削除関数 (jqcontextmenuよりcall)
-//
-function del_column(target, index) {
-	var ths, th;
-
-	if (!target) {
-		return false;
-	}
-
-	$('.nDiv tr:nth-child(' + index + ')').remove();
-	$('.cDrag div:nth-child(' + index + ')').remove();
-	$('.hDiv th:nth-child(' + index + ')').remove();
-	var targettd = $('#field_list td:nth-child(' + index + ')');
-	targetid = targettd.attr('name');
-
-	targettd.remove();
-	$('#' + targetid).html('');
-	$('#' + targetid).removeClass('enter-selected');
-	$('#' + targetid).removeClass('click-selected');
-	$('#' + targetid).addClass('not-selected');
-	cell_sw[targetid] = 0;
-
-	ths = $('.hDiv th');
-	ths.each(function(num) {
-		th = $(this);
-		th.find('div:first').text(++num);
-	});
-
-	var cmd_c = '<input type="hidden" name="cell-' + targetid +
-	    '-clear" value="" />';
-	var form = $('form#form-save');
-	form.append(cmd_c);
-
-	dirty = true;
-	$('#field_list').flexReload();
-
-	$('.statusMenu .marker button').attr('disabled', false);
-	$('.statusMenu .marker').removeClass('disable');
-}
-
-//
-// 設定済みフィールドをinputタグに変換
-//
-function pack_fields() {
-	var form = $('form#form-save');
-	$('#field_list td').each(function() {
-		var fieldname = $(this).attr('name');
-		var txt = $(this).text();
-		var type;
-
-		if (fieldname == "0")
-			return;
-		if (typeof(cell_type[fieldname]) == 'undefined') {
-			type = 1;
-		} else if (cell_type[fieldname] != -1) {
-			type = cell_type[fieldname];
-		} else {
-			return;
-		}
-
-		txt = txt.replace(/<\s*script[^>]*>[\s\S]*?<\s*\/script>/ig,
-				  '');
-		txt = $.escapeHTML(txt);
-
-		var cmd_m = '<input type="hidden" name="cell-' + fieldname +
-		    '-mark" value="' + txt + '" />';
-		var cmd_f = '<input type="hidden" name="field-' + fieldname +
-		    '-' + type + '" value="' + txt + '" />';
-
-		form.append(cmd_m);
-		form.append(cmd_f);
-	});
-
-	// save hidden input
-	form.submit();
-}
-
-// 「集計フィールド」内のセルクリック時関数
-function field_click() {
-	var htmlval;
-
-	if (!$(this).hasClass('on')) {
-	    $(this).addClass('on');
-		var txt = $(this).text(),
-		    html =  $(this).html(),
-		    width = $(this).width(),
-		    height = $(this).height(),
-		    fsize = $(this).css('font-size'),
-		    nlines = height / 16 | 0; // int conversion
-
-		txt = txt.replace(/<[^>]*>?/g, '');
-		$(this).html('<input type="text" id="active" value="'
-			+ txt
-			+ '" size="'
-			+ txt.length * 2
-			+ '" style="width:'
-			+ width
-			+ 'px; font-size:'
-			+ fsize
-			+ '; " />'
-		);
-
-		target = $('#active');
-		target.focus();
-		target.blur(function() {
-			var inputVal = $(this).val();
-			targetid = $(this).parent().attr('name');
-			width = width - 10;
-			inputVal = inputVal.replace(/<[^>]*>?/g, '');
-			htmlval = inputVal.replace(/(\\n)/g, '<br />');
-			$(this).parent().removeClass('on')
-			    .html('<div style="width: ' + width + 'px" >' +
-				  htmlval + '</div>');
-			$('#' + targetid).html('<b>' + inputVal + '</b>');
-
-			$('.statusMenu .marker button').attr('disabled', false);
-			$('.statusMenu .marker').removeClass('disable');
-		});
-	}
-}
 
 // key押下時
 function on_keydown(e) {
@@ -375,6 +149,7 @@ function on_keydown(e) {
 	    keychar,
 	    frm,
 	    target_next;
+	var isIe = false;
 
 	if (e != null) {
 		// Mozilla(Firefox, NN) and Opera
@@ -385,13 +160,14 @@ function on_keydown(e) {
 		    e.shiftKey : e.modifiers & Event.SHIFT_MASK;
 	} else {
 		// Internet Explorer
+		isIe = true;
 		keycode = event.keyCode;
 		ctrl = event.ctrlKey;
 		shift = event.shiftKey;
 	}
 
 	if (ctrl) {
-		dirty = !$('.statusMenu .marker button').attr('disabled');
+		dirty = !StatusMenu.MarkerButton.isUnClickable();
 
 		keychar = String.fromCharCode(keycode).toUpperCase();
 
@@ -406,70 +182,603 @@ function on_keydown(e) {
 			if (!dirty) {
 				return false;
 			}
-			frm = document.getElementById('form-save');
-			pack_fields();
-			frm.submit();
+			new FieldForm().submit();
 		}
 	}
-
-	// Tab
-	if (keycode == '9') {
-		target = $('#active');
+	if (isIe == true && keycode == 9) {
 		if (shift) {
-			target_next = target.parent().prev();
-			if (target_next.length) {
-				target.blur();
-				target_next.click();
-				return false;
-			}
+			return FieldList.moveFocusPrev();
 		} else {
-			target_next = target.parent().next('td:first');
-			if (target_next.length) {
-				target.blur();
-				target_next.click();
-				return false;
-			}
+			return FieldList.moveFocusNext();
 		}
 	}
 }
 
-// keyリリース時
-function on_keyup(e) {
-	var keycode,
-	    shift;
 
-	if (e != null) {
-		// Mozilla(Firefox, NN) and Opera
-		keycode = e.which;
-		shift = (typeof e.modifiers == 'undefined') ?
-		    e.shiftKey : e.modifiers & Event.SHIFT_MASK;
-	} else {
-		// Internet Explorer
-		keycode = event.keyCode;
-		shift = event.shiftKey;
-	}
+/**
+ * Main sheet field processor
+ * @class SheetFieldProcessor
+ */
+var SheetFieldProcessor = {
+	/**
+	 * Actions when the sheet cell is clicked
+	 * @param {} target jQuery object of clicked cell
+	 *
+	 */
+	set: function (target, field) {
+		field = field.replace(/<[^>]*>?/g, '');
+		var targetId = target.attr('id');
+		$('#' + targetId).html('<b>' + field + '</b>');
 
-	// Enter
-	if (keycode == '13') {
+		var retVal = FieldList.addOrSetContents(targetId, field);
+		if (retVal == true) {
+			return false;
+		}
+		SheetFieldProcessor._add_column(field, targetId, 80);
+	},
+	/**
+	 * Actions when reset is clicked for the sheet cell
+	 */
+	reset: function (targetId) {
+		var targettd = $('td[name="' + targetId + '"]');
 
-		if (!targetid) {
-			$('#active').blur();
-			return true;
+		if (isset(targettd)) {
+			var index = targettd.index() + 1;
+			target = $('.hDivBox th:nth-child(' + index + ')');
+			if (target.length) {
+				SheetFieldProcessor._del_column(targettd, index);
+			}
 		}
 
-		jquerycontextmenu.hidebox($, $('.jqcontextmenu'));
+		targetid = FieldList.applyFieldListStatusToMarkerButton();
+	},
+	/**
+	 * @private
+	 */
+	_add_column: function (html, targetId, width) {
+		var tagStrippedHtml = html.replace(/<[^>]*>?/g, '');
+
+		FieldList.addColumn(tagStrippedHtml, targetId, width);
+		$('#field_list').flexReload();
+		dirty = true;
+
+		StatusMenu.MarkerButton.makeItClickable();
+	},
+	/**
+	 * @private
+	 */
+	_del_column: function (target, index) {
+		if (!target) {
+			return false;
+		}
+
+		targetid = FieldList.del_Column(index);
+
+		SheetCell.clearHtmlText(targetid, cellBgColorManager);
+		SheetCell.notSelected(targetid, cellBgColorManager);
+
+		FieldList.renumberHeader();
+
+		new FieldForm().cellClear(targetid);
+		dirty = true;
+		$('#field_list').flexReload();
+
+		StatusMenu.MarkerButton.makeItClickable();
+	},
+	/**
+	 * @private
+	 */
+	_delColumn: function (target, idx) {
+		// global
+		targetid = FieldList.delColumn(idx);
+
+		SheetCell.clearHtmlText(targetid, cellBgColorManager);
+		SheetCell.notSelected(targetid, cellBgColorManager);
+
+		FieldList.renumberHeader();
+
+		new FieldForm().cellClear(targetid);
+		$('#field_list').flexReload();
+		dirty = true;
+
+		StatusMenu.MarkerButton.makeItClickable();
+	},
+
+};
+
+
+/**
+ * Cell background color management
+ * @class SheetCellBackgroundColor
+ */
+var SheetCellBackgroundColor = function () {
+	/**
+	 * @property {Array} cell_sw
+	 */
+	this.cell_sw = new Array();
+
+	this.setBgColorFlagForAllCells();
+};
+
+SheetCellBackgroundColor.prototype = {
+	/**
+	 * Store flags to cell_sw where the cell's bg color is set or not
+	 * @public
+	 */
+	setBgColorFlagForAllCells: function () {
+		// 各セルの背景色を取得し格納
+		var elements = document.getElementsByTagName('*');
+		for (var elm_cnt = 0; elm_cnt < elements.length; elm_cnt++) {
+			if (elements[elm_cnt].className == 'sheet_field') {
+				var table = elements[elm_cnt];
+				var tds = table.getElementsByTagName('td');
+				for (var tb_cnt = 0; tb_cnt < tds.length; tb_cnt++) {
+					var tbg = $(tds[tb_cnt]).css('background-color');
+					var h = this.cutHex(tbg);
+					if (h == tbg) {
+						var rgb = (tbg == 'rgb(255, 255, 255)') ? 255 * 3 :
+						(tbg == 'rgba(0, 0, 0, 0)') ? 255 * 3 :
+						(tbg == 'transparent') ? 255 * 3 : 1;
+					} else {
+						var r = this.HexToR(tbg);
+						var g = this.HexToG(tbg);
+						var b = this.HexToB(tbg);
+						var rgb = r + g + b;
+						rgb = rgb ? rgb : 255 * 3;
+					}
+					this.cell_sw[tds[tb_cnt].getAttribute('id')] = (rgb == 255 * 3) ? 0 : 1;
+				}
+			}
+		}
+	},
+	/**
+	 * Set the information that the cell's bg color is set.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @public
+	 */
+	set: function (targetid) {
+		this.cell_sw[targetid] = 1;
+	},
+	/**
+	 * Clear the information that the cell's bg color is set.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @public
+	 */
+	clear: function (targetid) {
+		this.cell_sw[targetid] = 0;
+	},
+	/**
+	 * Get the information whether the cell's bg color is set or not.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @return {boolean}
+	 * @public
+	 */
+	isSet: function (targetid) {
+		return this.cell_sw[targetid] == 1 ? true : false;
+	},
+	/**
+	 * @private
+	 */
+	HexToR: function (h) {
+		return parseInt((cutHex(h)).substring(0, 2), 16);
+	},
+	/**
+	 * @private
+	 */
+	HexToG: function (h) {
+		return parseInt((cutHex(h)).substring(2, 4), 16);
+	},
+	/**
+	 * @private
+	 */
+	HexToB: function (h) {
+		return parseInt((cutHex(h)).substring(4, 6), 16);
+	},
+	/**
+	 * @private
+	 */
+	cutHex: function (h) {
+		return (h.charAt(0) == '#') ? h.substring(1, 7) : h;
+	},
+};
+
+/**
+ * Sheet Cell Operation Class
+ * @class SheetCell
+ */
+// used also in jqcontextmenu
+var SheetCell = {
+	/**
+	 * Make the cell's state enter-selected.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @param {} cellBgColorManager Object to SheetCellBackgroundColorManager class
+	 * @return {} jQuery object
+	 */
+	enterSelected: function (targetid, cellBgColorManager) {
+		cellBgColorManager.set(targetid);
 		$('#' + targetid).removeClass('not-selected');
 		$('#' + targetid).removeClass('click-selected');
-		$target = $('#' + targetid).addClass('enter-selected');
-		cell_sw[targetid] = 1;
+		return $('#' + targetid).addClass('enter-selected');
+	},
+	/**
+	 * Make the cell's state click-selected.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @param {} cellBgColorManager Object to SheetCellBackgroundColorManager class
+	 */
+	clickSelected: function (targetid, cellBgColorManager) {
+		if (cellBgColorManager.isSet(targetid)) {
+			//$("#" + targetid).removeClass('not-selected');
+			$("#" + targetid).removeClass('enter-selected');
+			$("#" + targetid).addClass('click-selected');
+		}
+		//cellBgColorManager.set();
+	},
+	/**
+	 * Make the cell's state not-selected.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @param {} cellBgColorManager Object to SheetCellBackgroundColorManager class
+	 */
+	notSelected: function (targetid, cellBgColorManager) {
+		$('#' + targetid).removeClass('enter-selected');
+		$('#' + targetid).removeClass('click-selected');
+		$('#' + targetid).addClass('not-selected');
+		cellBgColorManager.clear(targetid);
+	},
+	/**
+	 * Set the cell's contents.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @param {string} text Html text
+	 * @return {} jQuery object
+	 */
+	setHtmlText: function (targetid, html) {
+		return $('#' + targetid).html(html);
+	},
+	/**
+	 * Clear the cell's contents.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @return {} jQuery object
+	 */
+	clearHtmlText: function (targetid) {
+		return $('#' + targetid).html('');
+	},
+};
 
-		set_field($target);
-		targetid = null;
+/**
+ * Status menu class
+ * @class StatusMenu
+ */
+var StatusMenu = {
+	/**
+	 * Marker button class
+	 * @class MarkerButton
+	 */
+	MarkerButton: {
+		/**
+		 * Make the button clickable
+		 */
+		makeItClickable: function() {
+			$('.statusMenu .marker button').attr('disabled', false);
+			$('.statusMenu .marker').removeClass('disable');
+		},
+		/**
+		 * Make the button un-clickable
+		 */
+		makeItUnClickable: function() {
+			$('.statusMenu .marker button').attr('disabled', true);
+			$('.statusMenu .marker').addClass('disable');
+		},
+		/**
+		 * Get whether the marker button is UNclickable or not.
+		 * @return {boolean}
+		 */
+		isUnClickable: function() {
+			return $('.statusMenu .marker button').attr('disabled');
+		},
+		setCallbackHandler: function (type, callback) {
+			return $('.statusMenu .marker button').bind(type, callback);
+		}
+	},
+	ReloadButton: {
+		/**
+		 * Go to the page of reselecting an excel file
+		 */
+		reloadSheetExcelFile: function() {
+			var gid = $("#form-status input[name=gid]").val();
+			var sid = $("#form-status input[name=sid]").val();
+			location.href = "/external/sheet/" + gid + "/" + sid + "/";
+		},
 
-		$('.statusMenu .marker button').attr('disabled', false);
-		$('.statusMenu .marker').removeClass('disable');
-	}
-}
+	},
+};
+
+/**
+ * Field form handler for field list
+ * @class FieldForm
+ */
+var FieldForm = function () {
+	this.form = $('form#form-save');
+};
+
+FieldForm.prototype = {
+	cellClear: function (targetid) {
+		var cmd_c = '<input type="hidden" name="cell-' + targetid + '-clear" value="" />';
+		return this.form.append(cmd_c);
+	},
+	cellMark: function (targetid, txt) {
+		var cmd_m = '<input type="hidden" name="cell-' + targetid + '-mark" value="' + txt + '" />';
+		return this.form.append(cmd_m);
+	},
+	cellType: function (targetid, txt, type) {
+		var cmd_f = '<input type="hidden" name="field-' + targetid + '-' + type + '" value="' + txt + '" />';
+		return this.form.append(cmd_f);
+	},
+	/**
+	 * Submit the form
+	 * @public
+	 */
+	submit: function () {
+		this.packAllFieldInfoToInputTags();
+		return this.form.submit();
+	},
+	/**
+	 * @private
+	 */
+	packAllFieldInfoToInputTags: function () {
+		var self = this;
+		FieldList.traverseItems(function (fieldname, txt) {
+			var type;
+			if (fieldname == "0")
+				return;
+			if (typeof(cell_type[fieldname]) == 'undefined') {
+				type = 1;
+			} else if (cell_type[fieldname] != -1) {
+				type = cell_type[fieldname];
+			} else {
+				return;
+			}
+
+			txt = txt.replace(/<\s*script[^>]*>[\s\S]*?<\s*\/script>/ig, '');
+			txt = $.escapeHTML(txt);
+
+			self.cellMark(fieldname, txt);
+			self.cellType(fieldname, txt, type);
+		});
+	},
+};
+
+/**
+ * Provide operations for field list
+ * @class FieldList
+ */
+var FieldList = {
+	/**
+	 * Initialize
+	 */
+	init: function () {
+		$('#field_list td').keydown(FieldList._key_events_in_field_list);
+		return FieldList.applyFieldListStatusToMarkerButton();
+	},
+	/**
+	 * Change the status of marker button according to the number of columns of field list.
+	 */
+	applyFieldListStatusToMarkerButton: function () {
+		var targetTDs = $('#field_list td');
+		var targetid = targetTDs.attr('name');
+		if (targetTDs.length == 1 && targetid == 0) {
+			// if field list contains only 1 column.
+			StatusMenu.MarkerButton.makeItUnClickable();
+		} else {
+			StatusMenu.MarkerButton.makeItClickable();
+		}
+		return targetid;
+	},
+	/**
+	 * Add a new column to field list.
+	 * @param {string} html html text to be set as a content
+	 * @param {number} width width of the contents
+	 * @public
+	 */
+	addColumn: function (html, targetid, width) {
+		var num;
+
+		var dupColumn = function (origElement, callback) {
+			var cloned = origElement.clone(true);
+			callback(origElement, cloned);
+			origElement.after(cloned);
+			return cloned;
+		};
+
+		dupColumn($('.nDiv tr:last'), function () {});
+		dupColumn($('.cDrag div:last'), function () {});
+
+		num = $('.hDiv th').length + 1;
+		dupColumn($('.hDiv th:last'), function (origElement, newElement) {
+			newElement.wrapInner(document.createElement('div'));
+			newElement.find('div').css('width', width + 'px').text(num);
+		});
+
+		dupColumn($('.bDiv td:last'), function (origElement, newElement) {
+			newElement.attr('name', targetid);
+			newElement.wrapInner(document.createElement('div'));
+			newElement.find('div').css('width', width + 'px').html(html); // ここが効く
+		});
+	},
+	/**
+	 * Delete a column in the field list.
+	 * @param {number} idx index of the field list set in TD tag.
+	 * @return {string} the ID name of removed field
+	 * @public
+	 */
+	delColumn: function (idx) {
+		var targettd = $('#field_list td').eq(idx);
+		var fieldName = targettd.attr('name');
+
+		// idx starts from 0
+		$('.nDiv tr').eq(idx).remove();
+		$('.cDrag div').eq(idx).remove();
+		$('.hDiv th').eq(idx).remove();
+		targettd.remove();
+
+		return fieldName;
+	},
+	/**
+	 * Delete a column in the field list.
+	 * @param {number} index index of the field list set in TD tag.
+	 * @return {string} the ID name of removed field
+	 * @public
+	 */
+	del_Column: function (index) {
+		// index starts from 1
+		$('.nDiv tr:nth-child(' + index + ')').remove();
+		$('.cDrag div:nth-child(' + index + ')').remove();
+		$('.hDiv th:nth-child(' + index + ')').remove();
+		var targettd = $('#field_list td:nth-child(' + index + ')');
+		var targetid = targettd.attr('name');
+		targettd.remove();
+		return targetid;
+	},
+	/**
+	 * Set a content to the specified field.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @param {string} contents A text string of contents
+	 * @return {boolean} true: if success, false: if failed
+	 * @public
+	 */
+	addOrSetContents: function (targetid, contents) {
+		var targettd = $('td[name="' + targetid + '"]');
+		if (targettd.length) {	// set contents if exists
+			targettd.find('div').text(contents);
+			return true;
+		}
+		return false;
+	},
+	/**
+	 * Renumber the header of field list
+	 * @public
+	 */
+	renumberHeader: function () {
+		var ths = $('.hDiv th'); // All columns of field list's header
+		ths.each(function(index) {	// index starts from 0
+			// To display the number from 1, increment the number
+			$(this).find('div:first').text(++index);
+		});
+	},
+	/**
+	 * Do some actions for all field
+	 * @param {} callback function to apply to each field list's element
+	 * @public
+	 */
+	traverseItems: function (callback) {
+		$('#field_list td').each(function() {
+			var fieldname = $(this).attr('name');
+			var txt = $(this).text();
+			return callback(fieldname, txt);
+		});
+	},
+	/**
+	 * Show text input field to edit
+	 */
+	editContents: function () {
+		if ($(this).hasClass('on')) {
+			return;
+		}
+
+		$(this).addClass('on');
+		// get current contents and attributes
+		var txt = $(this).text(),
+		    html =  $(this).html(),
+		    width = $(this).width(),
+		    height = $(this).height(),
+		    fsize = $(this).css('font-size'),
+		    nlines = height / 16 | 0; // int conversion
+		// remove html tags
+		txt = txt.replace(/<[^>]*>?/g, '');
+		// show text input small window
+		$(this).html('<input type="text" id="active" value="'
+			+ txt
+			+ '" size="'
+			+ txt.length * 2
+			+ '" style="width:'
+			+ width
+			+ 'px; font-size:'
+			+ fsize
+			+ '; " />'
+		);
+
+		// prepare for closing the small window when being unfocused
+		var target = $('#active');
+		target.focus();
+		target.blur(function() {
+			// set the user input with <div> tag.
+			var inputVal = $(this).val();
+			targetid = $(this).parent().attr('name');
+			width = width - 10;
+			inputVal = inputVal.replace(/<[^>]*>?/g, '');
+			var htmlval = inputVal.replace(/(\\n)/g, '<br />');
+			$(this).parent().removeClass('on')
+			    .html('<div style="width: ' + width + 'px" >' +
+				  htmlval + '</div>');
+
+			// update the corresponding sheet cell
+			SheetCell.setHtmlText(targetid, '<b>' + inputVal + '</b>');
+			// update marker button.
+			StatusMenu.MarkerButton.makeItClickable();
+		});
+		target.keydown(function(e) {
+			if (e.keyCode == 13) {
+				target.blur();
+			}
+		});
+	},
+	getFocusedFieldObject: function () {
+		return $('#active');
+	},
+	/**
+	 * Move the focus next
+	 * @public
+	 */
+	moveFocusNext: function () {
+		var currentFocused = FieldList.getFocusedFieldObject();
+		var nextField = currentFocused.parent().next('td:first');
+		return FieldList.moveFocus(currentFocused, nextField);
+	},
+	/**
+	 * Move the focus previous
+	 * @public
+	 */
+	moveFocusPrev: function () {
+		var currentFocused = FieldList.getFocusedFieldObject();
+		var nextField = currentFocused.parent().prev();
+		return FieldList.moveFocus(currentFocused, nextField);
+	},
+	/**
+	 * Move the focus next
+	 * @private
+	 */
+	moveFocus: function (currentFocusedField, nextField) {
+		if (nextField.length) { // if found
+			currentFocusedField.blur();
+			nextField.click();
+			return false;
+		}
+	},
+	/**
+	 * Key event handler
+	 * @private
+	 */
+	_key_events_in_field_list: function (e) {
+		var keycode = e.which;
+		var shift = (typeof e.modifiers == 'undefined') ?
+		    e.shiftKey : e.modifiers & Event.SHIFT_MASK;
+		if (keycode == '9') {	// Tab key
+			if (shift) {
+				return FieldList.moveFocusPrev();
+			} else {
+				return FieldList.moveFocusNext();
+			}
+		}
+	},
+};
 
 var SHEET = SHEET || {};// namespace
 
@@ -480,27 +789,54 @@ SHEET = {
 			resizable:false,
 			height:70,
 			onDragCol: function() {
-				ths = $('.hDiv th');
+				var ths = $('.hDiv th');
 				ths.each(function(num) {
-					th = $(this);
+					var th = $(this);
 					th.find('div:first').text(++num);
 				});
 			}
 		});
 
-		$('.hDivBox th').addcontextmenu('fieldreset');
-		$('.hDivBox th').click(function() {
-			target = $(this);
+		$.contextMenu({
+			selector: '.hDivBox th',
+			trigger: 'left',
+			items: {
+				'reset': {
+					name:'リセット',
+					icon:'delete',
+					callback: function (key, options) {
+						// get the name of target id
+						var targetId = $('#field_list td').eq(options.$trigger.index()).attr('name');
+						SheetFieldProcessor.reset(targetId); // XXX: may be jquery object instead of targetId?
+					},
+				},
+			},
+
 		});
-		$('#field_list td').click(field_click);
+		$('#field_list td').click(FieldList.editContents);
 
 		$('#bt-password').click(function() {
 			$.jqDialog.password('パスワードを入力して下さい', function(data) {
 				$('#passwd').val(data);
-				pack_fields();
+				new FieldForm().submit();
 				$('#form-status').attr('action', 'form-commit.php?start');
 				$('#form-status').submit();
 			});
 		});
 	}
 };
+
+function set_data_to_mutiple_cells(type_id, field_data) {
+	$(".ui-selected").each(function() {
+		cell_type[this.id] = type_id;
+		SheetFieldProcessor.set($(this), field_data);
+	});
+}
+
+function clear_data_to_mutiple_cells(type_id) {
+	$(".ui-selected").each(function() {
+		cell_type[this.id] = type_id;
+		SheetFieldProcessor.reset(this.id);
+	});
+}
+// vim: set noet fenc=utf-8 ff=unix sts=0 sw=8 ts=8 :

@@ -152,6 +152,18 @@ function put_config($file_id, $REQUEST, $group_id, $sheet_id, $xls, &$conf)
 	$val = var_export_1line($list_of_cell_size);
 	$conf->set("cell_height", $val);
 
+	$list_of_cell_colspan = array();
+	foreach (range(0, $xls->maxcell[$sn]) as $col) {
+		foreach (range(0, $xls->maxrow[$sn]) as $row) {
+			$colspan = $xls->celmergeinfo[$sn][$row][$col]['cspan'];
+			if (isset($colspan) && $colspan > 1) {
+				$list_of_cell_colspan["${col}-${row}"] = $colspan;
+			}
+		}
+	}
+	$val = var_export_1line($list_of_cell_colspan);
+	$conf->set("cell_colspan", $val);
+
 	$conf->commit();
 }
 
@@ -399,6 +411,16 @@ function put_rails($file_id, $sheet_marker, $rails_env, &$conf)
 			$sheet_marker->get_cells_height_array_with_marker()
 		)
 	);
+	$cell_colspan_ruby = php_hash_to_ruby_hash(
+		var_export_1line(
+			$sheet_marker->get_cells_colspan_array_with_marker()
+		)
+	);
+	$cell_rowspan_ruby = php_hash_to_ruby_hash(
+		var_export_1line(
+			$sheet_marker->get_cells_rowspan_array_with_marker()
+		)
+	);
 	$target = $conf->get("target") == "registered" ? 1 : 0;
 
 	//
@@ -563,6 +585,8 @@ end
 @sheet.block_height = {$no_of_rows} || 0 # XXX
 @sheet.cell_width = "$cell_width_ruby" || 0 # XXX
 @sheet.cell_height = "$cell_height_ruby" || 0 # XXX
+@sheet.cell_colspan = "$cell_colspan_ruby" || 0 # XXX
+@sheet.cell_rowspan = "$cell_rowspan_ruby" || 0 # XXX
 @sheet.status = 1
 # save
 if @sheet.save

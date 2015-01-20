@@ -697,9 +697,21 @@ form {
 	background-color: #ffb1b1;
 }
 
+/* for jquery.selector */
+.sheet_field td.ui-selecting {
+        background: #FECA40;
+}
+
+/* for jquery.selector */
+.sheet_field td.ui-selected {
+        background: #F39814; color: white;
+}
+
+/*
 .sheet_field td:hover {
 	background-color: #ccdddd;
 }
+*/
 
 .filelist tr:hover {
 	 background-color: #ccffff;

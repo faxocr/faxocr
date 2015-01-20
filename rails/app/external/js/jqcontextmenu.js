@@ -100,7 +100,7 @@ var jquerycontextmenu = {
 		var field;
 		//only bind click event to document once
 		if (this.builtcontextmenuids.length === 0) {
-			$(document).bind("click", function(e) {
+			$(document).bind("contextmenu", function(e) {
 				// hide all context menus (and their sub ULs)
 				// when left mouse button is clicked
 				if (e.button === 0) {
@@ -111,10 +111,7 @@ var jquerycontextmenu = {
 						jquerycontextmenu.hidebox($, $('.jqcontextmenu'));
 						if (targetid) {
 //							$("#" + targetid).css('background-color', ctbl[sval]);
-							if (cell_sw[targetid] == 1) {
-								$("#" + targetid).removeClass('enter-selected');
-								$("#" + targetid).addClass('click-selected');
-							}
+							SheetCell.clickSelected(targetid, cellBgColorManager);
 						}
 //						sval = 0;
 						targetid = null;
@@ -127,9 +124,11 @@ var jquerycontextmenu = {
 			});
 
 			// XXX
+			/*
 			$(document).bind("mouseup", function(e) {
 				jquerycontextmenu.hidebox($, $('.jqcontextmenu'));
 			});
+			*/
 		}
 
 		//if this context menu hasn't been built yet
@@ -140,7 +139,7 @@ var jquerycontextmenu = {
 				// hide all context menus (and their sub ULs)
 				// when left mouse button is clicked
 				if (e.button === 0) {
-					// jquerycontextmenu.hidebox($, $('.jqcontextmenu'))
+					jquerycontextmenu.hidebox($, $('.jqcontextmenu'))
 				}
 			});
 		}
@@ -151,7 +150,7 @@ var jquerycontextmenu = {
 			return;
 		}
 
-		$target.bind("click", function(e) {
+		$target.bind("contextmenu", function(e) {
 			var targettd;
 
 			// ターゲット選択時
@@ -174,7 +173,7 @@ var jquerycontextmenu = {
 			targetid = this.id;
 
 			// sval = (defaultbg === '#FFFFFF') ? 0 : 5;
-			set_field($(this));
+			//SheetFieldProcessor.set($(this));
 
 			return false;
 		});

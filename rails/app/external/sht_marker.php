@@ -171,7 +171,7 @@ $().ready(function() {
 	$('#ex3').jqDrag('.jqDrag').jqResize('.jqResize');
 //	$('#ex3').jqResize('.jqResize');
 
-	btn = $('.statusMenu button:disabled');
+	var btn = $('.statusMenu button:disabled');
 	btn.parent().addClass('disable');
 });
 

@@ -56,23 +56,14 @@ if (file_exists(DST_DIR . $file_id . ARRAY_CONF_EXT)) {
 // ヘッダ処理
 //
 //$header_opt = "<base target=\"/external/sht_field/\">\n";
-$header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/jqcontextmenu.css\" type=\"text/css\" />\n";
+$header_opt .= '<link type="text/css" rel="stylesheet" href="/external/css/jquery-ui-1.10.4.css" />' . "\n";
+$header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/jquery.contextMenu.css\" type=\"text/css\" />\n";
 $header_opt .= "<link rel=\"stylesheet\" href=\"/external/css/flexigrid.css\" type=\"text/css\" />\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.4.1.min.js\"></script>\n";
-$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jqcontextmenu.js\"></script>\n";
+$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-1.8.3.min.js\"></script>\n";
+$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery-ui-1.10.4.min.js\"></script>\n";
+$header_opt .= "<script type=\"text/javascript\" src=\"/external/js/jquery.contextMenu.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/flexigrid.js\"></script>\n";
 $header_opt .= "<script type=\"text/javascript\" src=\"/external/js/sheetlist.js\"></script>\n";
-
-$body_opt .= "<ul id=\"contextmenu\" class=\"jqcontextmenu\">\n";
-$body_opt .= "<li>　フィールド名 <input id=\"field\" size=\"10\" value=\"\" /></li>\n";
-$body_opt .= "<li><a onclick=\"cell_type[targetid] = 1;\">数字</a></li>\n";
-$body_opt .= "<li><a onclick=\"cell_type[targetid] = 2;\">○×△</a></li>\n";
-$body_opt .= "<li><a onclick=\"cell_type[targetid] = 3;\">画像</a></li>\n";
-$body_opt .= "<li class=\"btGray\"><a onclick=\"cell_type[targetid] = -1;reset_field();\">リセット</a></li>\n";
-$body_opt .= "</ul>\n";
-$body_opt .= "<ul id=\"fieldreset\" class=\"jqcontextmenu\">\n";
-$body_opt .= "<li style=\"z-index:10\"><a onclick=\"del_column();\">リセット</a></li>\n";
-$body_opt .= "</ul>\n";
 
 include( TMP_HTML_DIR . "tpl.header.html" );
 
@@ -371,9 +362,9 @@ function put_status($file_id, $group_id, $sheet_id, $conf_sw)
 	print "<input type=\"hidden\" name=\"gid\" value=\"" . $group_id . "\" />\n";
 	print "<input type=\"hidden\" name=\"sid\" value=\"" . $sheet_id . "\" />\n";
 
-	print "<div class=\"upload\"><button type=\"button\" id=\"\" onclick=\"this.disabled=false; go_sheet_upload(); return false;\" >再読み込み</button></div>\n";
+	print "<div class=\"upload\"><button type=\"button\" id=\"\" onclick=\"this.disabled=false; StatusMenu.ReloadButton.reloadSheetExcelFile(); return false;\" >再読み込み</button></div>\n";
 	print "<div class=\"field current\">&gt;<button type=\"button\" disabled=\"disabled\">フィールド指定</button></div>\n";
-	print "<div class=\"marker\">&gt;<button type=\"button\" id=\"next\" onclick=\"this.disabled=true; pack_fields();\" " . $status_label . ">マーカー指定</button></div>\n";
+	print "<div class=\"marker\">&gt;<button type=\"button\" id=\"next\" onclick=\"\" " . $status_label . ">マーカー指定</button></div>\n";
 	print "<div class=\"verify disable\">&gt;<button type=\"button\" disabled=\"disabled\">シート確認</button></div>\n";
 	print "<div class=\"commit disable\">&gt;<button type=\"button\" disabled=\"disabled\">シート登録</button></div>\n";
 
