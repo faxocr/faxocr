@@ -29,6 +29,22 @@ class Sheet < ActiveRecord::Base
       srmlstr = srmlstr + "      <cellAttribute number=\"#{cell_no}\" length=\"#{cell_height}\"/>\n"
     end
     srmlstr = srmlstr + "    </cellHeight>\n"
+    srmlstr = srmlstr + "    <cellColspan>\n"
+    unless sheet.cell_colspan.blank?
+      eval(sheet.cell_colspan).sort.each do |cell_no,cell_colspan|
+        row_no, col_no = cell_no.split('_')
+        srmlstr = srmlstr + "      <cellAttribute col=\"#{col_no}\" row=\"#{row_no}\" colspan=\"#{cell_colspan}\"/>\n"
+      end
+    end
+    srmlstr = srmlstr + "    </cellColspan>\n"
+    srmlstr = srmlstr + "    <cellRowspan>\n"
+    unless sheet.cell_rowspan.blank?
+      eval(sheet.cell_rowspan).sort.each do |cell_no,cell_rowspan|
+        row_no, col_no = cell_no.split('_')
+        srmlstr = srmlstr + "      <cellAttribute col=\"#{col_no}\" row=\"#{row_no}\" rowspan=\"#{cell_rowspan}\"/>\n"
+      end
+    end
+    srmlstr = srmlstr + "    </cellRowspan>\n"
     srmlstr = srmlstr + "    <properties>\n"
     srmlstr = srmlstr + "      <blockOcr"
     srmlstr = srmlstr + " name=\"echo_request_and_send_analyzed_data\""
