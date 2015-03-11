@@ -22,9 +22,9 @@
 var cellBgColorManager;	// global: also referenced from jqcontextmenu
 var cell_type;
 var enum_cell_type = {
-	'number': 0,
-	'rating': 1,
-	'image': 2,
+	'number': 1,
+	'rating': 2,
+	'image': 3,
 	'reset': -1,
 };
 var targetid;
