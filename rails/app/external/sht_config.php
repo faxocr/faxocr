@@ -170,7 +170,7 @@ function put_config($file_id, $REQUEST, $group_id, $sheet_id, $xls, &$conf)
 function php_hash_to_ruby_hash($str)
 {
 	$result = preg_replace("/^array\(/", "{", $str);
-	return preg_replace("/,\)$/", "}", $result);
+	return preg_replace("/,*\)$/", "}", $result);
 }
 
 function var_export_1line($val)
