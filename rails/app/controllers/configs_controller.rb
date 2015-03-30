@@ -37,10 +37,13 @@ class ConfigsController < ApplicationController
 
   def procfax_exec
     @script_path = "#{Rails.root}/../bin/procfax.sh"
-    @log_file_path = "#{Rails.root}/../Faxsystem/Log/rails_procfax.log"
-
-    @result = system("sh " + @script_path + " >> " + @log_file_path)
-    @raw_config = File.read(@log_file_path)
+    log_file_path = "#{Rails.root}/../Faxsystem/Log/rails_procfax.log"
+    @raw_config = `sh #{@script_path}`
+    @result = $?.exitstatus == 0 ? true : false
+    open(log_file_path, "a") do |f|
+      f.flock(File::LOCK_EX)
+      f.puts(@raw_config)
+    end
   end
 
   def getfax_exec
