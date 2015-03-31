@@ -8,8 +8,8 @@
 <table width="85%">
 <tr>
   <td valign="middle" align="right">
-    <% if !@s_prev.nil? %>
-    <%= link_to image_tag('/images/prev.gif'), group_survey_answer_sheet_path(@group, @survey, @s_prev) %>
+    <% if !@s_next.nil? %>
+    <%= link_to image_tag('/images/prev.gif'), group_survey_answer_sheet_path(@group, @survey, @s_next) %>
     <% end %>
   </td>
   <td align="center">
@@ -51,8 +51,8 @@
 </table>
   </td>
   <td valign="middle" align="left">
-    <% if !@s_next.nil? %>
-    <%= link_to image_tag('/images/next.gif'), group_survey_answer_sheet_path(@group, @survey, @s_next) %>
+    <% if !@s_prev.nil? %>
+    <%= link_to image_tag('/images/next.gif'), group_survey_answer_sheet_path(@group, @survey, @s_prev) %>
     <% end %>
   </td>
 </tr>
