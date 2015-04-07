@@ -2,7 +2,7 @@
 <div class="breadcrumb">
 　場所:
 <% if /^(configs)$/ =~ params[:controller] %>
-	  <%= link_to '管理ホーム' %>
+	  <%= link_to '管理ホーム', groups_url %>
 <% elsif  /^(groups|surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties|report|candidates|users)$/ =~ params[:controller] %>
 
 	<% if @current_group.is_administrator? %>
