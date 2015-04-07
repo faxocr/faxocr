@@ -188,7 +188,7 @@ private
         str += File.basename(file).gsub(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{0,2})/, '\1/\2/\3 \4:\5　')
         str += "到着Fax " + count_f.to_s + "件 (Fax処理失敗 " + count_fe.to_s +
            " / シート処理失敗 " + count_se.to_s + ") →  " + count_s.to_s +
-           " シート受理\n"
+           " シート受理\r\n"
         cnt += 1
       end
     end
