@@ -8,7 +8,7 @@ Shinsai Faxocr is a web application that is desinged to gather data from every f
 
 This project needs the Ruby on Rails environment. We are not providing tar balls. To set up the faxocr system, please execute the following commands: 
 
-    git clone https://code.google.com/p/faxocr/
+    git clone https://github.com/faxocr/faxocr.git faxocr
     cd faxocr
     gem update --system 1.5.3
     gem install rails -y -v 2.3.5
