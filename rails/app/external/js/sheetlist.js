@@ -19,6 +19,8 @@
  *
  */
 
+
+var cellAndFieldIdMap;	// global: file local
 var cellBgColorManager;	// global: also referenced from jqcontextmenu
 var cell_type;
 var enum_cell_type = {
@@ -77,9 +79,10 @@ jQuery(document).ready(function($) {
 				trigger: 'left',
 				callback: function (key, options) {
 					var fieldNameValueFromUser = $.contextMenu.getInputValues(options)['fieldname'];
-					set_data_to_mutiple_cells(
+					SheetFieldProcessor.setMulti(
 						enum_cell_type[key],
-						fieldNameValueFromUser
+						fieldNameValueFromUser,
+						JqSeletableUIHelper.getSelectedCellIds()
 					);
 				},
 				items: {
@@ -109,7 +112,7 @@ jQuery(document).ready(function($) {
 					'reset': {
 						name:'リセット',
 						callback: function (key, options) {
-							clear_data_to_mutiple_cells(enum_cell_type['reset']);
+							SheetFieldProcessor.resetMulti();
 						},
 					},
 				},
@@ -126,9 +129,10 @@ jQuery(document).ready(function($) {
 			$('.ui-selected:first').contextMenu();
 		},
 	});
-	cell_type = new Array();
+	cell_type = {};
 
 	cellBgColorManager = new SheetCellBackgroundColor();
+	cellAndFieldIdMap = new CellAndFieldMapper();
 
 	document.onkeydown = on_keydown;
 
@@ -196,14 +200,236 @@ function on_keydown(e) {
 
 
 /**
+ * Cell Id Manipulator
+ * @class CellIdManipulator
+ */
+var CellIdManipulator = {
+	/**
+	 * Get page number from ID.
+	 * @param {string} ID
+	 * @return {string} page number of ID or null
+	 * @public
+	 */
+	getPageNum: function (id) {
+		return CellIdManipulator._getField(id, "page");
+	},
+	/**
+	 * Get row number from ID.
+	 * @param {string} ID
+	 * @return {string} row number of ID or null
+	 * @public
+	 */
+	getRowNum: function (id) {
+		return CellIdManipulator._getField(id, "row");
+	},
+	/**
+	 * Get column number from ID.
+	 * @param {string} ID
+	 * @return {string} column number of ID or null
+	 * @public
+	 */
+	getColNum: function (id) {
+		return CellIdManipulator._getField(id, "col");
+	},
+	/**
+	 * Get colspan from ID.
+	 * @param {string} ID
+	 * @return {string} colspan of ID or null
+	 * @public
+	 */
+	getColSpan: function (id) {
+		return CellIdManipulator._getField(id, "colSpan");
+	},
+	/**
+	 * Get rowspan from ID.
+	 * @param {string} ID
+	 * @return {string} rowspan of ID or null
+	 * @public
+	 */
+	getRowSpan: function (id) {
+		return CellIdManipulator._getField(id, "rowSpan");
+	},
+	/**
+	 * Get general ID from ID. ex. "0-1-2" from "0-1-2-3"
+	 * @param {string} ID
+	 * @return {string} general ID or null
+	 * @public
+	 */
+	getGeneralId: function (id) {
+		var result = id.match(/(\d+-\d+-\d+)(-\d+)*/);
+		return (result == null ? result : result[1]);
+	},
+	/**
+	 * Get general ID from ID. ex. "0-1-2" from "0-1-2-3"
+	 * @param {string} id - input value of ID
+	 * @param {string} fieldName - a name of part in the ID.
+	 * @return {string} general ID or null
+	 * @private
+	 */
+	_getField: function (id, fieldName) {
+		var fieldNameTable = {
+			page: 1,
+			row: 2,
+			col: 3,
+			colSpan: 5,
+			rowSpan: 6,
+		};
+		var result = id.match(/(\d+)-(\d+)-(\d+)(-(\d+))*/);
+		return (result == null ? result : result[fieldNameTable[fieldName]]);
+	},
+};
+
+
+/**
+ * Collections of functions to cells selected by jQuery selectable
+ * @class MultiCells
+ *
+ */
+var MultiCells = {
+	/**
+	 * Get colspan from selected cells
+	 * @return {number} colspan
+	 * @public
+	 */
+	getColSpan: function () {
+		var ids = JqSeletableUIHelper.getSelectedCellIds();
+		var firstRowNum = MultiCells._getFirstRowNumber(ids);
+		return MultiCells._getHorizontalCellCount(ids, firstRowNum);
+	},
+	/**
+	 * Get rowspan from selected cells
+	 * @return {number} rowspan
+	 * @public
+	 */
+	getRowSpan: function () {
+		var ids = JqSeletableUIHelper.getSelectedCellIds();
+		var firstColNum = MultiCells._getFirstColNumber(ids);
+		return MultiCells._getVerticalCellCount(ids, firstColNum);
+	},
+	/**
+	 * Get first row number from selected cells.
+	 * @return {number} row number
+	 * @private
+	 */
+	_getFirstRowNumber: function (ids) {
+		var min = Number.MAX_VALUE;
+		for (var i in ids) {
+			min = Math.min(min, CellIdManipulator.getRowNum(ids[i]));
+		}
+		return min;
+	},
+	/**
+	 * Get first column number from selected cells.
+	 * @return {number} column number
+	 * @private
+	 */
+	_getFirstColNumber: function (ids) {
+		var min = Number.MAX_VALUE;
+		for (var i in ids) {
+			min = Math.min(min, CellIdManipulator.getColNum(ids[i]));
+		}
+		return min;
+	},
+
+	/**
+	 * considered HTML row/cols span
+	 */
+	/**
+	 * Get a number of rows from IDs.
+	 * @return {number} row count
+	 * @private
+	 */
+	_getHorizontalCellCount: function (ids, firstRowNum) {
+		var cellCount = 0;
+		for (var i in ids) {
+			if (CellIdManipulator.getRowNum(ids[i]) == firstRowNum) {
+				cellCount++;
+			};
+		}
+		return cellCount;
+	},
+	/**
+	 * Get a number of columns from IDs.
+	 * @return {number} column count
+	 * @private
+	 */
+	_getVerticalCellCount: function (ids, firstColNum) {
+		var cellCount = 0;
+		for (var i in ids) {
+			if (CellIdManipulator.getColNum(ids[i]) == firstColNum) {
+				cellCount++;
+			};
+		}
+		return cellCount;
+	},
+};
+
+
+/**
+ * Handling for cells selected by jQuery Selectable
+ * @class
+ */
+var JqSeletableUIHelper = {
+	/**
+	 * Get a list of selected cell's IDs.
+	 * @return {String[]} array of IDs
+	 * @public
+	 */
+	getSelectedCellIds: function () {
+		var ids = new Array();
+		$(".ui-selected").each(function() {
+			ids.push(this.id);
+		});
+		return ids;
+	},
+	/**
+	 * Get a list of selected cell's IDs.
+	 * @return {Object[]} jQuery objects selected by jQuery selectable
+	 * @public
+	 */
+	getSelectedCellJqObjects: function () {
+		return $(".ui-selected");
+	},
+};
+
+
+/**
  * Main sheet field processor
  * @class SheetFieldProcessor
  */
 var SheetFieldProcessor = {
 	/**
 	 * Actions when the sheet cell is clicked
+	 * @param {number} type_id - a type of field
+	 * @param {String} field_data - a text of selected cells
+	 * @param {String[]} selectedCellIds - IDs of selected cells
+	 * @public
+	 */
+	setMulti: function (type_id, field_data, selectedCellIds) {
+		field_data = field_data.replace(/<[^>]*>?/g, '');
+		var firstCellId = $(".ui-selected:first").attr('id');
+		selectedCellIds.forEach(function (id, index, ids) {
+			cell_type[id] = type_id;
+			SheetCell.setHtmlText(id, '<b>' + field_data + '</b>');
+			SheetCell.enterSelected(id, cellBgColorManager);
+		});
+		var idNameForFieldList = firstCellId + "-" + MultiCells.getColSpan(selectedCellIds); // + "-" + MultiCells.getRowSpan(selectedCellIds);
+		var retVal = FieldList.addOrSetContents(idNameForFieldList, field_data);
+		if (retVal == true) {
+			return false;
+		}
+		SheetFieldProcessor._add_column(
+				field_data,
+				idNameForFieldList,
+				80,
+				JqSeletableUIHelper.getSelectedCellJqObjects()
+		);
+	},
+	/**
+	 * Actions when the sheet cell is clicked
 	 * @param {} target jQuery object of clicked cell
-	 *
+	 * // XXX: if setMulti is used this function will not be used
+	 * @public
 	 */
 	set: function (target, field) {
 		field = field.replace(/<[^>]*>?/g, '');
@@ -218,6 +444,25 @@ var SheetFieldProcessor = {
 	},
 	/**
 	 * Actions when reset is clicked for the sheet cell
+	 * @public
+	 */
+	resetMulti: function () {
+		var fieldIDsToBeReset = {}
+		var ids = JqSeletableUIHelper.getSelectedCellIds();
+		ids.forEach(function (id, index, ids) {
+			var selectedFieldId = id;
+			cellAndFieldIdMap.getFieldId(selectedFieldId).forEach(function (fieldId, index, fieldIDs) {
+				fieldIDsToBeReset[fieldId] = true;	// set dummy value
+			});
+		});
+		for (var fieldId in fieldIDsToBeReset) {
+			SheetFieldProcessor.reset(fieldId);
+		};
+	},
+	/**
+	 * Actions when reset is clicked in the field list
+	 * @param {String} targetId
+	 * @public
 	 */
 	reset: function (targetId) {
 		var targettd = $('td[name="' + targetId + '"]');
@@ -229,16 +474,48 @@ var SheetFieldProcessor = {
 				SheetFieldProcessor._del_column(targettd, index);
 			}
 		}
+		// clear click-selected
+		SheetFieldProcessor._clearCells(targetId);
+		var fieldIdReferredFromOtherCell = SheetFieldProcessor._getFieldIDsRefferdFromOtherCell(targetId);
+		cellAndFieldIdMap.del(targetId);
+		SheetFieldProcessor._redrawCellsByFieldIds(fieldIdReferredFromOtherCell);
 
 		targetid = FieldList.applyFieldListStatusToMarkerButton();
 	},
 	/**
 	 * @private
 	 */
-	_add_column: function (html, targetId, width) {
+	_add_column: function (html, targetId, width, selectedCellObjects) {
 		var tagStrippedHtml = html.replace(/<[^>]*>?/g, '');
 
-		FieldList.addColumn(tagStrippedHtml, targetId, width);
+		var fieldNumberInFieldList = FieldList.addColumn(tagStrippedHtml, targetId, width, function (newHDivThElement, newNDivTdElement) {
+			newHDivThElement.hover(
+				function (e) {
+					cellAndFieldIdMap.get($(this).attr('name')).each(function () {
+						SheetCell.clickSelected(this.id, cellBgColorManager);
+						SheetCell.setHtmlText(this.id, newNDivTdElement.text());
+					});
+				},
+				function (e) {
+					cellAndFieldIdMap.get($(this).attr('name')).each(function () {
+						// preserve only .enter-selected class
+						SheetCell.enterSelected(this.id, cellBgColorManager);
+					});
+				}
+			);
+			// set hover event handler to emit event from cell -> field list
+			selectedCellObjects.each(function() {
+				$(this).hover(
+					function (e) {
+						newHDivThElement.mouseenter();
+					},
+					function (e) {
+						newHDivThElement.mouseleave();
+					}
+				);
+			});
+		});
+		cellAndFieldIdMap.add(targetId, selectedCellObjects);
 		$('#field_list').flexReload();
 		dirty = true;
 
@@ -283,7 +560,136 @@ var SheetFieldProcessor = {
 
 		StatusMenu.MarkerButton.makeItClickable();
 	},
+	/**
+	 * Clear cells specified by Field ID.
+	 * @param {String} fieldId - Field ID
+	 * @private
+	 */
+	_clearCells: function (fieldId) {
+		cellAndFieldIdMap.get(fieldId).each(function() {
+			var targetId = $(this).attr('id');
+			SheetCell.setHtmlText(targetId, '');
+			SheetCell.notSelected(targetId, cellBgColorManager);
+		});
+	},
+	/**
+	 * Set text and background color for cells specified by field ID
+	 * @param {String} fieldId - Field ID
+	 * @private
+	 */
+	_redrawCells: function (fieldId) {
+		var txt = FieldList.getText(fieldId);
+		cellAndFieldIdMap.get(fieldId).each(function() {
+			var targetId = $(this).attr('id');
+			SheetCell.setHtmlText(targetId, txt);
+			SheetCell.enterSelected(targetId, cellBgColorManager);
+		});
+	},
+	/**
+	 * Redray cells specified by field IDs.
+	 * @param {String[]} fieldIDs - An array of Field IDs
+	 * @private
+	 */
+	_redrawCellsByFieldIds: function (fieldIDs) {
+		for (var fieldId in fieldIDs) {
+			SheetFieldProcessor._redrawCells(fieldId);
+		};
+	},
+	/**
+	 * Get Field IDs refferd from other cells.
+	 * @param {String} targetId - TargetID of FieldList
+	 * @return {String[]} Field IDs
+	 * @private
+	 */
+	_getFieldIDsRefferdFromOtherCell: function (targetId) {
+		var fieldIdReferredFromOtherCell = {};
+		cellAndFieldIdMap.get(targetId).each(function() {
+			var cellId = $(this).attr('id');
+			cellAndFieldIdMap.getFieldId(cellId).forEach(function (fieldId, index, origArray) {
+				fieldIdReferredFromOtherCell[fieldId] = true;	// set dummy value
+			});
+		});
+		delete fieldIdReferredFromOtherCell[targetId];
+		return fieldIdReferredFromOtherCell;
+	},
 
+};
+
+/**
+ * Field's Id and Cell's Id Mapper
+ * @class CellAndFieldMapper
+ */
+var CellAndFieldMapper = function () {
+	/**
+	 * selected jQuery Objects by fieldId
+	 * @property {Hash} id_map
+	 */
+	this.id_map = {};
+	/**
+	 * field Id by cell Id
+	 * @property {Hash} cellId2fieldId
+	 */
+	this.cellId2fieldId = {};
+};
+
+CellAndFieldMapper.prototype = {
+	/**
+	 * Store the selected jQuery object and create reverse map for query by cell Id.
+	 * @param {string} field Cell's id. ex. "0-1-2-0"
+	 * @param {object} jQuery objects by jQuery-select
+	 * @public
+	 */
+	add: function(fieldId, selectedJqObjects) {
+		var self = this;
+		this.id_map[fieldId] = selectedJqObjects;
+		JqSeletableUIHelper.getSelectedCellIds().forEach(function(id, index, ids) {
+			if (typeof self.cellId2fieldId[id] == "undefined") {
+				self.cellId2fieldId[id] = {};
+			}
+			self.cellId2fieldId[id][fieldId] = true;	// set dummy value
+		});
+	},
+	/**
+	 * Delete the entry by field Id.
+	 * @param {string} field Cell's id. ex. "0-1-2-0"
+	 * @public
+	 */
+	del: function(fieldId) {
+		delete this.id_map[fieldId];
+		for (var cellId in this.cellId2fieldId) {
+			if (typeof this.cellId2fieldId[cellId][fieldId] != "undefined") {
+				delete this.cellId2fieldId[cellId][fieldId];
+			}
+		}
+	},
+	/**
+	 * Get the selected jQuery objects by field Id.
+	 * @param {string} fieldId Field's id. ex. "0-1-2-0"
+	 * @return {object} jQuery object
+	 * @public
+	 */
+	get: function(fieldId) {
+		var result = this.id_map[fieldId];
+		if (typeof result == 'undefined') {
+			// return empty object that has each" function which do nothing
+			return { each: function(callback){} };
+		} else {
+			return result;
+		}
+	},
+	/**
+	 * Get the field Id by cell Id.
+	 * @param {string} cellId Cell's id. ex. "0-1-2"
+	 * @return {String[]} array of field IDs
+	 * @public
+	 */
+	getFieldId: function(cellId) {
+		if (typeof this.cellId2fieldId[cellId] != "undefined") {
+			return Object.keys(this.cellId2fieldId[cellId]);
+		} else {
+			return new Array();
+		}
+	},
 };
 
 
@@ -527,12 +933,13 @@ FieldForm.prototype = {
 		var self = this;
 		FieldList.traverseItems(function (fieldname, txt) {
 			var type;
+			var firstCellId = CellIdManipulator.getGeneralId(fieldname);
 			if (fieldname == "0")
 				return;
-			if (typeof(cell_type[fieldname]) == 'undefined') {
+			if (typeof(cell_type[firstCellId]) == 'undefined') {
 				type = 1;
-			} else if (cell_type[fieldname] != -1) {
-				type = cell_type[fieldname];
+			} else if (cell_type[firstCellId] != -1) {
+				type = cell_type[firstCellId];
 			} else {
 				return;
 			}
@@ -540,8 +947,10 @@ FieldForm.prototype = {
 			txt = txt.replace(/<\s*script[^>]*>[\s\S]*?<\s*\/script>/ig, '');
 			txt = $.escapeHTML(txt);
 
-			self.cellMark(fieldname, txt);
-			self.cellType(fieldname, txt, type);
+			cellAndFieldIdMap.get(fieldname).each(function () {
+				self.cellMark(this.id, txt);
+				self.cellType(this.id, txt, type);
+			});
 		});
 	},
 };
@@ -575,10 +984,13 @@ var FieldList = {
 	/**
 	 * Add a new column to field list.
 	 * @param {string} html html text to be set as a content
+	 * @param {string} targetid
 	 * @param {number} width width of the contents
+	 * @param {object} callback a callback function to handle for newly created hdiv element
+	 * @return {number} field number of field list
 	 * @public
 	 */
-	addColumn: function (html, targetid, width) {
+	addColumn: function (html, targetid, width, callback) {
 		var num;
 
 		var dupColumn = function (origElement, callback) {
@@ -592,16 +1004,19 @@ var FieldList = {
 		dupColumn($('.cDrag div:last'), function () {});
 
 		num = $('.hDiv th').length + 1;
-		dupColumn($('.hDiv th:last'), function (origElement, newElement) {
+		var newHDivThElement = dupColumn($('.hDiv th:last'), function (origElement, newElement) {
+			newElement.attr('name', targetid);
 			newElement.wrapInner(document.createElement('div'));
 			newElement.find('div').css('width', width + 'px').text(num);
 		});
 
-		dupColumn($('.bDiv td:last'), function (origElement, newElement) {
+		var newBDivTdElement = dupColumn($('.bDiv td:last'), function (origElement, newElement) {
 			newElement.attr('name', targetid);
 			newElement.wrapInner(document.createElement('div'));
 			newElement.find('div').css('width', width + 'px').html(html); // ここが効く
 		});
+		callback(newHDivThElement, newBDivTdElement);
+		return num;
 	},
 	/**
 	 * Delete a column in the field list.
@@ -651,6 +1066,15 @@ var FieldList = {
 			return true;
 		}
 		return false;
+	},
+	/**
+	 * Get a content of the specified field.
+	 * @param {string} targetid Cell's id. ex. "0-1-2"
+	 * @return {string} a text
+	 * @public
+	 */
+	getText: function (targetid) {
+		return $('td[name="' + targetid + '"]').text();
 	},
 	/**
 	 * Renumber the header of field list
@@ -720,7 +1144,9 @@ var FieldList = {
 				  htmlval + '</div>');
 
 			// update the corresponding sheet cell
-			SheetCell.setHtmlText(targetid, '<b>' + inputVal + '</b>');
+			cellAndFieldIdMap.get(targetid).each(function() {
+				SheetCell.setHtmlText(this.id, '<b>' + inputVal + '</b>');
+			});
 			// update marker button.
 			StatusMenu.MarkerButton.makeItClickable();
 		});
@@ -826,17 +1252,4 @@ SHEET = {
 	}
 };
 
-function set_data_to_mutiple_cells(type_id, field_data) {
-	$(".ui-selected").each(function() {
-		cell_type[this.id] = type_id;
-		SheetFieldProcessor.set($(this), field_data);
-	});
-}
-
-function clear_data_to_mutiple_cells(type_id) {
-	$(".ui-selected").each(function() {
-		cell_type[this.id] = type_id;
-		SheetFieldProcessor.reset(this.id);
-	});
-}
 // vim: set noet fenc=utf-8 ff=unix sts=0 sw=8 ts=8 :
