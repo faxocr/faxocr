@@ -10,7 +10,7 @@ class SheetCellattributeRowcolspan < ActiveRecord::Base
     span = row_or_col=="row" ? entry.row_span : entry.col_span
     srmlstr = ""
     if span > 1
-        srmlstr = "      <cellAttribute col=\"#{entry.col_number}\" row=\"#{entry.row_number}\" colspan=\"#{span}\"/>\n"
+        srmlstr = "      <cellAttribute col=\"#{entry.col_number}\" row=\"#{entry.row_number}\" span=\"#{span}\"/>\n"
     end
     return srmlstr
   end
