@@ -254,7 +254,7 @@ function put_config($file_id, $REQUEST, $target, $sheet_name, &$list_colspan)
 	if (isset($sheet_name) && strlen($sheet_name) > 0) {
 		$conf->set("name", $sheet_name);
 	}
-
+	$conf->set("selectedFieldDataJson", $_REQUEST["selectedFieldData"]);
 	$conf->commit();
 }
 

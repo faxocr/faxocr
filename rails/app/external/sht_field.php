@@ -23,6 +23,7 @@
 require_once "config.php";
 require_once "init.php";
 require_once "lib/common.php";
+require_once 'lib/file_conf.php';
 require_once "lib/sheet.php";
 require_once "contrib/peruser.php";
 
@@ -128,6 +129,19 @@ if ($xls) {
 	} else {
 		$dirty_label = count($field_list) > 0 ? "" : "disabled=\"disabled\"";
 	}
+
+	// pass field_list or saved data to js
+	$field_list_json = field_list2json($field_list);
+	$field_list = array();	// clear: no longer use
+	$json = loadPreviouslySelectedFieldList($file_id);
+	if ($json == "") {	// first time to upload
+		$json = $field_list_json;
+	}
+	print "<script type=\"text/javascript\">
+	<!--
+	var loadedSelectedData = JSON.parse('$json');
+	-->
+	</script>\n";
 
 	// 集計フィールド
 	put_fields($field_list, $field_width);
@@ -370,6 +384,22 @@ function put_status($file_id, $group_id, $sheet_id, $conf_sw)
 
 	print "</form>\n";
 	print "</div>\n";
+}
+
+/*
+ * convert field_list to data structure used in sheetlist.js
+ */
+function field_list2json($field_list) {
+	$field_list_for_js = array();
+	foreach ($field_list as $fieldId => $val) {
+		$field_list_for_js[$fieldId] = array("type" => 1, "data" => $val, "cellIDs" => array("$val"));
+	}
+	return json_encode($field_list_for_js);
+}
+
+function loadPreviouslySelectedFieldList($file_id) {
+	$conf = new FileConf($file_id);
+	return $conf->get("selectedFieldDataJson");
 }
 
 ?>

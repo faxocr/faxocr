@@ -114,7 +114,11 @@ class FileConfFile {
 
 			$conf_path = DST_DIR . $this->file_id . CONF_EXT;
 
-			$lines = file($conf_path);
+			if (is_file($conf_path)) {
+				$lines = file($conf_path);
+			} else {
+				$lines = array();
+			}
 
 			for ($cnt = 0; $cnt < count($lines); $cnt++) {
 				$line = explode(",", $lines[$cnt], 2);

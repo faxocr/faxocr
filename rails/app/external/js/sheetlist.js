@@ -142,6 +142,21 @@ jQuery(document).ready(function($) {
 		this.disabled=true;
 		new FieldForm().submit();
 	});
+
+	// setup previously selected field data in the sht_field when going back from sht_config page
+	for (var fieldId in loadedSelectedData) {
+		var type_id = loadedSelectedData[fieldId]['type'];
+		var field_data = loadedSelectedData[fieldId]['data'];
+		loadedSelectedData[fieldId]['cellIDs'].forEach(function(cellId, index, cellIDs) {
+			$("#" + cellId).addClass('ui-selected');
+		});
+		SheetFieldProcessor.setMulti(
+			type_id, field_data, JqSeletableUIHelper.getSelectedCellIds()
+		);
+		loadedSelectedData[fieldId]['cellIDs'].forEach(function(cellId, index, cellIDs) {
+			$("#" + cellId).removeClass('ui-selected');
+		});
+	}
 });
 
 
@@ -918,6 +933,10 @@ FieldForm.prototype = {
 		var cmd_f = '<input type="hidden" name="field-' + targetid + '-' + type + '" value="' + txt + '" />';
 		return this.form.append(cmd_f);
 	},
+	setSelectedDataInJson: function (json) {
+		var cmd_f = '<input type="hidden" name="selectedFieldData" value=\'' + json + '\' />';
+		return this.form.append(cmd_f);
+	},
 	/**
 	 * Submit the form
 	 * @public
@@ -931,6 +950,7 @@ FieldForm.prototype = {
 	 */
 	packAllFieldInfoToInputTags: function () {
 		var self = this;
+		var saveJson = {};
 		FieldList.traverseItems(function (fieldname, txt) {
 			var type;
 			var firstCellId = CellIdManipulator.getGeneralId(fieldname);
@@ -951,7 +971,15 @@ FieldForm.prototype = {
 				self.cellMark(this.id, txt);
 				self.cellType(this.id, txt, type);
 			});
+			saveJson[fieldname] = {};
+			saveJson[fieldname]['type'] = type;
+			saveJson[fieldname]['data'] = txt;
+			saveJson[fieldname]['cellIDs'] = new Array();
+			cellAndFieldIdMap.get(fieldname).each(function () {
+				saveJson[fieldname]['cellIDs'].push(this.id);
+			});
 		});
+		self.setSelectedDataInJson(JSON.stringify(saveJson));
 	},
 };
 

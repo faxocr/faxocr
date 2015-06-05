@@ -241,7 +241,8 @@ class ExternalController < ApplicationController
 
     @param_str = ""
     params.each {|key, value|
-      @param_str += key + "=\"" + value + "\" "
+      quoted_value = value.gsub('"', '\"')
+      @param_str += key + "=\"" + quoted_value + "\" "
     }
     @errmsg = `cd ./app/external; php sht_script.php #{@param_str} file_id=#{@fileid} debug_mode=\"#{debug_mode}\"`
     # flash[:notice] = @errmsg
