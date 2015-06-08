@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140818130420) do
+ActiveRecord::Schema.define(:version => 20150408114440) do
 
   create_table "answer_sheet_properties", :force => true do |t|
     t.integer  "answer_sheet_id", :null => false
@@ -70,6 +70,38 @@ ActiveRecord::Schema.define(:version => 20140818130420) do
 
   add_index "role_mappings", ["group_id", "user_id"], :name => "index_role_mappings_on_group_id_and_user_id", :unique => true
 
+  create_table "sheet_cellattribute_colwidths", :force => true do |t|
+    t.integer  "sheet_cellattribute_id", :null => false
+    t.integer  "col_number",             :null => false
+    t.float    "size",                   :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "sheet_cellattribute_rowcolspans", :force => true do |t|
+    t.integer  "sheet_cellattribute_id", :null => false
+    t.integer  "row_number",             :null => false
+    t.integer  "col_number",             :null => false
+    t.integer  "row_span",               :null => false
+    t.integer  "col_span",               :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "sheet_cellattribute_rowheights", :force => true do |t|
+    t.integer  "sheet_cellattribute_id", :null => false
+    t.integer  "row_number",             :null => false
+    t.float    "size",                   :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "sheet_cellattributes", :force => true do |t|
+    t.integer  "sheet_id",   :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "sheet_properties", :force => true do |t|
     t.integer  "position_x"
     t.integer  "position_y"
@@ -89,10 +121,6 @@ ActiveRecord::Schema.define(:version => 20140818130420) do
     t.integer  "status",       :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "cell_width"
-    t.string   "cell_height"
-    t.string   "cell_colspan"
-    t.string   "cell_rowspan"
   end
 
   add_index "sheets", ["sheet_code"], :name => "index_sheets_on_sheet_code", :unique => true

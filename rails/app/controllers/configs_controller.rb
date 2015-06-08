@@ -32,15 +32,28 @@ class ConfigsController < ApplicationController
   def view_procfax_log
     @page_size = page_size
     @logdir_path = "#{Rails.root}/../Faxsystem/Log/*"
-    @files = Dir.glob(@logdir_path).sort.reverse
+    files = Dir.glob(@logdir_path).sort.reverse
+    @str = get_summary_of_procfax_log(files, @page_size)
+  end
+
+  def download_all_procfax_log
+    @logdir_path = "#{Rails.root}/../Faxsystem/Log/*"
+    files = Dir.glob(@logdir_path).sort.reverse
+    str = get_summary_of_procfax_log(files, -1)
+    respond_to do |format|
+      format.text { send_data str, :filename => "procfax_summary_log.txt"}
+    end
   end
 
   def procfax_exec
     @script_path = "#{Rails.root}/../bin/procfax.sh"
-    @log_file_path = "#{Rails.root}/../Faxsystem/Log/rails_procfax.log"
-
-    @result = system("sh " + @script_path + " >> " + @log_file_path)
-    @raw_config = File.read(@log_file_path)
+    log_file_path = "#{Rails.root}/../Faxsystem/Log/rails_procfax.log"
+    @raw_config = `sh #{@script_path}`
+    @result = $?.exitstatus == 0 ? true : false
+    open(log_file_path, "a") do |f|
+      f.flock(File::LOCK_EX)
+      f.puts(@raw_config)
+    end
   end
 
   def getfax_exec
@@ -157,5 +170,28 @@ private
     unless @current_user.login_name == 'admin'
       access_violation
     end
+  end
+
+  def get_summary_of_procfax_log(files, show_lines)
+    str = ""
+    cnt = 0
+    show_all = show_lines == -1 ? true : false
+    files.each do |file|
+      if File.ftype(file) == "directory" && (show_all or cnt < show_lines.to_i)
+        next unless File.exist?("#{file}/procfax.log")
+        contents = IO.readlines("#{file}/procfax.log")
+        count_f = contents.map{|l| l if l.include?("INFO: Number of fax processed:")}.join.chomp.split(':')[-1]
+        count_fe = contents.map{|l| l if l.include?("INFO: Number of error occurred processing fax:")}.join.chomp.split(':')[-1]
+        count_se = contents.map{|l| l if l.include?("INFO: Number of error occurred processing sheet:")}.join.chomp.split(':')[-1]
+        count_s = contents.map{|l| l if l.include?("INFO: Number of sheet processed:")}.join.split(':')[-1]
+        count_s = count_s.to_i - count_se.to_i
+        str += File.basename(file).gsub(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{0,2})/, '\1/\2/\3 \4:\5　')
+        str += "到着Fax " + count_f.to_s + "件 (Fax処理失敗 " + count_fe.to_s +
+           " / シート処理失敗 " + count_se.to_s + ") →  " + count_s.to_s +
+           " シート受理\r\n"
+        cnt += 1
+      end
+    end
+    return str
   end
 end

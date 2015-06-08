@@ -4,6 +4,7 @@ class Sheet < ActiveRecord::Base
   belongs_to :survey
   has_many :answer_sheets, :dependent => :destroy
   has_many :sheet_properties, :dependent => :destroy
+  has_one :sheet_cellattribute, :dependent => :destroy
 
   validates_presence_of :sheet_code, :sheet_name, :survey_id
   validates_uniqueness_of :sheet_code
@@ -20,29 +21,23 @@ class Sheet < ActiveRecord::Base
     srmlstr = srmlstr + "    <blockWidth>" + (sheet.block_width).to_s + "</blockWidth>\n"
     srmlstr = srmlstr + "    <blockHeight>" + (sheet.block_height).to_s + "</blockHeight>\n"
     srmlstr = srmlstr + "    <cellWidth>\n"
-    eval(sheet.cell_width).sort.each do |cell_no,cell_width|
-      srmlstr = srmlstr + "      <cellAttribute number=\"#{cell_no}\" length=\"#{cell_width}\"/>\n"
+    sheet.sheet_cellattribute.sheet_cellattribute_colwidths.each do |cell|
+      srmlstr = srmlstr + cell.get_one_srml_entry
     end
     srmlstr = srmlstr + "    </cellWidth>\n"
     srmlstr = srmlstr + "    <cellHeight>\n"
-    eval(sheet.cell_height).sort.each do |cell_no,cell_height|
-      srmlstr = srmlstr + "      <cellAttribute number=\"#{cell_no}\" length=\"#{cell_height}\"/>\n"
+    sheet.sheet_cellattribute.sheet_cellattribute_rowheights.each do |cell|
+      srmlstr = srmlstr + cell.get_one_srml_entry
     end
     srmlstr = srmlstr + "    </cellHeight>\n"
     srmlstr = srmlstr + "    <cellColspan>\n"
-    unless sheet.cell_colspan.blank?
-      eval(sheet.cell_colspan).sort.each do |cell_no,cell_colspan|
-        row_no, col_no = cell_no.split('_')
-        srmlstr = srmlstr + "      <cellAttribute col=\"#{col_no}\" row=\"#{row_no}\" colspan=\"#{cell_colspan}\"/>\n"
-      end
+    sheet.sheet_cellattribute.sheet_cellattribute_rowcolspans.each do |cell|
+      srmlstr = srmlstr + cell.get_one_srml_entry("col")
     end
     srmlstr = srmlstr + "    </cellColspan>\n"
     srmlstr = srmlstr + "    <cellRowspan>\n"
-    unless sheet.cell_rowspan.blank?
-      eval(sheet.cell_rowspan).sort.each do |cell_no,cell_rowspan|
-        row_no, col_no = cell_no.split('_')
-        srmlstr = srmlstr + "      <cellAttribute col=\"#{col_no}\" row=\"#{row_no}\" rowspan=\"#{cell_rowspan}\"/>\n"
-      end
+    sheet.sheet_cellattribute.sheet_cellattribute_rowcolspans.each do |cell|
+      srmlstr = srmlstr + cell.get_one_srml_entry("row")
     end
     srmlstr = srmlstr + "    </cellRowspan>\n"
     srmlstr = srmlstr + "    <properties>\n"

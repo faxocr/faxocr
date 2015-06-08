@@ -583,10 +583,6 @@ end
 @sheet.survey_id = survey_id # integer
 @sheet.block_width = {$no_of_columns} || 0 # XXX
 @sheet.block_height = {$no_of_rows} || 0 # XXX
-@sheet.cell_width = "$cell_width_ruby" || 0 # XXX
-@sheet.cell_height = "$cell_height_ruby" || 0 # XXX
-@sheet.cell_colspan = "$cell_colspan_ruby" || 0 # XXX
-@sheet.cell_rowspan = "$cell_rowspan_ruby" || 0 # XXX
 @sheet.status = 1
 # save
 if @sheet.save
@@ -624,6 +620,82 @@ if @sheet.save
 else
   print  "sheet_property: save fail\\n"
   exit(0)
+end
+
+#
+# create sheet_attribute_*
+#
+sheet_cellattribute = SheetCellattribute.new
+sheet_cellattribute.sheet_id = @sheet.id
+@sheet.sheet_cellattribute = sheet_cellattribute
+# save
+if @sheet.save
+  print  "sheet_cellattribute: save success\\n"
+else
+  print  "sheet_cellattribute: save fail\\n"
+  exit(1)
+end
+
+${cell_width_ruby}.each do |i,v|
+  sheet_cellattribute_colwidth = SheetCellattributeColwidth.new
+  sheet_cellattribute_colwidth.sheet_cellattribute_id = sheet_cellattribute.id
+  sheet_cellattribute_colwidth.col_number = i
+  sheet_cellattribute_colwidth.size = v
+  @sheet.sheet_cellattribute.sheet_cellattribute_colwidths << sheet_cellattribute_colwidth
+end
+# save
+if @sheet.save
+  print  "sheet_cellattribute_colwidth: save success\\n"
+else
+  print  "sheet_cellattribute_colwidth: save fail\\n"
+  exit(2)
+end
+
+${cell_height_ruby}.each do |i,v|
+  sheet_cellattribute_rowheight = SheetCellattributeRowheight.new
+  sheet_cellattribute_rowheight.sheet_cellattribute_id = sheet_cellattribute.id
+  sheet_cellattribute_rowheight.row_number = i
+  sheet_cellattribute_rowheight.size = v
+  @sheet.sheet_cellattribute.sheet_cellattribute_rowheights << sheet_cellattribute_rowheight
+end
+# save
+if @sheet.save
+  print  "sheet_cellattribute_rowheight: save success\\n"
+else
+  print  "sheet_cellattribute_rowheight: save fail\\n"
+  exit(2)
+end
+
+
+# merge col_span and row_span to one hash
+spans={};
+${cell_colspan_ruby}.each do |rowcol, span|
+  spans[rowcol] = {'col_span' => span, 'row_span' => 1}
+end
+${cell_rowspan_ruby}.each do |rowcol, span|
+  if spans.has_key?(rowcol)
+    spans[rowcol].update({'row_span' => span})
+  else
+    spans[rowcol] = {'col_span' => 1, 'row_span' => span}
+  end
+end
+
+spans.each do |rowcol_num, rowcol_span|
+  row_number, col_number = rowcol_num.split('_')
+  sheet_cellattribute_rowcolspan = SheetCellattributeRowcolspan.new
+  sheet_cellattribute_rowcolspan.sheet_cellattribute_id = sheet_cellattribute.id
+  sheet_cellattribute_rowcolspan.row_number = row_number
+  sheet_cellattribute_rowcolspan.col_number = col_number
+  sheet_cellattribute_rowcolspan.col_span = rowcol_span['col_span']
+  sheet_cellattribute_rowcolspan.row_span = rowcol_span['row_span']
+  @sheet.sheet_cellattribute.sheet_cellattribute_rowcolspans << sheet_cellattribute_rowcolspan
+end
+# save
+if @sheet.save
+  print  "sheet_cellattribute_rowcolspan: save success\\n"
+else
+  print  "sheet_cellattribute_rowcolspan: save fail\\n"
+  exit(3)
 end
 
 exit(0)
