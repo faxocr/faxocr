@@ -1241,7 +1241,7 @@ SHEET = {
 		$('#field_list').flexigrid({
 			showToggleBtn:false,
 			resizable:false,
-			height:70,
+			height:'auto',
 			onDragCol: function() {
 				var ths = $('.hDiv th');
 				ths.each(function(num) {
