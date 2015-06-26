@@ -5,3 +5,7 @@ gem 'rake'
 gem 'rdoc'
 gem 'rdoc-data'
 gem 'mysql'
+
+# rails 2.3.x -> 3.0.x
+#   form_for / f.error_messages
+gem 'dynamic_form'
