@@ -101,7 +101,7 @@ accept_sheet_statuses = []
 # sheet is opened
 accept_sheet_statuses << 1
 
-groups = Group.find(:all)
+groups = Group.all
 groups.each do |group|
   print "#Group:#{group.group_name}\n"
   surveys = group.surveys.find_all_by_status(accept_survey_statuses)

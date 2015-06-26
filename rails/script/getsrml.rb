@@ -26,7 +26,7 @@ accept_sheet_statuses << 1
 #accept_sheet_statuses << 3
 
 print "<srMl>\n"
-groups = Group.find(:all)
+groups = Group.all
 groups.each do |group|
   #print "  <!-- Group:#{group.group_name} -->\n"
   surveys = group.surveys.find_all_by_status(accept_survey_statuses)

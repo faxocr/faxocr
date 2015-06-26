@@ -4,7 +4,7 @@ class RoleMappingsController < ApplicationController
   # GET /role_mappings
   # GET /role_mappings.xml
   def index
-    @role_mappings = RoleMapping.find(:all, :order => "group_id, user_id")
+    @role_mappings = RoleMapping.where("group_id, user_id")
 
     respond_to do |format|
       format.html # index.html.erb

@@ -15,10 +15,10 @@ class UsersController < ApplicationController
     end
     @group = @authorized_group || @current_group
     #@group = Group.find(params[:group_id])
-    @users = User.find(:all, :select => "u.*",
-        :joins => "AS u INNER JOIN role_mappings AS gu ON u.id = gu.user_id",
-        :conditions => "gu.group_id = #{@group.id}",
-        :order => "u.login_name")
+    @users = User.select("u.*").
+        joins("AS u INNER JOIN role_mappings AS gu ON u.id = gu.user_id").
+        where("gu.group_id = ?", @group.id).
+        order("u.login_name")
 
     respond_to do |format|
       format.html # index.html.erb

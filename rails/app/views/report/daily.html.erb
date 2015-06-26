@@ -36,8 +36,7 @@ line_num = 1
 
   <% for column in columns do %>
     <%
-    rp = AnswerSheetProperty.find(:first,
-      :conditions => ['answer_sheet_id = ? and ocr_name = ?', a.id, column])
+    rp = AnswerSheetProperty.where(['answer_sheet_id = ? and ocr_name = ?', a.id, column]).first
     cell_str = rp != nil ? rp.ocr_value : '-'
     cell_img = rp != nil ? rp.ocr_image : nil
 

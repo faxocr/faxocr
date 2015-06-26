@@ -6,11 +6,11 @@
 
   <p>
     <%= f.label :survey_id %><br />
-    <%= f.collection_select :survey_id, Survey.find(:all), :id, :survey_name %>
+    <%= f.collection_select :survey_id, Survey.all, :id, :survey_name %>
   </p>
   <p>
     <%= f.label :user_id %><br />
-    <%= f.collection_select :user_id, User.find(:all), :id, :full_name %>
+    <%= f.collection_select :user_id, User.all, :id, :full_name %>
   </p>
   <p>
     <%= f.label :owner %><br />

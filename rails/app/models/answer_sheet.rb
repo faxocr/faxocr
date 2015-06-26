@@ -17,15 +17,15 @@ class AnswerSheet < ActiveRecord::Base
 
   def self.find_all_by_need_check(need_check)
     if need_check
-      AnswerSheet.find(:all, :select => "a.*",
-        :joins => "AS a INNER JOIN answer_sheet_properties AS ap ON a.id = ap.answer_sheet_id",
-        :conditions => "ap.need_check = true",
-        :group => "a.id")
+      AnswerSheet.select("a.*").
+        joins("AS a INNER JOIN answer_sheet_properties AS ap ON a.id = ap.answer_sheet_id").
+        where("ap.need_check = true").
+        group("a.id")
     else
-      AnswerSheet.find(:all, :select => "a.*",
-        :joins => "AS a INNER JOIN answer_sheet_properties AS ap ON a.id = ap.answer_sheet_id",
-        :group => "a.id",
-        :having => "sum(ap.need_check) = 0")
+      AnswerSheet.select("a.*").
+        joins("AS a INNER JOIN answer_sheet_properties AS ap ON a.id = ap.answer_sheet_id").
+        group("a.id").
+        having("sum(ap.need_check) = 0")
     end
   end
 
@@ -80,7 +80,7 @@ class AnswerSheet < ActiveRecord::Base
     system("cp -R #{Rails.root}/faxocr_config/recognize_sheetreader #{tmpdir_sr}")
 
     srmlstr = "<srMl>\n"
-    groups = Group.find(:all)
+    groups = Group.all
     groups.each do |group|
       surveys = group.surveys
       if surveys != nil

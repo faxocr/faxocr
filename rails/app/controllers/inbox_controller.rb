@@ -21,10 +21,10 @@ class InboxController < ApplicationController
   end
 
   def answer_sheet_properties
-    @answer_sheet_properties = AnswerSheetProperty.find(:all, :select => "asp.*",
-      :joins => "AS asp INNER JOIN survey_properties AS sp ON asp.ocr_name = sp.ocr_name",
-      :conditions => "asp.answer_sheet_id = #{@authorized_answer_sheet.id} AND sp.survey_id = #{@authorized_survey.id}",
-      :order => "sp.view_order")
+    @answer_sheet_properties = AnswerSheetProperty.select("asp.*").
+      joins("AS asp INNER JOIN survey_properties AS sp ON asp.ocr_name = sp.ocr_name").
+      where("asp.answer_sheet_id = ? AND sp.survey_id = ?", @authorized_answer_sheet.id, @authorized_survey.id).
+      order("sp.view_order")
   end
 
   def update_answer_sheet_properties

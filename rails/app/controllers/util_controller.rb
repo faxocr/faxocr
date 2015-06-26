@@ -14,7 +14,7 @@ class UtilController < ApplicationController
       accept_survey_statuses << 1
       accept_sheet_statuses = []
       accept_sheet_statuses << 1
-      groups = Group.find(:all)
+      groups = Group.all
       srmlstr = ""
       groups.each do |group|
         surveys = group.surveys.find_all_by_status(accept_survey_statuses)

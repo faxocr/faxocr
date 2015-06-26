@@ -89,14 +89,11 @@ class FaxocrController < ApplicationController
     end
     
     if @current_group.is_administrator?
-      #@users = User.find(:all)
-      @users = User.find(:all, :conditions => ["id != ?", @current_user.id])
+      #@users = User.all
+      @users = User.where("id != ?", @current_user.id)
     else
       #@users = @current_group.users
-      @users = User.find(:all, :select => "users.*",
-        :joins => "INNER JOIN role_mappings ON users.id = role_mappings.user_id",
-        :conditions => ["role_mappings.group_id = ? AND users.id != ?", @current_group.id, @current_user.id]
-      )
+      @users = User.joins("INNER JOIN role_mappings ON users.id = role_mappings.user_id").where(["role_mappings.group_id = ? AND users.id != ?", @current_group.id, @current_user.id])
     end
   end
 
