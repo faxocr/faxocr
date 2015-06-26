@@ -1,7 +1,7 @@
 <h1>受信調査項目修正</h1>
 <p style="color: green"><%= flash[:notice] %></p>
 
-<% form_for([@group,@survey,@answer_sheet,@answer_sheet_property]) do |f| %>
+<%= form_for([@group,@survey,@answer_sheet,@answer_sheet_property]) do |f| %>
   <%= f.error_messages %>
   <p>
     <%= f.label :ocr_name %><br />

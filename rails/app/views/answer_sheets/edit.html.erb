@@ -1,7 +1,7 @@
 <h1>FAX受信調査シート編集</h1>
 <p style="color: green"><%= flash[:notice] %></p>
 
-<% form_for([@group,@survey,@answer_sheet]) do |f| %>
+<%= form_for([@group,@survey,@answer_sheet]) do |f| %>
   <%= f.error_messages %>
 
   <p>

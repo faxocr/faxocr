@@ -25,7 +25,7 @@
     <th>Ocr value</th>
   </tr>
 
-<%
+<%=
 form_tag :controller => 'inbox', :action => 'update_answer_sheet_properties' do
   prop_names = Hash.new
   SurveyProperty.find_all_by_survey_id(@authorized_survey).each do |sp|

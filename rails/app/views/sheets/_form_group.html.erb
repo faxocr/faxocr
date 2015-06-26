@@ -1,4 +1,4 @@
-<% form_for([@group, @survey, @sheet]) do |f| %>
+<%= form_for([@group, @survey, @sheet]) do |f| %>
   <%= f.error_messages %>
   <%= f.hidden_field :survey_id %>
   <h2 class="surveysobject">名称</h2>
