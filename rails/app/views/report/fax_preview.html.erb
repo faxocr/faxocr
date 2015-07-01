@@ -1,10 +1,10 @@
 <%
-  report_header = @survey.report_header
+  report_header = @survey.report_header.to_s
   @place_holder.each do |k, v|
       report_header = report_header.sub(/%%#{k}%%/, v)
   end
 %>
-<%= report_header %>
+<%= report_header.html_safe %>
 <%
 
 # Collect
@@ -55,7 +55,7 @@ line_num = 1
 		end
     end
 %>
-    <td align="center"><%= cell_item %></td>
+    <td align="center"><%= cell_item.html_safe %></td>
 <%
   end
 %>
@@ -74,7 +74,7 @@ end
 for column in columns do
   cell_item = (data_types[column] == 'number') ? sums[column] : '&nbsp;'
 %>
-    <td align="center"><%= cell_item %></td>
+    <td align="center"><%= cell_item.to_s.html_safe %></td>
 <%
 end
 %>
@@ -82,4 +82,4 @@ end
 <% end %>
 
 
-<%= @survey.report_footer %>
+<%= @survey.report_footer.to_s.html_safe %>

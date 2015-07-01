@@ -58,7 +58,7 @@ line_num = 1
 		end
       %>
     <% end %>
-    <td align="center"><%= cell_item %></td>
+    <td align="center"><%== cell_item %></td>
   <% end %>
   </tr>
   <% line_num = line_num + 1 %>
@@ -72,7 +72,7 @@ line_num = 1
 
   <% for column in columns do %>
     <% cell_item = (data_types[column] == 'number') ? sums[column] : '&nbsp;' %>
-    <td align="center"><%= cell_item %></td>
+    <td align="center"><%== cell_item %></td>
   <% end %>
   </tr>
 <% end %>
