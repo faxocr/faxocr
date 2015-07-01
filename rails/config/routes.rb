@@ -1,215 +1,119 @@
-ActionController::Routing::Routes.draw do |map|
+Faxocr::Application.routes.draw do
 
-  map.resources :configs, :collection => { :index => :get, :view_system_config => :get, :update => :post, :database => :get, :view_procfax_log => :get, :download_all_procfax_log => :get, :procfax_exec => :post, :getfax_exec => :post, :cron => :get, :note => :get, :note_update => :post, :view_sendfax_log => :get, :sendtestfax_exec => :post, :view_faxmail_queue => :get, :view_answer_sheet => :get }
-
-  map.resources :role_mappings
-
-  map.resources :groups, :member => { :report => :get } do |group|
-    group.resources :surveys, :member => { :report => :get, :update_report => :put } do |survey|
-      survey.resources :sheets do |sheet|
-        sheet.resources :sheet_properties
-      end
-      survey.resources :survey_properties
-      survey.resources :survey_candidates
-      survey.resources :answer_sheets, :member => { :image => :get, :image_thumb => :get, :edit_recognize => :get, :update_recognize => :put } do |answer_sheet|
-        answer_sheet.resources :answer_sheet_properties, :member => { :image => :get }
-      end
-      survey.connect "report/:year/:month/:day",
-        :controller => "report",
-        :action => "daily",
-        :requirements => {:year => /(19|20)\d\d/,
-                          :month => /[01]?\d/,
-                          :day => /[0-3]\d/},
-        :day => nil,
-        :month => nil
-      survey.connect "report/:year/:month/:day/fax_preview",
-        :controller => "report",
-        :action => "fax_preview",
-        :requirements => {:year => /(19|20)\d\d/,
-                          :month => /[01]?\d/,
-                          :day => /[0-3]\d/},
-        :day => nil,
-        :month => nil
-      survey.connect "export/:year/:month/:day",
-        :controller => "export",
-        :action => "csv",
-        :requirements => {:year => /(19|20)\d\d/,
-                          :month => /[01]?\d/,
-                          :day => /[0-3]\d/},
-        :day => nil,
-        :month => nil
+  resources :configs do
+    collection do
+      post :note_update
+      get  :view_procfax_log
+      get  :database
+      get  :view_sendfax_log
+      get  :download_all_procfax_log
+      post :sendtestfax_exec
+      get  :note
+      post :procfax_exec
+      get  :view_faxmail_queue
+      post :getfax_exec
+      get  :view_answer_sheet
+      get  :cron
+      post :update
+      get  :index
+      get  :view_system_config
     end
-    group.resources :candidates
-    group.resources :users, :member => {:edit_self => :get, :update_self => :post}
   end
 
-  map.contact '/answer_sheets', :controller => 'answer_sheets', :action => 'index_all'
-  map.resources :answer_sheets, 
-    :collection => { :index_all => :get }, 
-    :member => { :show_all => :get, :image_thumb_all => :get }
+  resources :role_mappings
 
-  # The priority is based upon order of creation: first created -> highest priority.
+  resources :groups do
+    member do
+      get :report
+    end
+    resources :surveys do
+      member do
+        get :report
+        put :update_report
+      end
+      resources :sheets do
+        resources :sheet_properties
+      end
+      resources :survey_properties
+      resources :survey_candidates
+      resources :answer_sheets do
+        member do
+          put :update_recognize
+          get :image
+          get :image_thumb
+          get :edit_recognize
+        end
+        resources :answer_sheet_properties do
+          member do
+            get :image
+          end
+        end
+      end
 
-  # Sample of regular route:
-  #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'
-  # Keep in mind you can assign values other than :controller and :action
+      match 'report/:year(/:month(/:day))' => 'report#daily', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
+      match 'report/:year(/:month(/:day))/fax_preview' => 'report#fax_preview', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
+      match 'export/:year(/:month(/:day))' => 'export#csv', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
+    end
+
+    resources :candidates
+    resources :users do
+      member do
+        post :update_self
+        get :edit_self
+      end
+    end
+  end
+
+  match '/answer_sheets' => 'answer_sheets#index_all', :as => :contact
+  resources :answer_sheets do
+    collection do
+      get :index_all
+    end
+    member do
+      get :show_all
+      get :image_thumb_all
+    end
+  end
 
   #
   # PHP driver (Target registration)
   #
-  map.connect 'external/register/:group_id',
-    :controller => 'external',
-    :action => 'register'
-
-  map.connect 'external/reg_upload',
-    :controller => 'external',
-    :action => 'reg_upload'
-
-  map.connect 'external/reg_exec',
-    :controller => 'external',
-    :action => 'reg_exec'
-
-  # PHP driver (Sheet registration Debug)
-  map.connect 'external/sheet_checker',
-    :controller => 'external',
-    :action => 'sheet_checker'
-
-  map.connect 'external/sht_field_checker',
-    :controller => 'external',
-    :action => 'sht_field_checker'
+  match 'external/register/:group_id' => 'external#register'
+  match 'external/reg_upload' => 'external#reg_upload'
+  match 'external/reg_exec' => 'external#reg_exec'
+  match 'external/sheet_checker' => 'external#sheet_checker'
+  match 'external/sht_field_checker' => 'external#sht_field_checker'
 
   #
   # PHP driver (Sheet registration)
   #
-  map.connect 'external/sheet/:group_id/:survey_id',
-    :controller => 'external',
-    :action => 'sheet'
-
-  map.connect 'external/sht_field',
-    :controller => 'external',
-    :action => 'sht_field'
-
-  map.connect 'external/sht_script',
-    :controller => 'external',
-    :action => 'sht_script'
-
-  map.connect 'external/sht_marker',
-    :controller => 'external',
-    :action => 'sht_marker'
-
-  map.connect 'external/sht_config',
-    :controller => 'external',
-    :action => 'sht_config'
-
-  map.connect 'external/sht_verify',
-    :controller => 'external',
-    :action => 'sht_verify'
-
-  map.connect 'external/sht_commit',
-    :controller => 'external',
-    :action => 'sht_commit'
+  match 'external/sheet/:group_id/:survey_id' => 'external#sheet'
+  match 'external/sht_field' => 'external#sht_field'
+  match 'external/sht_script' => 'external#sht_script'
+  match 'external/sht_marker' => 'external#sht_marker'
+  match 'external/sht_config' => 'external#sht_config'
+  match 'external/sht_verify' => 'external#sht_verify'
+  match 'external/sht_commit' => 'external#sht_commit'
 
   # PHP driver
-  map.connect 'external/:action',
-    :controller => 'external'
+  match 'external/:action' => 'external#index'
+  match 'external/download/:group_id/:survey_id' => 'external#download'
+  match 'external/download_zip/:group_id/:survey_id' => 'external#download_zip'
+  match 'external/download_html/:group_id/:survey_id' => 'external#download_html'
+  match 'external/getimg/:group_id/:survey_id' => 'external#getimg'
 
-  map.connect 'external/download/:group_id/:survey_id',
-    :controller => 'external',
-    :action => 'download'
+  match 'faxocr/direct_masquerade/:group_id/:id' => 'faxocr#direct_masquerade'
+  match 'faxocr/:action' => 'faxocr#index'
 
-  map.connect 'external/download_zip/:group_id/:survey_id',
-    :controller => 'external',
-    :action => 'download_zip'
+  match 'inbox/' => 'inbox#index'
+  match 'inbox/:group_id' => 'inbox#group_surveys'
+  match 'inbox/:group_id/:survey_id/' => 'inbox#survey_answer_sheets'
+  match 'inbox/:group_id/:survey_id/:answer_sheet_id/' => 'inbox#answer_sheet_properties'
+  match 'inbox/:group_id/:survey_id/:answer_sheet_id/update' => 'inbox#update_answer_sheet_properties'
 
-  map.connect 'external/download_html/:group_id/:survey_id',
-    :controller => 'external',
-    :action => 'download_html'
+  match 'report/:survey_id/daily/:year(/:month(/:day))' => 'report#daily', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
 
-  map.connect 'external/getimg/:group_id/:survey_id',
-    :controller => 'external',
-    :action => 'getimg'
-
-  map.connect 'faxocr/direct_masquerade/:group_id/:id',
-    :controller => 'faxocr',
-    :action => 'direct_masquerade'
-
-  map.connect 'faxocr/:action',
-    :controller => 'faxocr'
-
-  map.connect "inbox/",
-    :controller => "inbox",
-    :action => "index"
-
-  map.connect "inbox/:group_id",
-    :controller =>"inbox",
-    :action => "group_surveys"
-
-  map.connect "inbox/:group_id/:survey_id/",
-    :controller => "inbox",
-    :action => "survey_answer_sheets"
-
-  map.connect "inbox/:group_id/:survey_id/:answer_sheet_id/",
-    :controller => "inbox",
-    :action => "answer_sheet_properties"
-
-  map.connect "inbox/:group_id/:survey_id/:answer_sheet_id/update",
-    :controller => "inbox",
-    :action => "update_answer_sheet_properties"
-
-  map.connect "report/:survey_id/daily/:year/:month/:day",
-    :controller => "report",
-    :action => "daily",
-    :requirements => {:year => /(19|20)\d\d/,
-                      :month => /[01]?\d/,
-                      :day => /[0-3]\d/},
-    :day => nil,
-    :month => nil
-
-  map.connect "util/survey/:survey_code/fax_numbers",
-    :controller => "util",
-    :action => "survey_fax_numbers"
-
-  map.connect "util/sheet/:sheet_code/srml",
-    :controller => "util",
-    :action => "get_one_srml_entry"
-
-  map.connect "util/sheet/srml",
-    :controller => "util",
-    :action => "get_srml_contents"
-
-  # Sample of named route:
-  #   map.purchase 'products/:id/purchase', :controller => 'catalog', :action => 'purchase'
-  # This route can be invoked with purchase_url(:id => product.id)
-
-  # Sample resource route (maps HTTP verbs to controller actions automatically):
-  #   map.resources :products
-
-  # Sample resource route with options:
-  #   map.resources :products, :member => { :short => :get, :toggle => :post }, :collection => { :sold => :get }
-
-  # Sample resource route with sub-resources:
-  #   map.resources :products, :has_many => [ :comments, :sales ], :has_one => :seller
-  
-  # Sample resource route with more complex sub-resources
-  #   map.resources :products do |products|
-  #     products.resources :comments
-  #     products.resources :sales, :collection => { :recent => :get }
-  #   end
-
-  # Sample resource route within a namespace:
-  #   map.namespace :admin do |admin|
-  #     # Directs /admin/products/* to Admin::ProductsController (app/controllers/admin/products_controller.rb)
-  #     admin.resources :products
-  #   end
-
-  # You can have the root of your site routed with map.root -- just remember to delete public/index.html.
-  # map.root :controller => "welcome"
-
-  # See how all your routes lay out with "rake routes"
-
-  # Install the default routes as the lowest priority.
-  # Note: These default routes make all actions in every controller accessible via GET requests. You should
-  # consider removing or commenting them out if you're using named routes and resources.
-  #map.connect ':controller/:action/:id'
-  #map.connect ':controller/:action/:id.:format'
+  match 'util/survey/:survey_code/fax_numbers' => 'util#survey_fax_numbers'
+  match 'util/sheet/:sheet_code/srml' => 'util#get_one_srml_entry'
+  match 'util/sheet/srml' => 'util#get_srml_contents'
 end
