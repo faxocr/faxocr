@@ -1,6 +1,6 @@
 
 git "cloning faxocr" do
-  repository "https://code.google.com/p/faxocr"
+  repository "https://github.com/faxocr/faxocr"
   destination "/home/faxocr"
   action :sync
   user "root"

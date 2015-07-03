@@ -1,6 +1,6 @@
 
 git "#{node[:faxocr][:home_dir]}/src/kocr" do
-  repository "https://code.google.com/p/kocr"
+  repository "https://github.com/faxocr/kocr"
   reference "master"
   action :sync
   user "faxocr"

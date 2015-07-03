@@ -1,6 +1,6 @@
 
 git "#{node[:faxocr][:home_dir]}/src" do
-  repository "https://code.google.com/p/sheet-reader"
+  repository "https://github.com/faxocr/sheet-reader"
   reference "master"
   destination "#{node[:faxocr][:home_dir]}/src/sheet-reader"
   action :sync
