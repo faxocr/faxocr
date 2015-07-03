@@ -77,7 +77,7 @@ class AnswerSheet < ActiveRecord::Base
     system("rm -f #{tmpdir}")
     system("rm -Rf #{tmpdir}")
     system("mkdir #{tmpdir}")
-    system("cp -R #{RAILS_ROOT}/faxocr_config/recognize_sheetreader #{tmpdir_sr}")
+    system("cp -R #{Rails.root}/faxocr_config/recognize_sheetreader #{tmpdir_sr}")
 
     srmlstr = "<srMl>\n"
     groups = Group.find(:all)
@@ -93,6 +93,6 @@ class AnswerSheet < ActiveRecord::Base
     File.open(tmp_srml, 'w') {|f| f.write(srmlstr) }
     system("echo sheetreader -m rails -c #{tmpdir_sr} -u #{self.analyzed_candidate_code} -i #{self.analyzed_sheet_code} -r #{self.receiver_number} -s #{self.sender_number} -p #{MyAppConf::IMAGE_PATH_PREFIX}/ #{MyAppConf::IMAGE_PATH_PREFIX}/#{self.sheet_image} 1> #{tmpdir}/result")
     system("sheetreader -m rails -c #{tmpdir_sr} -u #{self.analyzed_candidate_code} -i #{self.analyzed_sheet_code} -r #{self.receiver_number} -s #{self.sender_number} -p #{MyAppConf::IMAGE_PATH_PREFIX} #{MyAppConf::IMAGE_PATH_PREFIX}#{self.sheet_image} 1> #{tmpdir}/result.rb 2>#{tmpdir}/result.err")
-    system("ruby #{tmpdir}/result.rb #{RAILS_ROOT} #{MyAppConf::IMAGE_PATH_PREFIX} #{tmpdir}/echoresult.html")
+    system("ruby #{tmpdir}/result.rb #{Rails.root} #{MyAppConf::IMAGE_PATH_PREFIX} #{tmpdir}/echoresult.html")
   end
 end

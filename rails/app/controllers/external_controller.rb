@@ -36,7 +36,7 @@ class ExternalController < ApplicationController
     @html = "<PRE>\n"
     # @html += "RAILS_ENV=#{fetch(:rails_env)}"
     # @html = `cd ./app/external; php form-marker.php`
-    @html += "RAILS_ENV=#{RAILS_ENV}"
+    @html += "RAILS_ENV=#{Rails.env}"
     @html += "<PRE>\n"
 
     render :dummy
@@ -81,7 +81,7 @@ class ExternalController < ApplicationController
     end
 
     if 0 < @size && @size <= @@size_limit && /\.xls$/ =~ @filename then
-      File.open("#{RAILS_ROOT}/files/#{@tname}" + ".lst", "wb") {
+      File.open("#{Rails.root}/files/#{@tname}" + ".lst", "wb") {
         |f| f.write(params[:file]['upfile'].read)
       }
       # @html = "GID: " + @gid + "\n<BR>" +
@@ -89,7 +89,7 @@ class ExternalController < ApplicationController
       #  "Temp file: " + @tname
       # @html = `cd ./app/external; php reg_upload.php`
       # @html = `echo php reg_upload.php file=\"#{@tname}\"`
-      @html = `cd ./app/external; php reg_upload.php gid=\"#{@gid}\" file=\"#{@tname}\" rails_env=\"#{RAILS_ENV}\" debug_mode=\"#{debug_mode}\"`
+      @html = `cd ./app/external; php reg_upload.php gid=\"#{@gid}\" file=\"#{@tname}\" rails_env=\"#{Rails.env}\" debug_mode=\"#{debug_mode}\"`
       render :dummy
     else
       # @html = "GID: " + @gid + "\n<BR>"
@@ -103,7 +103,7 @@ class ExternalController < ApplicationController
     @file = params[:file]
     @gid = params[:gid]
     @group = Group.find(params[:gid])
-    @result = `ruby #{RAILS_ROOT}/files/#{@file}.rb #{RAILS_ROOT} #{@gid}`
+    @result = `ruby #{Rails.root}/files/#{@file}.rb #{Rails.root} #{@gid}`
 
     flash[:notice] = "調査対象を一括登録しました"
     redirect_to group_candidates_url(@group)
@@ -143,7 +143,7 @@ class ExternalController < ApplicationController
 
     if 0 < @size && @size <= @@size_limit && /(\.xlsx?)$/ =~ @filename then
       ext = $1
-      outputFileName = "#{RAILS_ROOT}/files/#{@tname}"
+      outputFileName = "#{Rails.root}/files/#{@tname}"
       outputFileNameWithExt = outputFileName + ext
       File.open(outputFileNameWithExt, "wb") {
         |f| f.write(params[:file]['upfile'].read)
@@ -210,7 +210,7 @@ class ExternalController < ApplicationController
         redirect_to :controller => 'faxocr'
     elsif 0 < @size && @size <= @@size_limit && /(\.xlsx?)$/ =~ @filename then
       ext = $1
-      outputFileName = "#{RAILS_ROOT}/files/#{@tname}"
+      outputFileName = "#{Rails.root}/files/#{@tname}"
       outputFileNameWithExt = outputFileName + ext
       File.open(outputFileNameWithExt, "wb") {
         |f| f.write(params[:file]['upfile'].read)
@@ -302,11 +302,11 @@ class ExternalController < ApplicationController
     @param_str += "\""
 
     if (params[:func]) then
-      @file_html = "#{RAILS_ROOT}/files/#{@file}.html"
-      @file_prefix = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}"
+      @file_html = "#{Rails.root}/files/#{@file}.html"
+      @file_prefix = "#{Rails.root}/files/#{@gid}-#{@sid}"
       @orient = params[:orient]
 
-      @ret = `cd #{RAILS_ROOT}; xvfb-run -a wkhtmltopdf --page-size A4 -O #{@orient} #{@file_html} #{@file_prefix}.pdf`
+      @ret = `cd #{Rails.root}; xvfb-run -a wkhtmltopdf --page-size A4 -O #{@orient} #{@file_html} #{@file_prefix}.pdf`
       @ret = `pdftk #{@file_prefix}.pdf cat 2-end output #{@file_prefix}-00000.pdf`
       @ret = `pdftk #{@file_prefix}-00000.pdf burst output #{@file_prefix}-%05d.pdf`
       @ret = `rm -f #{@file_prefix}-00000.pdf`
@@ -317,7 +317,7 @@ class ExternalController < ApplicationController
       @ret = `rm -f doc_data.txt`
       @ret = `cp -p #{@file_html} #{@file_prefix}.html`
     else
-      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{RAILS_ENV}\" debug_mode=\"#{debug_mode}\"`
+      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{Rails.env}\" debug_mode=\"#{debug_mode}\"`
       # flash[:notice] = @errmsg
       # flash[:notice] = "セーブしました"
     end
@@ -343,11 +343,11 @@ class ExternalController < ApplicationController
     @file = params[:fileid]
     @group = Group.find(params[:gid])
 
-    @result = `ruby #{RAILS_ROOT}/files/#{@file}.rb #{RAILS_ROOT} #{@gid}`
+    @result = `ruby #{Rails.root}/files/#{@file}.rb #{Rails.root} #{@gid}`
 
     if debug_mode == 'true'
-      @file_prefix = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}"
-      @debug = `cd #{RAILS_ROOT}/files/`
+      @file_prefix = "#{Rails.root}/files/#{@gid}-#{@sid}"
+      @debug = `cd #{Rails.root}/files/`
       @debug = `convert #{@file_prefix}.pdf #{@file_prefix}.tif`
       sendmail "#{@file_prefix}.tif"
     end
@@ -360,13 +360,13 @@ class ExternalController < ApplicationController
 
     @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
     @sid = params[:survey_id]
-    @file_pdf = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.pdf"
+    @file_pdf = "#{Rails.root}/files/#{@gid}-#{@sid}.pdf"
 
-    # send_file("#{RAILS_ROOT}/files/simple.zip",
+    # send_file("#{Rails.root}/files/simple.zip",
     #          {:filename => "simple.zip",
     #           :type => "application/zip"})
 
-    # send_file("#{RAILS_ROOT}/files/simple.pdf",
+    # send_file("#{Rails.root}/files/simple.pdf",
     #           {:filename => "simple.pdf",
     #             :type => "application/pdf"})
 
@@ -379,7 +379,7 @@ class ExternalController < ApplicationController
 
     @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
     @sid = params[:survey_id]
-    @file_zip = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.zip"
+    @file_zip = "#{Rails.root}/files/#{@gid}-#{@sid}.zip"
 
     send_file(@file_zip,
               {:filename => "#{@gid}-#{@sid}.zip",
@@ -390,7 +390,7 @@ class ExternalController < ApplicationController
 
     @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
     @sid = params[:survey_id]
-    @file_html = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.html"
+    @file_html = "#{Rails.root}/files/#{@gid}-#{@sid}.html"
 
     send_file(@file_html,
               {:filename => "#{@gid}-#{@sid}.html",
@@ -401,7 +401,7 @@ class ExternalController < ApplicationController
 
     @gid = params[:group_id]
     @sid = params[:survey_id]
-    @file_png = "#{RAILS_ROOT}/files/#{@gid}-#{@sid}.png"
+    @file_png = "#{Rails.root}/files/#{@gid}-#{@sid}.png"
 
     send_file(@file_png,
               {:filename => "#{@gid}-#{@sid}.png",

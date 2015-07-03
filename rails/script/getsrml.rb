@@ -1,15 +1,14 @@
 #!/usr/bin/env ruby
 require File.expand_path('../../config/boot',  __FILE__)
-rails_prefix = RAILS_ROOT
 require "rubygems"
 require "active_record"
 require "yaml"
 require "cgi"
-config_db = rails_prefix + "/config/database.yml"
+config_db = "#{Rails.root}/config/database.yml"
 db_env = "development"
 ActiveRecord::Base.configurations = YAML.load_file(config_db)
 ActiveRecord::Base.establish_connection(db_env)
-Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |model|
+Dir.glob("#{Rails.root}/app/models/*.rb").each do |model|
   load model
 end
 
