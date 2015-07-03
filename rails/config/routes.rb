@@ -14,7 +14,7 @@ Faxocr::Application.routes.draw do
       post :getfax_exec
       get  :view_answer_sheet
       get  :cron
-      post :update
+      post :update_system_config
       get  :index
       get  :view_system_config
     end

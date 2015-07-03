@@ -2,7 +2,7 @@
 <p style="color: green"><%= flash[:notice] %></p>
 
 <br>
-<%= form_tag('/configs/update', {:method => 'post'}) do %>
+<%= form_tag('/configs/update_system_config', {:method => 'post'}) do %>
 <center>
   <%= text_area :body, '', :style => 'width: 95%; height: 250px;', :value => @raw_config %>
 </center>

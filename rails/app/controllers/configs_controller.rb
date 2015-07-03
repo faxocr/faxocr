@@ -11,7 +11,7 @@ class ConfigsController < ApplicationController
     @raw_config = File.read(@config_file_path)
   end
 
-  def update
+  def update_system_config
     @body = params[:body].to_s.gsub("\r\n", "\n")
 
     @config_file_path = "#{Rails.root}/../etc/faxocr.conf"
