@@ -103,7 +103,7 @@ Faxocr::Application.routes.draw do
   match 'external/getimg/:group_id/:survey_id' => 'external#getimg'
 
   match 'faxocr/direct_masquerade/:group_id/:id' => 'faxocr#direct_masquerade'
-  match 'faxocr/:action' => 'faxocr#index'
+  match 'faxocr(/:action)', :controller => 'faxocr'
 
   match 'inbox/' => 'inbox#index'
   match 'inbox/:group_id' => 'inbox#group_surveys'
