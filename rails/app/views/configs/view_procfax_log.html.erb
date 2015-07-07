@@ -11,7 +11,7 @@
 <table width="100%">
 <tr>
   <td align="left">Log Directory Path: <%= @logdir_path %></td>
-  <td align="right"><%= button_to "全Fax処理履歴ダウンロード", download_all_procfax_log_configs_path, :method => 'get' %></td>
+  <td align="right"><%= button_to "全Fax処理履歴ダウンロード", download_all_procfax_log_configs_path(:format => "text"), :method => 'get' %></td>
   <td align="right"><%= button_to "procfax.sh実行", procfax_exec_configs_path, :onclick => "DisableButton(this);" %></td>
 </tr>
 </table>
