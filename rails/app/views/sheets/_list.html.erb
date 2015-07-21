@@ -38,7 +38,7 @@
     <td class="surveysobject_manage">
       <% file_zip = "#{Rails.root}/files/#{@group.id.to_s}-#{sheet.id.to_s}.zip" %>
       <% if File.exist?(file_zip) %>
-<a href=<%="\"/external/download_zip/" + @group.id.to_s + "/" + sheet.id.to_s + "\""%> >[PDF]</a>
+      <%= link_to '[PDF]', "/external/download_zip/#{@group.id}/#{sheet.id}" %>
       <% end %>
 <%= link_to '[編集]', group_survey_sheet_path(@group, @survey, sheet) %>
 <%= link_to '[削除]', group_survey_sheet_path(@group, @survey, sheet), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
@@ -49,7 +49,7 @@
     <td class="surveysobject_manage">
       <% file_zip = "#{Rails.root}/files/#{@group.id.to_s}-#{sheet.sheet_code.to_i.to_s}.zip" %>
       <% if File.exist?(file_zip) %>
-      <a href=<%="\"/external/download_zip/" + @group.id.to_s + "/" + sheet.sheet_code.to_i.to_s + "\""%> >[PDF]</a>
+      <%= link_to '[PDF]', "/external/download_zip/#{@group.id}/#{sheet.sheet_code.to_i}" %>
       <% end %>
     </td>
     <% end %>

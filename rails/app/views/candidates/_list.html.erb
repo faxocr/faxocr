@@ -3,7 +3,7 @@
 <% if @current_user.has_candidate_role(@group.id) %>
 <%= link_to '[調査対象の新規作成]', new_group_candidate_path(@group) %>
 <% end %>
-<a href=<%="\"/external/register/" + @group.id.to_s + "\""%> >[新規一括取込]</a>
+<%= link_to '[新規一括取込]', { :controller => 'external', :action => 'register', :group_id => @group.id.to_s } %>
 <% end %>
 </div>
 <table class="surveysobject">
