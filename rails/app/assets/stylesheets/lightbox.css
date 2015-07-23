@@ -43,7 +43,7 @@
     width: 100%;
     text-align: center;
     line-height: 0;
-    background: url(images/lb-load.gif) no-repeat center 15%;
+    background: url(lb-load.gif) no-repeat center 15%;
 }
 
 #ux-lightbox-hoverNav {
@@ -73,8 +73,8 @@
 
 #ux-lightbox-navPrev { left: 0; float: left;}
 #ux-lightbox-navNext { right: 0; float: right;}
-#ux-lightbox-navPrev:hover, #ux-lightbox-navPrev:visited:hover { background: url(images/lb-prev.png) left 33% no-repeat; }
-#ux-lightbox-navNext:hover, #ux-lightbox-navNext:visited:hover { background: url(images/lb-next.png) right 33% no-repeat; }
+#ux-lightbox-navPrev:hover, #ux-lightbox-navPrev:visited:hover { background: url(lb-prev.png) left 33% no-repeat; }
+#ux-lightbox-navNext:hover, #ux-lightbox-navNext:visited:hover { background: url(lb-next.png) right 33% no-repeat; }
 
 #ux-lightbox-outerDataContainer {
     margin: 0 auto;
@@ -92,8 +92,8 @@
 #ux-lightbox-data #ux-lightbox-details{ width: 80%; float: left; text-align: left; }
 #ux-lightbox-data #ux-lightbox-caption{ font-weight: bold;	}
 #ux-lightbox-data #ux-lightbox-imageNumber{ display: block; clear: left; padding-bottom: 1.0em;	}
-#ux-lightbox-data #ux-lightbox-navClose{ background: url(images/lb-close.gif) no-repeat; width: 66px; height: 22px; float: right;  padding-bottom: 0.7em; outline: none;}
-#ux-lightbox-data #ux-lightbox-navClose:hover{ background-image: url(images/lb-close-over.gif);}
+#ux-lightbox-data #ux-lightbox-navClose{ background: url(lb-close.gif) no-repeat; width: 66px; height: 22px; float: right;  padding-bottom: 0.7em; outline: none;}
+#ux-lightbox-data #ux-lightbox-navClose:hover{ background-image: url(lb-close-over.gif);}
 
 #ux-lightbox-overlay,
 #ux-lightbox-shim{

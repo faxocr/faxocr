@@ -1,0 +1,657 @@
+@charset "UTF-8";
+/* CSS Document */
+
+html{height:100%;}
+body{
+	margin:0;
+	padding:0;
+	line-height:1.6;
+	height:100%;
+	background:image-url('back.gif') repeat-x 0 0;
+	color:#000;
+	font-family: "ヒラギノ角ゴ Pro","Hiragino Kaku Gothic Pro","メイリオ",Osaka,"MS P Gothic","ＭＳ Ｐゴシック";
+	font-size:0.9em;
+}
+
+/*
+input[type="text"], textarea
+{
+//  display: block;
+    padding: 0px;
+//  border: solid 0px;
+    border: solid 1px gold;
+}
+*/
+
+/* hack */
+/* -------------------------------------------- */
+/* letter-spacing hack */
+@media screen{
+	body{letter-spacing:0.05em;}
+	br{letter-spacing:0;}
+}
+
+/* height100% hack */
+body > div#container{height:auto;}
+
+/* link */
+/* -------------------------------------------- */
+a			{color:#1d7877;text-decoration:underline;}
+a:link		{}
+a:visited	{}
+a:hover		{color:#35aca8;text-decoration:none;}
+a:active	{}
+
+/* other */
+/* -------------------------------------------- */
+img{border:none;}
+form{margin:0;padding:0;}
+
+
+
+
+
+/* header */
+/* -------------------------------------------- */
+#header{
+	width:940px;
+	margin:0 auto 1px;
+	padding:6px 0 0 0;
+}
+
+#header dl{
+	margin:0;
+	padding:0 0 0 0;
+}
+
+#header dt{
+	float:left;
+	margin:0;
+	padding:0 0 0 0;
+}
+
+#header img{
+	margin:2px;
+}
+
+#header dd{
+	margin:0 0 0 95px;
+	padding:1em 0 0 0;
+}
+
+/* nav */
+/* -------------------------------------------- */
+#nav{
+	margin:0 0 0;
+	padding:2px;
+	background:image-url('back_nav.gif') repeat-x 0 0;
+}
+
+#nav ul{
+	list-style:none;
+	width:940px;
+	margin:0 auto;
+	padding:0;
+}
+
+#nav li{
+	float:left;
+	margin:0 2em 0 0;
+	padding:0;
+}
+
+#nav li a{
+	display:block;
+	margin:0;
+	padding:1.3em 0 1.3em 16px;
+	background:image-url('arw_nav.gif') no-repeat 0 50%;
+	font-weight:bold;
+	color:#fff;
+	text-decoration:none;
+}
+
+#nav li a:hover{
+	color:#e0f8f8;
+}
+
+/* container */
+/* -------------------------------------------- */
+#container{
+	width:948px;
+	margin:0 auto 2em;
+	padding:0;
+}
+
+/* contents */
+/* -------------------------------------------- */
+#contents{
+	float:left;
+	width:698px;
+	margin:0;
+	padding:0;
+}
+
+#contents h1{
+	margin:0;
+	padding:1.1em 0 1.1em 26px;
+	background:image-url('back_title.gif') no-repeat 0 0;
+	font-size:1.1em;
+	color:#1d7877;
+}
+
+#contents .article{
+	margin:0;
+	padding:0 15px;
+}
+
+
+
+
+/* side */
+/* -------------------------------------------- */
+#side{
+	float:right;
+	width:228px;
+	margin:0;
+	padding:0;
+}
+
+#side h4{
+	margin:0;
+	padding:1.2em 0 0.9em 2.8em;
+	background:image-url('back_side_contents.gif') no-repeat 0 0;
+	font-size:1em;
+	color:#1d7877;
+}
+
+#side .menu{
+	margin:0 0 1.8em;
+	padding:0 0 4px;
+	background:image-url('back_side_menu.gif') no-repeat 0 100%;
+}
+
+#side .menu ul{
+	list-style:none;
+	margin:0 4px;
+	padding:0;
+}
+
+#side .menu ul li{
+	margin:0;
+	padding:0.7em 0 0.7em 10px;
+	background:image-url('line_dot.gif') repeat-x 0 100%;
+}
+
+#side .menu ul li a{
+	margin:0;
+	padding:0 0 0 1em;
+	background:image-url('arw.gif') no-repeat 0 3px;
+	font-size:0.85em;
+	color:#000;
+	text-decoration:none;
+}
+
+#side .menu ul li a:hover{
+	text-decoration:underline;
+}
+
+#side h5{
+	margin:0 0 0.8em;
+	padding:0em 0 0.3em 1em;
+	background:image-url('back_side_sub.gif') no-repeat 0 100%;
+	font-size:0.9em;
+	color:#1d7877;
+}
+
+#side h5 .related{
+	margin:0;
+	padding:0 0 0 1.7em;
+	background:image-url('mark_related.gif') no-repeat 0 0;
+}
+
+#side .sub-area{
+	margin:0;
+	padding:0;
+}
+
+#side .sub-area ul{
+	list-style:none;
+	margin:0 10px;
+	padding:0;
+}
+
+#side .sub-area li{
+	margin:0 0 0.4em;
+	padding:0;
+}
+
+#side .sub-area li a{
+	margin:0;
+	padding:0 0 0 1em;
+	background:image-url('arw_small.gif') no-repeat 0 3px;
+	font-size:0.85em;
+	color:#000;
+	text-decoration:none;
+}
+
+#side .sub-area li a:hover{
+	text-decoration:underline;
+}
+
+
+/* contents: 1 column */
+/* -------------------------------------------- */
+#contents_1c{
+        width: 100%;
+        margin:0;
+        padding:0;
+}
+
+#contents_1c h1{
+        margin:0;
+        padding:1.1em 0 1.1em 26px;
+        background:image-url('back_title_1column.gif') no-repeat 0 0;
+        font-size:1.1em;
+        color:#1d7877;
+}
+
+#contents_1c h1.admin {
+        background:image-url('back_title_1column_red.gif') no-repeat 0 0;
+        color:#fa5f0a;
+}
+
+#contents .article{
+        margin:0;
+        padding:0 15px;
+}
+
+
+/* footer */
+/* -------------------------------------------- */
+#footer{
+	margin:0;
+	padding:0;
+}
+
+#footer #pagetop{
+	width:930px;
+	margin:0 auto 1px;
+	padding:0;
+	text-align:right;
+}
+
+#footer .inner{
+	height:110px;
+	margin:0 0;
+	padding:0;
+	background:image-url('back_footer_short.gif') repeat-x 0 0;
+}
+
+#footer .top-area{
+	margin:0 0 1.8em;
+	padding:25px 25px 0 25px;
+}
+
+#footer .top-area dl{
+	float:left;
+	margin:0;
+	padding:0;
+}
+
+#footer .top-area dt{
+	float:left;
+	margin:0;
+	padding:0;
+}
+
+#footer .top-area dd{
+	margin:0 0 0 120px;
+	padding:0.3em 0 0;
+	font-size:0.8em;
+	_font-size:0.6em;
+}
+
+#footer .top-area ul{
+	float:right;
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+
+#footer .top-area ul li{
+	float:right;
+	margin:0;
+	padding:0;
+	font-size:0.8em;
+	_font-size:0.6em;
+}
+
+#footer .top-area ul li a{
+	margin:0;
+	padding:0;
+	color:#000;
+	text-decoration:none;
+}
+
+#footer .top-area ul li a:hover{
+	text-decoration:underline;
+}
+
+#footer .bottom-area{
+	margin:0;
+	padding:0 25px;
+}
+
+#footer .bottom-area dl{
+	float:left;
+	margin:0;
+	padding:0;
+}
+
+#footer .bottom-area dt{
+	float:left;
+	margin:0;
+	padding:0;
+}
+
+#footer .bottom-area dd{
+	margin:0 0 0 80px;
+	padding:0.4em 0 0;
+	font-size:0.8em;
+}
+
+#footer .bottom-area p{
+	float:right;
+	margin:0;
+	padding:0;
+	font-size:0.8em;
+}
+
+/* clearfix */
+/* ---------------------------------------------- */
+.clearfix:after {
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: " ";
+	clear: both;
+	height: 0;
+}
+* html .clearfix             { zoom: 1; } /* IE6 */
+*:first-child+html .clearfix { zoom: 1; } /* IE7 */
+
+/* ---------------------------------------------------------------- */
+
+/* 検索条件用テーブル */
+.srcTable1 {
+	font-size: 80%;
+	line-height: 125%;
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #999999;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: #999999;
+}
+.srcTable1 th {
+	font-size: 110%;
+	font-weight: normal;
+	color: #003322;
+	text-align: left;
+	background-color: #e0f8f8;
+	padding-left: 8px;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #999999;
+	border-right-width: 1px;
+	border-right-style: solid;
+	border-right-color: #999999;
+}
+.srcTable1 td {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #999999;
+	border-right-width: 1px;
+	border-right-style: solid;
+	border-right-color: #999999;
+}
+
+.srcTable2 td {
+	border-width: 0px;
+}
+
+.srcTable2 table {
+	border-width: 0px;
+}
+/*-----------------------------------*/
+
+/* --- ▼メインカラム内の設定開始 --- */
+
+/* --- 強調セクション --- */
+#main div.emphasis {
+padding: 1.1em 15px 0; /* セクションのパディング（上、左右、下） */
+background: image-url('emphasis_back1.gif') repeat-x top; /* セクションの背景 */
+border: 1px #c0c0c0 solid; /* セクションの境界線 */
+}
+ /* 見出し */
+#main div.emphasis h2 {
+margin: 0 0 0.8em; /* 見出しのマージン（上、左右、下） */
+font-size: 130%; /* 見出しの文字サイズ */
+color: #dc3900; /* 見出しの文字色 */
+}
+ /* 段落 */
+#main div.emphasis p {
+margin: 0 0 1em; /* 段落のマージン（上、左右、下） */
+color: #2b2b2b; /* 段落の文字色 */
+line-height: 150%; /* 行の高さ */
+}
+
+/* --- 新着情報（トップページ） --- */
+#main div.update dl {
+width: 590px; /* 新着情報の幅（メインカラムの幅から40px引いた値） */
+margin: 0 auto; /* センタリング */
+}
+/* 日付エリア */
+#main div.update dt {
+width: 6.7em; /* 日付エリアの幅 */
+float: left;
+padding: 7px 0 6px 3px; /* 日付エリアのパディング（上右下左） */
+line-height: 120%; /* 行の高さ */
+}
+/* 本文エリア */
+#main div.update dd {
+margin: 0;
+padding: 7px 3px 6px 6.6em; /* 本文エリアのパディング（上右下左） */
+border-bottom: 1px #c0c0c0 dotted; /* 本文エリア下境界線 */
+line-height: 120%; /* 行の高さ */
+}
+
+/* --- リスト（トップページ） --- */
+#main .llist ul {
+width: 550px; /* 新着情報の幅（メインカラムの幅から40px引いた値） */
+margin: 0 auto; /* センタリング */
+list-style-type: decimal;
+}
+/* 本文エリア */
+#main .llist li {
+margin: 0;
+padding: 7px 3px 6px 6px; /* 本文エリアのパディング（上右下左） */
+border-bottom: 1px #c0c0c0 dotted; /* 本文エリア下境界線 */
+line-height: 100%; /* 行の高さ */
+}
+
+#main .cclist ul {
+width: 450px; /* 新着情報の幅（メインカラムの幅から40px引いた値） */
+margin: 0 auto; /* センタリング */
+list-style-type: disc;
+}
+
+#main .cclist li {
+margin: 0;
+padding: 7px 3px 6px 6px; /* 本文エリアのパディング（上右下左） */
+border-bottom: 0px #c0c0c0 dotted; /* 本文エリア下境界線 */
+line-height: 95%; /* 行の高さ */
+}
+
+
+#main .llist li table {
+margin: 0;
+padding: 2px 0px 2px 0px; /* */
+/*border: 1px #404040 dotted;*/
+border-spacing: 0px;
+}
+#main .llist li td {
+margin: 0;
+/* padding: 2px 0px 2px 0px; /* */
+border: 1px #404040 dotted;
+}
+
+#main .slist dl {
+width: 500px; /* 新着情報の幅（メインカラムの幅から40px引いた値） */
+margin: 0 auto; /* センタリング */
+list-style-type: decimal;
+}
+#main .slist dh { 
+width: 40em;
+margin: 0;
+padding: 3px 3px 2px 6px; /* 本文エリアのパディング（上右下左） */
+/*border-bottom: 1px #c0c0c0 dotted; /* 本文エリア下境界線 */
+border-bottom: 0px;
+line-height: 100%; /* 行の高さ */
+}
+#main .slist dd { 
+margin: 0;
+padding: 3px 3px 2px 6px; /* 本文エリアのパディング（上右下左） */
+/*border-bottom: 1px #c0c0c0 dotted; /* 本文エリア下境界線 */
+border-bottom: 0px;
+line-height: 100%; /* 行の高さ */
+}
+#main .llist .tlist table {
+border: 0px;
+}
+#main .llist .tlist tr {
+border: 0px;
+padding: 1px 0px 1px 0px;
+}
+#main .llist .tlist td {
+border: 0px;
+}
+
+.viewlist {
+	border:1px solid #E0E0E0;
+	padding:5px;
+	margin-top:3px;
+}
+
+/* --- ▲メインカラム内の設定終了 --- */
+
+/* temporary */
+.itemimage{
+	cursor: pointer;
+}
+
+.cf:after	{ content: "" !important; display: block !important; clear: both !important; height: 0 !important; visibility: hidden !important; }
+.cf			{ zoom: 1 !important; }
+.fl	{ float: left; }
+.fr	{ float: right; }
+
+table.surveysobject {
+	border-collapse:collapse;
+	width: 100%;
+	font-size: 10pt;
+}
+
+div.surveysobject_new {
+	text-align: right;
+}
+
+table.surveysobject th, 
+table.surveysobject td {
+	padding: 5px;
+}
+th.surveysobject {
+	color: #ffffff;
+	background-color: #cccc88;
+}
+tr.surveysobject {
+	background-color: #eeeeee;
+}
+tr.surveysobject_dark {
+	background-color: #f5f5f5;
+}
+td.surveysobject_manage {
+	white-space: nowrap;
+	text-align: center;
+}
+
+table.surveysobject {
+	border-collapse:collapse;
+	width: 100%;
+	font-size: 10pt;
+}
+
+div.surveysobject_new {
+	text-align: right;
+}
+
+/* report */
+table.report {
+	border-collapse:collapse;
+	width: 100%;
+	margin-top: 10px;
+	font-size: 10pt;
+}
+
+table.report tr {
+	background-color: #eeeeee;
+	text-align: center;
+}
+
+table.report tr.dark {
+	background-color: #f5f5f5;
+}
+
+table.report tr.summary {
+	border-top: 1px solid #DDDDDD;
+}
+
+table.report th {
+	color: #ffffff;
+	background-color: #cccc88;
+}
+
+table.report th.manage {
+	width: 30px;
+}
+
+table.report th.name {
+	width: 200px;
+}
+
+table.report td {
+	padding: 3px 0;
+}
+
+.rotate90 {
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    /* for ie */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3, mirror=1);
+    transform-origin: 250px 250px;
+    -webkit-transform-origin: 250px 250px;
+    -moz-transform-origin: 250px 250px;
+    -ms-transform-origin: 250px 250px;
+}
+
+.debug {
+    background-color: #F2DEDE;
+    border: 1px solid #EED3D7;
+    margin: 5px 0;
+    padding: 10px;
+    color: #B94A48;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
+}

@@ -216,9 +216,9 @@ function go_next() {
 <div id="ex3" class="jqDnR" style="opacity:0.9; position: absolute; top:200px; left:100px;display:none">
 <div class="jqDrag" style="height:100%">
 
-<img src="/image/mark.gif" class="mark-img" style="top: 0;left: 0; width: {$sheet->marker_size}px;" />
-<img src="/image/mark.gif" class="mark-img" style="top: 0;right: 0; width: {$sheet->marker_size}px;" />
-<img src="/image/mark.gif" class="mark-img" style="bottom: 0;left: 0; width: {$sheet->marker_size}px;" />
+<img src="/external/image/mark.gif" class="mark-img" style="top: 0;left: 0; width: {$sheet->marker_size}px;" />
+<img src="/external/image/mark.gif" class="mark-img" style="top: 0;right: 0; width: {$sheet->marker_size}px;" />
+<img src="/external/image/mark.gif" class="mark-img" style="bottom: 0;left: 0; width: {$sheet->marker_size}px;" />
 
 <br /><br />
 <center>
@@ -229,8 +229,8 @@ function go_next() {
 </p>
 
 <h3>マーカーサイズ変更</h3>
-縮小 <img src="/image/arrow-l.gif" onmousedown="size_down();" />
-　　<img src="/image/arrow-r.gif" onmousedown="size_up();" /> 拡大<br />
+縮小 <img src="/external/image/arrow-l.gif" onmousedown="size_down();" />
+　　<img src="/external/image/arrow-r.gif" onmousedown="size_up();" /> 拡大<br />
 
 <br /><br /><br />
 <button onclick="hide_marker();" style="position:relative; z-index:10;">確定</button><br /><br />

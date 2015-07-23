@@ -1,6 +1,8 @@
 <table id="header">
   <tr>
-    <td width="50px" rowspan="2"><img src="/image/logo.png" alt="Shinsai FaxOCR System" /></td>
+    <td width="50px" rowspan="2">
+      <%= image_tag("logo.png", :alt => "Shinsai FaxOCR System") %>
+    </td>
     <% if @current_user != nil %>
     <td>Shinsai FaxOCRシステム</td>
     <% else %>

@@ -9,13 +9,12 @@
   <meta name="keywords" content="" />
   <meta name="description" content="" />
   <title>Shinsai FaxOCR</title>
-  <%= stylesheet_link_tag 'style' %>
+  <%= stylesheet_link_tag 'style', 'lightbox' %>
   <script type="text/javascript" src="http://www.google.com/jsapi"></script>
   <script type="text/javascript">
     google.load('ext-core', '3');
   </script>
-  <link href="/stylesheets/lightbox.css" rel="stylesheet" />
-  <script type="text/javascript" src="/javascripts/lightbox.js"></script>
+  <%= javascript_include_tag 'lightbox' %>
   <script type="text/javascript">
     Ext.ux.Lightbox.register('a[rel^=lightbox]');
   </script>
@@ -48,7 +47,7 @@
 <div id="footer">
 	<p id="pagetop">
 	  <a href="#">
-	    <img src="/image/pagetop.gif" alt="このページの先頭へ" />
+		<%= image_tag("pagetop.gif", :alt => "このページの先頭へ") %>
 	</a>
 	</p>
 	<div class="inner">

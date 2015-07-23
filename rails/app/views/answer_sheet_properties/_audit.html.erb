@@ -9,7 +9,7 @@
 <tr>
   <td valign="middle" align="right">
     <% if !@s_next.nil? %>
-    <%= link_to image_tag('/images/prev.gif'), group_survey_answer_sheet_path(@group, @survey, @s_next) %>
+    <%= link_to image_tag('prev.gif'), group_survey_answer_sheet_path(@group, @survey, @s_next) %>
     <% end %>
   </td>
   <td align="center">
@@ -52,7 +52,7 @@
   </td>
   <td valign="middle" align="left">
     <% if !@s_prev.nil? %>
-    <%= link_to image_tag('/images/next.gif'), group_survey_answer_sheet_path(@group, @survey, @s_prev) %>
+    <%= link_to image_tag('next.gif'), group_survey_answer_sheet_path(@group, @survey, @s_prev) %>
     <% end %>
   </td>
 </tr>

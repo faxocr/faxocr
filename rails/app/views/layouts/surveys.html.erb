@@ -10,7 +10,7 @@
   <meta name="description" content="" />
   <title>Shinsai FaxOCR</title>
   <%= stylesheet_link_tag 'style' %>
-  <script type="text/javascript" src="/javascripts/jquery-1.4.1.min.js"></script>
+  <%= javascript_include_tag "surveys" %>
 </head>
 
 <body>
@@ -40,7 +40,7 @@
 <div id="footer">
 	<p id="pagetop">
 	  <a href="#">
-	    <img src="/image/pagetop.gif" alt="このページの先頭へ" />
+		<%= image_tag("pagetop.gif", :alt => "このページの先頭へ") %>
 	</a>
 	</p>
 	<div class="inner">

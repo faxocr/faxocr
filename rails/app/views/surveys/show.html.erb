@@ -72,48 +72,48 @@ $('#panel_survey').slideUp('slow');
   <tr>
     <th>
       <a onclick="show_sheets();">
-	<img src="/image/icon-pdf.gif"><br>
+	<%= image_tag("icon-pdf.gif") %><br>
 	配布シート
       </a>
     </th>
 
-    <th width="48"><img src="/image/rightarrow.gif"></th>
+    <th width="48"><%= image_tag("rightarrow.gif") %></th>
     <th>
       <a onclick="show_candidate();">
-	<img src="/image/icon-targets.gif"><br>
+	<%= image_tag("icon-targets.gif") %><br>
 	配布対象
       </a>
     </th>
 
-    <th width="48"><img src="/image/rightarrow.gif"></th>
+    <th width="48"><%= image_tag("rightarrow.gif") %></th>
     <th>
       <%= link_to group_survey_answer_sheets_path(@group, @survey) do %>
-      <img src="/image/icon-faxes.gif"><br>
+      <%= image_tag("icon-faxes.gif") %><br>
       受信Fax一覧
       <% end %>
     </th>
 
-    <th width="48"><img src="/image/rightarrow.gif"></th>
+    <th width="48"><%= image_tag("rightarrow.gif") %></th>
     <th>
       <a onclick="show_properties();">
-	<img src="/image/icon-database.gif"><br>
+	<%= image_tag("icon-database.gif") %><br>
 	調査項目
       </a>
     </th>
 
-    <th width="48"><img src="/image/rightarrow.gif"></th>
+    <th width="48"><%= image_tag("rightarrow.gif") %></th>
     <th>
       <a onclick="show_reports();">
-	<img src="/image/icon-reports.gif"><br>
+	<%= image_tag("icon-reports.gif") %><br>
 	集計レポート
       </a>
     </th>
 
     <% if @current_user.has_survey_role(@current_group.id) %>
-    <th width="48"><img src="/image/dot.gif"></th>
+    <th width="48"><%= image_tag("dot.gif") %></th>
     <th>
       <a onclick="show_survey();">
-	<img src="/image/icon-config.gif"><br>
+	<%= image_tag("icon-config.gif") %><br>
 	シート設定
       </a>
     </th>
