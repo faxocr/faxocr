@@ -2,7 +2,7 @@ bash "installing bundler and bundle install" do
   cwd "#{node[:faxocr][:home_dir]}/rails"
   code <<-EOH
     gem install bundler
-    bundle install
+    bundle install --path vendor/bundler
     EOH
 end
 

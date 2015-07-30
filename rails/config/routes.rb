@@ -50,9 +50,9 @@ Faxocr::Application.routes.draw do
         end
       end
 
-      match 'report/:year(/:month(/:day))' => 'report#daily', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
-      match 'report/:year(/:month(/:day))/fax_preview' => 'report#fax_preview', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
-      match 'export/:year(/:month(/:day))' => 'export#csv', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
+      get 'report/:year(/:month(/:day))' => 'report#daily', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
+      get 'report/:year(/:month(/:day))/fax_preview' => 'report#fax_preview', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
+      get 'export/:year(/:month(/:day))' => 'export#csv', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
     end
 
     resources :candidates
@@ -64,7 +64,7 @@ Faxocr::Application.routes.draw do
     end
   end
 
-  match '/answer_sheets' => 'answer_sheets#index_all', :as => :contact
+  get '/answer_sheets' => 'answer_sheets#index_all', :as => :contact
   resources :answer_sheets do
     collection do
       get :index_all
@@ -75,45 +75,58 @@ Faxocr::Application.routes.draw do
     end
   end
 
-  #
-  # PHP driver (Target registration)
-  #
-  match 'external/register/:group_id' => 'external#register'
-  match 'external/reg_upload' => 'external#reg_upload'
-  match 'external/reg_exec' => 'external#reg_exec'
-  match 'external/sheet_checker' => 'external#sheet_checker'
-  match 'external/sht_field_checker' => 'external#sht_field_checker'
+  namespace :external do
+    #
+    # PHP driver (Target registration)
+    #
+    get 'register/:group_id', :action => 'register'
+    get 'reg_upload', :action => 'reg_upload'
+    get 'reg_exec', :action => 'reg_exec'
+    get 'sheet_checker', :action => 'sheet_checker' #get
+    post 'sht_field_checker', :action => 'sht_field_checker'  #post
 
-  #
-  # PHP driver (Sheet registration)
-  #
-  match 'external/sheet/:group_id/:survey_id' => 'external#sheet'
-  match 'external/sht_field' => 'external#sht_field'
-  match 'external/sht_script' => 'external#sht_script'
-  match 'external/sht_marker' => 'external#sht_marker'
-  match 'external/sht_config' => 'external#sht_config'
-  match 'external/sht_verify' => 'external#sht_verify'
-  match 'external/sht_commit' => 'external#sht_commit'
+    #
+    # PHP driver (Sheet registration)
+    #
+    get 'sheet/:group_id/:survey_id', :action => 'sheet'
+    post 'sht_field', :action => 'sht_field'
+    post 'sht_script', :action => 'sht_script'
+    post 'sht_marker', :action => 'sht_marker'  # also get
+    post 'sht_config', :action => 'sht_config'
+    post 'sht_verify', :action => 'sht_verify'
+    post 'sht_commit', :action => 'sht_commit'
 
-  # PHP driver
-  match 'external/:action' => 'external#index'
-  match 'external/download/:group_id/:survey_id' => 'external#download'
-  match 'external/download_zip/:group_id/:survey_id' => 'external#download_zip'
-  match 'external/download_html/:group_id/:survey_id' => 'external#download_html'
-  match 'external/getimg/:group_id/:survey_id' => 'external#getimg'
+    # PHP driver
+    get ':action', :action => 'index'
+    get 'download/:group_id/:survey_id', :action => 'download'  #get
+    get 'download_zip/:group_id/:survey_id', :action => 'download_zip'
+    get 'download_html/:group_id/:survey_id', :action => 'download_html'
+    get 'getimg/:group_id/:survey_id', :action => 'getimg'  # get
+  end
 
-  match 'faxocr/direct_masquerade/:group_id/:id' => 'faxocr#direct_masquerade'
-  match 'faxocr(/:action)', :controller => 'faxocr'
+  namespace :faxocr do
+    get 'direct_masquerade/:group_id/:id', :action => :direct_masquerade
+    match :masquerade, :via => [:get, :post]
+    match :login, :via => [:get, :post]
+    match :group_select, :via => [:get, :post]
+    get :logout
+    get :index
+    get '', :action => :index
+  end
 
-  match 'inbox/' => 'inbox#index'
-  match 'inbox/:group_id' => 'inbox#group_surveys'
-  match 'inbox/:group_id/:survey_id/' => 'inbox#survey_answer_sheets'
-  match 'inbox/:group_id/:survey_id/:answer_sheet_id/' => 'inbox#answer_sheet_properties'
-  match 'inbox/:group_id/:survey_id/:answer_sheet_id/update' => 'inbox#update_answer_sheet_properties'
+  namespace :inbox do
+    get '', :action => 'index'
+    get ':group_id', :action => 'group_surveys'
+    get ':group_id/:survey_id/', :action => 'survey_answer_sheets'
+    get ':group_id/:survey_id/:answer_sheet_id/', :action => 'answer_sheet_properties'
+    post ':group_id/:survey_id/:answer_sheet_id/update', :action => 'update_answer_sheet_properties'
+  end
 
-  match 'report/:survey_id/daily/:year(/:month(/:day))' => 'report#daily', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
+  get 'report/:survey_id/daily/:year(/:month(/:day))' => 'report#daily', :constraints => { :month => /[01]?\d/, :year => /(19|20)\d\d/, :day => /[0-3]\d/ }
 
-  match 'util/survey/:survey_code/fax_numbers' => 'util#survey_fax_numbers'
-  match 'util/sheet/:sheet_code/srml' => 'util#get_one_srml_entry'
-  match 'util/sheet/srml' => 'util#get_srml_contents'
+  namespace :util do
+    get 'survey/:survey_code/fax_numbers', :action => 'survey_fax_numbers'
+    get 'sheet/:sheet_code/srml', :action => 'get_one_srml_entry'
+    get 'sheet/srml', :action => 'get_srml_contents'
+  end
 end
