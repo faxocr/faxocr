@@ -2,6 +2,7 @@
 .project
 .loadpath
 .cvsignore
+.secret
 .tmp*
 db/*.sqlite3
 log/*
