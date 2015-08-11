@@ -3,7 +3,10 @@
 
 ja:
   date:
-    order: [:year, :month, :day]
+    order:
+      - :year
+      - :month
+      - :day
   activerecord:
     models:
       user: "ユーザ"
