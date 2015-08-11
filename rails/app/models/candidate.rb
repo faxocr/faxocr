@@ -7,5 +7,5 @@ class Candidate < ActiveRecord::Base
 
   validates_presence_of :candidate_code, :candidate_name, :fax_number
   validates_uniqueness_of :candidate_code
-  validates_format_of :candidate_code, :with => /^\d{5}$/
+  validates_format_of :candidate_code, :with => /\A\d{5}\z/
 end

@@ -19,7 +19,7 @@
 <!-- header END -->
 
 <!-- nav STR -->
-<% if ( /^(masquerade)$/ =~ params[:action])%>
+<% if ( /\A(masquerade)\z/ =~ params[:action])%>
   <%= render :partial => "layouts/menu" %>
 <% else %>
 <div id="nav">

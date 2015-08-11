@@ -37,7 +37,7 @@ line_num = 1
     cell_str = rp != nil ? rp.ocr_value : '-'
     cell_img = rp != nil ? rp.ocr_image : nil
 
-    if data_types[column] == 'number' && cell_str =~ /^[0-9]+$/
+    if data_types[column] == 'number' && cell_str =~ /\A[0-9]+\z/
       sums[column] = sums[column] + cell_str.to_i
     end
 

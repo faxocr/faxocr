@@ -1,101 +1,101 @@
 <!-- <%= link_to 'グループ選択', groups_path %> -->
 <div class="breadcrumb">
 　場所:
-<% if /^(configs)$/ =~ params[:controller] %>
+<% if /\A(configs)\z/ =~ params[:controller] %>
 	  <%= link_to '管理ホーム', groups_url %>
-<% elsif  /^(groups|surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties|report|candidates|users)$/ =~ params[:controller] %>
+<% elsif  /\A(groups|surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties|report|candidates|users)\z/ =~ params[:controller] %>
 
 	<% if @current_group.is_administrator? %>
 	  <%= link_to '管理ホーム', groups_url %>
 
-	  <% if !(/^(groups)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	  <% if !(/\A(groups)\z/ =~ params[:controller] && /\A(index|new|create)\z/ =~ params[:action])%>
 	  &gt;
 	    <%= link_to @group.group_name, group_path(@group) %>
 	  <% end %>
 
 	<% else %>
-	  <% if !(/^(groups)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	  <% if !(/\A(groups)\z/ =~ params[:controller] && /\A(index|new|create)\z/ =~ params[:action])%>
 	    <%= link_to 'ホーム', group_path(@group) %>
 	  <% else %>
 	    <%= link_to 'ホーム', @current_group %>
 	  <% end %>
 	<% end %>
-	<% if /^(groups)$/ =~ params[:controller] && /^(new)$/ =~ params[:action] %>
+	<% if /\A(groups)\z/ =~ params[:controller] && /\A(new)\z/ =~ params[:action] %>
 	  &gt;&nbsp;<%= link_to '新規グループ登録', new_group_path() %>
 	<% end %>
 
-	<% if /^(surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties)$/ =~ params[:controller] && !(/^(answer_sheets)$/ =~ params[:controller] && /^(index_all|show_all)$/ =~ params[:action]) %>
+	<% if /\A(surveys|sheets|sheet_properties|survey_properties|survey_candidates|answer_sheets|answer_sheet_properties)\z/ =~ params[:controller] && !(/\A(answer_sheets)\z/ =~ params[:controller] && /\A(index_all|show_all)\z/ =~ params[:action]) %>
 	  &gt;&nbsp;<%= link_to '調査一覧', group_surveys_path(@group) %>
-	  <% if !(/^(surveys)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action]) %>
+	  <% if !(/\A(surveys)\z/ =~ params[:controller] && /\A(index|new|create)\z/ =~ params[:action]) %>
 	  &gt;&nbsp;<%= link_to @survey.survey_name, group_survey_path(@group, @survey) %>
 	  <% end %>
-	  <% if /^(sheets|sheet_properties)$/ =~ params[:controller] %>
+	  <% if /\A(sheets|sheet_properties)\z/ =~ params[:controller] %>
 		&gt;&nbsp;<%= link_to 'シート一覧', group_survey_sheets_path(@group, @survey) %>
-	    <% if !(/^(sheets)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	    <% if !(/\A(sheets)\z/ =~ params[:controller] && /\A(index|new|create)\z/ =~ params[:action])%>
 		  &gt;&nbsp;<%= link_to @sheet.sheet_name, group_survey_sheet_path(@group, @survey, @sheet) %>
 	    <% end %>
-	    <% if /^(sheet_properties)$/ =~ params[:controller] %>
+	    <% if /\A(sheet_properties)\z/ =~ params[:controller] %>
 		  &gt;&nbsp;<%= link_to 'シートの調査項目', group_survey_sheet_sheet_properties_path(@group, @survey, @sheet) %>
-	      <% if !(/^(sheet_properties)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	      <% if !(/\A(sheet_properties)\z/ =~ params[:controller] && /\A(index|new|create)\z/ =~ params[:action])%>
 	      &gt;&nbsp;<%= link_to @sheet_property.survey_property.ocr_name_full, group_survey_sheet_sheet_properties_path(@group, @survey, @sheet, @sheet_property) %>
-	      <% elsif (/^(sheet_properties)$/ =~ params[:controller] && /^(new)$/ =~ params[:action])%>
+	      <% elsif (/\A(sheet_properties)\z/ =~ params[:controller] && /\A(new)\z/ =~ params[:action])%>
 	      &gt;&nbsp;<%= link_to 'シート調査項目追加', new_group_survey_sheet_sheet_property_path(@group, @survey, @sheet, @sheet) %>
 	      <% end %>
 	    <% end %>
-	  <% elsif /^(survey_properties)$/ =~ params[:controller] %>
+	  <% elsif /\A(survey_properties)\z/ =~ params[:controller] %>
 	    &gt;&nbsp;<%= link_to '調査項目', group_survey_survey_properties_path(@group, @survey) %>
-	    <% if !(/^(survey_properties)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	    <% if !(/\A(survey_properties)\z/ =~ params[:controller] && /\A(index|new|create)\z/ =~ params[:action])%>
 	      &gt;&nbsp;<%= link_to @survey_property.ocr_name_full, group_survey_survey_property_path(@group, @survey, @survey_property) %>
-	    <% elsif (/^(survey_properties)$/ =~ params[:controller] && /^(new)$/ =~ params[:action])%>
+	    <% elsif (/\A(survey_properties)\z/ =~ params[:controller] && /\A(new)\z/ =~ params[:action])%>
 	      &gt;&nbsp;<%= link_to '調査項目を追加', new_group_survey_survey_property_path(@group, @survey) %>
 	    <% end %>
-	  <% elsif /^(survey_candidates)$/ =~ params[:controller] %>
+	  <% elsif /\A(survey_candidates)\z/ =~ params[:controller] %>
 	    &gt;&nbsp;<%= link_to '調査対象', group_survey_survey_candidates_path(@group, @survey) %>
-	    <% if !(/^(survey_candidates)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	    <% if !(/\A(survey_candidates)\z/ =~ params[:controller] && /\A(index|new|create)\z/ =~ params[:action])%>
 	      &gt;&nbsp;<%= link_to @survey_candidate.candidate.candidate_name, group_survey_survey_candidate_path(@group, @survey, @survey_candidate) %>
-	    <% elsif (/^(survey_candidates)$/ =~ params[:controller] && /^(new)$/ =~ params[:action])%>
+	    <% elsif (/\A(survey_candidates)\z/ =~ params[:controller] && /\A(new)\z/ =~ params[:action])%>
 	      &gt;&nbsp;<%= link_to '調査対象を追加', new_group_survey_survey_candidate_path(@group, @survey) %>
 	    <% end %>
-	  <% elsif /^(answer_sheets|answer_sheet_properties)$/ =~ params[:controller] %>
+	  <% elsif /\A(answer_sheets|answer_sheet_properties)\z/ =~ params[:controller] %>
 	    &gt;&nbsp;<%= link_to 'FAX受信調査シート一覧', group_survey_answer_sheets_path(@group, @survey) %>
-	    <% if !(/^(answer_sheets)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	    <% if !(/\A(answer_sheets)\z/ =~ params[:controller] && /\A(index|new|create)\z/ =~ params[:action])%>
 	    &gt;&nbsp;<%= link_to @answer_sheet.date.to_s(:datetime_jp), group_survey_answer_sheet_path(@group, @survey, @answer_sheet) %>
 	    <% end %>
-	    <% if /^(answer_sheet_properties)$/ =~ params[:controller] %>
+	    <% if /\A(answer_sheet_properties)\z/ =~ params[:controller] %>
 	      &gt;&nbsp;<%= link_to '調査項目', group_survey_answer_sheet_answer_sheet_properties_path(@group, @survey, @answer_sheet) %>
-	      <% if !(/^(answer_sheet_properties)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	      <% if !(/\A(answer_sheet_properties)\z/ =~ params[:controller] && /\A(index|new|create)\z/ =~ params[:action])%>
 	      &gt;&nbsp;<%= @answer_sheet_property.ocr_name %>
 	      <% end %>
 	    <% end %>
 	  <% end %>
-	<% elsif /^(candidates)$/ =~ params[:controller] %>
+	<% elsif /\A(candidates)\z/ =~ params[:controller] %>
 	  &gt;&nbsp;<%= link_to '調査対象', group_candidates_path(@group) %>
-	  <% if !(/^(candidates)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	  <% if !(/\A(candidates)\z/ =~ params[:controller] && /\A(index|new|create)\z/ =~ params[:action])%>
 	  &gt;&nbsp;<%= link_to @candidate.candidate_name, group_candidate_path(@group, @candidate) %>
-	  <% elsif (/^(candidates)$/ =~ params[:controller] && /^(new)$/ =~ params[:action])%>
+	  <% elsif (/\A(candidates)\z/ =~ params[:controller] && /\A(new)\z/ =~ params[:action])%>
 	  &gt;&nbsp;<%= link_to '調査対象作成', new_group_candidate_path(@group) %>
 	  <% end %>
-	<% elsif /^(users)$/ =~ params[:controller] %>
+	<% elsif /\A(users)\z/ =~ params[:controller] %>
 	  &gt;&nbsp;<%= link_to 'ユーザ設定', group_users_path(@group) %>
-	  <% if !(/^(users)$/ =~ params[:controller] && /^(index|new|create)$/ =~ params[:action])%>
+	  <% if !(/\A(users)\z/ =~ params[:controller] && /\A(index|new|create)\z/ =~ params[:action])%>
 	  &gt;&nbsp;<%= @user.full_name %>
-	  <% elsif (/^(users)$/ =~ params[:controller] && /^(new)$/ =~ params[:action])%>
+	  <% elsif (/\A(users)\z/ =~ params[:controller] && /\A(new)\z/ =~ params[:action])%>
 	  &gt;&nbsp;<%= link_to 'ユーザ新規作成', new_group_user_path(@group) %>
 	  <% end %>
-	<% elsif /^(report)$/ =~ params[:controller] %>
+	<% elsif /\A(report)\z/ =~ params[:controller] %>
 	  &gt;&nbsp;<%= link_to 'ダウンロード', report_group_path(@group) %>
 	  &gt;&nbsp;<%= link_to @survey.survey_name, group_survey_path(@group, @survey) %>
-	  <% if (/^(report)$/ =~ params[:controller] && /^(daily)$/ =~ params[:action])%>
+	  <% if (/\A(report)\z/ =~ params[:controller] && /\A(daily)\z/ =~ params[:action])%>
 	  &gt;&nbsp;集計レポート(<%= @place_holder['YEAR'] + "/" +  @place_holder['MONTH'] + "/" +  @place_holder['DAY'] %>)
 	  <% end %>
 	<% end %>
-	<% if /^(groups)$/ =~ params[:controller] && /^(report)$/ =~ params[:action] %>
+	<% if /\A(groups)\z/ =~ params[:controller] && /\A(report)\z/ =~ params[:action] %>
 	  &gt;&nbsp;<%= link_to 'ダウンロード', report_group_path(@group) %>
 	<% end %>
 
-	<% if /^(answer_sheets)$/ =~ params[:controller] && /^(index_all|show_all)$/ =~ params[:action] %>
+	<% if /\A(answer_sheets)\z/ =~ params[:controller] && /\A(index_all|show_all)\z/ =~ params[:action] %>
 	  &gt;&nbsp;<%= link_to '宛先不明Fax一覧', "/answer_sheets" %>
-	  <% if /^(answer_sheets)$/ =~ params[:controller] && /^(show_all)$/ =~ params[:action] %>
+	  <% if /\A(answer_sheets)\z/ =~ params[:controller] && /\A(show_all)\z/ =~ params[:action] %>
 	    &gt;&nbsp;<%= link_to @answer_sheet.date.to_s(:datetime_jp), show_all_answer_sheet_path(@answer_sheet) %>
 	  <% end %>
 	<% end %>
