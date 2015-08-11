@@ -59,7 +59,7 @@ class SheetPropertiesController < ApplicationController
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:survey_id])
     @sheet = @survey.sheets.find(params[:sheet_id])
-    @sheet_property = @sheet.sheet_properties.build(params[:sheet_property])
+    @sheet_property = @sheet.sheet_properties.build(sheet_property_params)
     if @sheet_property.save
       redirect_to group_survey_sheet_sheet_property_url(@group, @survey, @sheet, @sheet_property)
     else
@@ -74,7 +74,7 @@ class SheetPropertiesController < ApplicationController
     @survey = Survey.find(params[:survey_id])
     @sheet = Sheet.find(params[:sheet_id])
     @sheet_property = SheetProperty.find(params[:id])
-    if @sheet_property.update_attributes(params[:sheet_property])
+    if @sheet_property.update_attributes(sheet_property_params)
       redirect_to group_survey_sheet_sheet_property_url(@group, @survey, @sheet, @sheet_property)
     else
       render :action => "edit"
@@ -105,4 +105,11 @@ class SheetPropertiesController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
+  private
+
+  def sheet_property_params
+    params.require(:sheet_property).permit(:sheet_id, :survey_property_id, :position_x, :position_y, :colspan)
+  end
+
 end

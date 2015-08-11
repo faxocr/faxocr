@@ -308,7 +308,7 @@ class AnswerSheetsController < ApplicationController
       end
     end
 
-    if @answer_sheet.update_attributes(params[:answer_sheet])
+    if @answer_sheet.update_attributes(params.require(:answer_sheet).permit(:date, :sheet_image, :sender_number, :receiver_number, :sheet_code, :candidate_code))
       redirect_to group_survey_answer_sheet_url(@group, @survey, @answer_sheet)
     else
       render :action => "edit"

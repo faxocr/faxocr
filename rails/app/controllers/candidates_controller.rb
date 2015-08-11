@@ -49,7 +49,7 @@ class CandidatesController < ApplicationController
   # POST /candidates.xml
   def create
     @group = Group.find(params[:group_id])
-    @candidate = @group.candidates.build(params[:candidate])
+    @candidate = @group.candidates.build(candidate_params)
     if @candidate.save
       redirect_to group_candidates_url(@group)
     else
@@ -62,7 +62,7 @@ class CandidatesController < ApplicationController
   def update
     @group = Group.find(params[:group_id])
     @candidate = Candidate.find(params[:id])
-    if @candidate.update_attributes(params[:candidate])
+    if @candidate.update_attributes(candidate_params)
       redirect_to group_candidate_url(@group, @candidate)
     else
       render :action => "edit"
@@ -80,5 +80,11 @@ class CandidatesController < ApplicationController
       format.html { redirect_to group_candidates_path(@group) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+
+  def candidate_params
+    params.require(:candidate).permit(:group_id, :candidate_name, :candidate_code, :tel_number, :fax_number)
   end
 end

@@ -88,7 +88,7 @@ class UsersController < ApplicationController
   # POST /users.xml
   def create
     @group = @authorized_group
-    @user = User.new(params[:user])
+    @user = User.new(user_params)
     @role_mapping = RoleMapping.new
     @role_mapping.group = @group
     @role_mapping.user = @user
@@ -123,9 +123,9 @@ class UsersController < ApplicationController
     respond_to do |format|
       if role_mapping
         role_mapping.role = ""
-        result = @user.update_attributes(params[:user]) && role_mapping.update_attributes(role_mapping_attr)
+        result = @user.update_attributes(user_params) && role_mapping.update_attributes(role_mapping_attr)
       else
-        result = @user.update_attributes(params[:user])
+        result = @user.update_attributes(user_params)
       end
       if result
         flash[:notice] = "ユーザ #{@user.login_name} の情報を更新しました"
@@ -171,4 +171,7 @@ private
     super('u')
   end
 
+  def user_params
+    params.require(:user).permit(:login_name, :password, :password_confirmation, :full_name, :organization, :section, :tel_number, :fax_number, :email)
+  end
 end
