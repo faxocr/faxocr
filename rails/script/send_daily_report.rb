@@ -36,9 +36,7 @@ class ReportHtml
     @answer_sheets = []
     @survey_candidates.each do |survey_candidate|
       if survey_candidate.has_receivereport_role
-        @answer_sheet = AnswerSheet.find_by_sheet_id_and_candidate_id(sheet_ids, survey_candidate.candidate_id,
-        :conditions => ['date <= ?', @datetime_end],
-        :order => 'date desc')
+        @answer_sheet = AnswerSheet.where(:sheet_id => sheet_ids).where(:candidate_id => survey_candidate.candidate_id).where('date <= ?', @datetime_end).order(date: :desc).take
         if @answer_sheet == nil
           @answer_sheet = AnswerSheet.new
           @answer_sheet.candidate_id = survey_candidate.candidate_id
