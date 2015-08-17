@@ -6,7 +6,7 @@
   	調査対象を選択してください。
   </div>
   <p class="surveysobject">
-    <%= f.collection_select :candidate_id, @group.candidates.all, :id, :candidate_name %>
+    <%= f.collection_select :candidate_id, @group.candidates, :id, :candidate_name %>
   </p>
   <h2 class="surveysobject">役割</h2>
   <div class="surveysobject">

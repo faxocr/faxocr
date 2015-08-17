@@ -5,7 +5,7 @@ class SurveyPropertiesController < ApplicationController
   def index
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:survey_id])
-    @survey_properties = @survey.survey_properties.all(:order => "view_order")
+    @survey_properties = @survey.survey_properties.order(:view_order)
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @survey_properties }
