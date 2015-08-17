@@ -35,7 +35,7 @@
    	<td class="surveysobject" align="center"><%= link_to faxcount.to_s + "件", group_survey_answer_sheets_path(@group, survey) %></td>
 	<% if params[:controller] == "surveys" %>
     <% if @current_user.has_survey_role(@group.id) %>
-    <td class="surveysobject_manage"><%= link_to '削除', group_survey_path(@group, survey), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+    <td class="surveysobject_manage"><%= link_to '削除', group_survey_path(@group, survey), data: { confirm: '削除してもよろしいですか？' }, :method => :delete %></td>
     <% else %>
     <td class="surveysobject_manage">操作できません</td>
     <% end %>

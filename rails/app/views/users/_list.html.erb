@@ -55,7 +55,7 @@
 	<% if params[:controller] == "users" %>
     <% if @current_user.has_user_role(@group.id) %>
 	    <td><%= link_to '編集', edit_group_user_path(@group, user) %>
-	    <%= link_to '削除', group_user_path(@group, user), :confirm => '削除してもよろしいですか？', :method => :delete %>
+	    <%= link_to '削除', group_user_path(@group, user), data: {confirm: '削除してもよろしいですか？'}, :method => :delete %>
 		<% if @current_user.has_masquerade_role(@group.id) %>
 			<% if @masqueradable && user.id != @current_user.id %>
 				<%= link_to '代理ログイン', :controller => 'faxocr', :action => 'direct_masquerade', :group_id => @group.id, :id => user.id %>

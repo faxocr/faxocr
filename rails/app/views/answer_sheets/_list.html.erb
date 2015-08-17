@@ -38,7 +38,7 @@
 	<% end %>
     <td class="surveysobject_manage" ><%= link_to '表示', group_survey_answer_sheet_path(@group, @survey, answer_sheet) %></td>
 	<% if @current_user.has_survey_role(@current_group.id) %>
-    <td class="surveysobject_manage"><%= link_to '削除', group_survey_answer_sheet_path(@group, @survey, answer_sheet), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+    <td class="surveysobject_manage"><%= link_to '削除', group_survey_answer_sheet_path(@group, @survey, answer_sheet), data: {confirm: '削除してもよろしいですか？'}, :method => :delete %></td>
 	<% end %>
   </tr>
 <% end %>

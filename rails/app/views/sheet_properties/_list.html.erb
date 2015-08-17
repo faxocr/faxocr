@@ -29,7 +29,7 @@
     <td class="surveysobject"><%=h sheet_property.colspan %></td>
 	<% if params[:controller] == "sheet_properties" %>
     <% if @current_user.has_survey_role(@group.id) %>
-    <td class="surveysobject_manage"><%= link_to '削除', group_survey_sheet_sheet_property_path(@group, @survey, @sheet, sheet_property), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+    <td class="surveysobject_manage"><%= link_to '削除', group_survey_sheet_sheet_property_path(@group, @survey, @sheet, sheet_property), data: {confirm: '削除してもよろしいですか？'}, :method => :delete %></td>
     <% else %>
     <td class="surveysobject_manage">操作できません</td>
     <% end %>

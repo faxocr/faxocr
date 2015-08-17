@@ -15,7 +15,7 @@
     <td><%= su.owner == true ? "Yes" : ""%></td>
     <td><%= link_to 'Show', su %></td>
     <td><%= link_to 'Edit', edit_survey_user_path(su) %></td>
-    <td><%= link_to 'Destroy', su, :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+    <td><%= link_to 'Destroy', su, data: {confirm: '削除してもよろしいですか？'}, :method => :delete %></td>
   </tr>
 <% end %>
 </table>

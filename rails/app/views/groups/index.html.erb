@@ -18,7 +18,7 @@
   <% end %>
    	<td class="surveysobject"><%= link_to group.group_name, group %></td>
     <% if @current_user.has_administrator_group %>
-    <td class="surveysobject_manage"><%= link_to '削除', group, :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+    <td class="surveysobject_manage"><%= link_to '削除', group, data: {confirm: '削除してもよろしいですか？'}, :method => :delete %></td>
     <% else %>
     <td class="surveysobject_manage">操作できません</td>
     <% end %>

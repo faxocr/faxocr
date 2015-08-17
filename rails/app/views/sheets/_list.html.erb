@@ -41,7 +41,7 @@
       <%= link_to '[PDF]', "/external/download_zip/#{@group.id}/#{sheet.id}" %>
       <% end %>
 <%= link_to '[編集]', group_survey_sheet_path(@group, @survey, sheet) %>
-<%= link_to '[削除]', group_survey_sheet_path(@group, @survey, sheet), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+<%= link_to '[削除]', group_survey_sheet_path(@group, @survey, sheet), data: {confirm: '削除してもよろしいですか？'}, :method => :delete %></td>
     <% else %>
     <td class="surveysobject_manage">操作できません</td>
     <% end %>
