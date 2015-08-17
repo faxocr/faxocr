@@ -22,7 +22,8 @@
   <% else %>
   <tr class="surveysobject_dark">
   <% end %>
-    <td class="surveysobject"><%= answer_sheet.date.to_s(:datetime_jp).gsub(/日/, "日<BR>　　　") %></td>
+    <% (date, time) = answer_sheet.date.to_s(:datetime_jp).split(/日/) %>
+    <td class="surveysobject"><%= date %>日<BR>　　　<%= time %></td>
     <td class="surveysobject">
 	<%=h answer_sheet.sender_number %><br/>
 	<%=h answer_sheet.receiver_number %>
