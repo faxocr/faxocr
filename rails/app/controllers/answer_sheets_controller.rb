@@ -8,8 +8,7 @@ class AnswerSheetsController < ApplicationController
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:survey_id])
     sheet_ids = @survey.sheet_ids
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids,
-        :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).order(date: :desc)
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @answer_sheets }
@@ -23,7 +22,7 @@ class AnswerSheetsController < ApplicationController
     @group = Group.find(group_id)
     @survey = @group.surveys.find(survey_id)
     sheet_ids = @survey.sheet_ids
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids, :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).order(date: :desc)
 
     respond_to do |format|
       format.html # index_all.html.erb
@@ -49,8 +48,7 @@ class AnswerSheetsController < ApplicationController
     #
     # Finds prev and next
     #
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(@survey.sheet_ids,
-						      :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => @survey.sheet_ids).order(date: :desc)
     nsheets = @answer_sheets.length
     case nsheets
     when 0
@@ -126,7 +124,7 @@ class AnswerSheetsController < ApplicationController
     @sheet_orientation = (sheet.block_width > sheet.block_height) ? :landscape : :portrait 
 
     # Finds prev and next
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(@survey.sheet_ids, :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => @survey.sheet_ids).order(date: :desc)
     nsheets = @answer_sheets.length
     case nsheets
     when 0

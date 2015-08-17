@@ -29,7 +29,7 @@ print "<srMl>\n"
 groups = Group.all
 groups.each do |group|
   #print "  <!-- Group:#{group.group_name} -->\n"
-  surveys = group.surveys.find_all_by_status(accept_survey_statuses)
+  surveys = group.surveys.where(:status => accept_survey_statuses)
   if surveys != nil
     surveys.each do |survey|
       #print "  <!-- Survey:#{survey.survey_name} -->\n"

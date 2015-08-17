@@ -13,7 +13,7 @@
   sheets = survey.sheets
   sheet_ids = []
   sheets.each {|sheet| sheet_ids << sheet.id}
-  answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids)
+  answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids)
   need_checks = AnswerSheet.count :conditions => ["sheet_id IN (?) AND need_check = true", sheet_ids]
 
 %>

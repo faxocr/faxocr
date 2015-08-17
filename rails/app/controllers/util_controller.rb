@@ -17,7 +17,7 @@ class UtilController < ApplicationController
       groups = Group.all
       srmlstr = ""
       groups.each do |group|
-        surveys = group.surveys.find_all_by_status(accept_survey_statuses)
+        surveys = group.surveys.where(:status => accept_survey_statuses)
         if surveys != nil
           surveys.each do |survey|
             srmlstr += survey.get_srml(accept_sheet_statuses)

@@ -162,7 +162,7 @@ class ConfigsController < ApplicationController
     @group = Group.find(group_id)
     @survey = @group.surveys.find(survey_id)
     sheet_ids = @survey.sheet_ids
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids, :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).order(date: :desc)
   end
 
 private

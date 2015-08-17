@@ -30,11 +30,9 @@ class ExportController < ApplicationController
       end
     end
     sheet_ids = @survey.sheet_ids
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id_and_candidate_id(sheet_ids, candidate_ids,
-    :conditions => ['date like ?', date_range],
-    :order => 'date')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).where(:candidate_id => candidate_ids).where('date like ?', date_range).order(date: :asc)
     #Makes the header of csv.
-    survey_properties = SurveyProperty.find_all_by_survey_id(@survey.id, :order => 'view_order')
+    survey_properties = SurveyProperty.where(:survey_id => @survey.id).order(view_order: :asc)
     csv_string = "日付,調査対象,電話番号"
     columnames = []
     survey_properties.each do |rp|

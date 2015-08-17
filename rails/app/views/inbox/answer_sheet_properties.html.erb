@@ -28,7 +28,7 @@
 <%=
 form_tag :controller => 'inbox', :action => 'update_answer_sheet_properties' do
   prop_names = Hash.new
-  SurveyProperty.find_all_by_survey_id(@authorized_survey).each do |sp|
+  SurveyProperty.where(:survey_id => @authorized_survey).each do |sp|
     prop_names.store(sp.ocr_name, sp.ocr_name_full)
   end
   @answer_sheet_properties.each do |asp|

@@ -17,7 +17,7 @@ class InboxController < ApplicationController
   def survey_answer_sheets
     sheet_ids = []
     @authorized_survey.sheets.each {|sheet| sheet_ids << sheet.id}
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids, :order => 'date DESC')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).order(date: :desc)
   end
 
   def answer_sheet_properties

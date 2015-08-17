@@ -28,16 +28,14 @@ class SurveysController < ApplicationController
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:id])
     @survey_candidates = @survey.survey_candidates
-    @survey_properties = @survey.survey_properties.all(:order => "view_order")
+    @survey_properties = @survey.survey_properties.order(view_order: :asc)
     @sheets = @survey.sheets
     sheet_ids = @survey.sheet_ids
     datetime = DateTime.now
     @today = datetime.strftime("%Y/%m/%d")
     datetime = datetime - 1
     date_begin = datetime.strftime("%Y/%m/%d %H:%M:%S")
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids,
-        :conditions => ['date >= ?', date_begin],
-        :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).where('date >= ?', date_begin).order(date: :desc).to_a
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @survey }

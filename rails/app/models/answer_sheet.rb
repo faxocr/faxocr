@@ -30,7 +30,7 @@ class AnswerSheet < ActiveRecord::Base
   end
 
   def needs_check?
-    answer_sheet_properties = AnswerSheetProperty.find_all_by_answer_sheet_id_and_need_check(self.id, true)
+    answer_sheet_properties = AnswerSheetProperty.where(:answer_sheet_id => self.id, :need_check => true)
     answer_sheet_properties.length == 0 ? false : true
   end
   

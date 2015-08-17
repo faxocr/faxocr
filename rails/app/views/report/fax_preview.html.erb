@@ -8,8 +8,7 @@
 <%
 
 # Collect
-survey_properties = SurveyProperty.find_all_by_survey_id(@survey.id,
-  :order => 'view_order')
+survey_properties = SurveyProperty.where(:survey_id => @survey.id).order(view_order: :asc)
 columns = []
 data_types = Hash.new
 sums = Hash.new
