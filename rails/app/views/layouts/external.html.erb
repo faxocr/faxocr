@@ -3,15 +3,11 @@
   <%= render :partial => "layouts/welcome" %>
   <!-- header END -->
   <!-- nav STR -->
-  <% if ( /\A(masquerade)\z/ =~ params[:action])%>
-    <%= render :partial => "layouts/menu" %>
-  <% else %>
-    <div id="nav">
-      <ul class="clearfix">
-        <li></li>
-      </ul>
-    </div>
-  <% end %>
+  <div id="nav">
+    <ul class="clearfix">
+      <li><a href="/faxocr/">トップページ</a></li>
+  </ul>
+  </div>
   <!-- nav END -->
   <br>
 <% end %>

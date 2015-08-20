@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -9,41 +9,41 @@
   <meta name="keywords" content="" />
   <meta name="description" content="" />
   <title>Shinsai FaxOCR</title>
-  <%= stylesheet_link_tag 'style' %>
+  <%= content_for?(:stylesheet_replace_default) ? yield(:stylesheet_replace_default) : (stylesheet_link_tag 'style') %>
+  <%= yield :include_css %>
+  <%= yield :include_javascript %>
+  <%= yield :head %>
 </head>
 
 <body>
-
-<!-- header STR -->
-<%= render :partial => "layouts/welcome" %>
-<!-- header END -->
-<!-- nav STR -->
-<%= render :partial => "layouts/menu" %>
-<!-- nav END -->
-<%= render :partial => "layouts/breadcrumb" %>
-
+<%= yield :headnav %>
 <!-- container STR -->
 <div id="container" class="clearfix">
 
-	<!-- contents STR -->
-	<div id="contents_1c">
+<!-- contents STR -->
+<% if content_for?(:sidemenu) %>
+  <%= content_for(:sidemenu) %>
+  <div id="contents">
+<% else %>
+  <div id="contents_1c">
+<% end %>
 
 <%= yield %>
 
-	</div>
-	<!-- contents END -->
+  </div>
+  <!-- contents END -->
 <!-- container END -->
 </div>
 
 <!-- footer STR -->
 <div id="footer">
-	<p id="pagetop">
-	  <a href="#">
-	    <%= image_tag("pagetop.gif", :alt => "このページの先頭へ") %>
-	</a>
-	</p>
-	<div class="inner">
-	</div>
+  <p id="pagetop">
+    <a href="#">
+    <%= image_tag("pagetop.gif", :alt => "このページの先頭へ") %>
+  </a>
+  </p>
+  <div class="inner">
+  </div>
 </div>
 <!-- footer END -->
 

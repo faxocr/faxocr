@@ -24,7 +24,7 @@ class ExternalController < ApplicationController
     @html += `cd ./app/external; php contrib/test.php debug_mode=\"#{debug_mode}\"`
     @html += "<PRE>\n"
 
-    render :dummy
+    render :dummy, :layout => false
   end
 
   # http://server_addr:3000/external/test
@@ -39,7 +39,7 @@ class ExternalController < ApplicationController
     @html += "RAILS_ENV=#{Rails.env}"
     @html += "<PRE>\n"
 
-    render :dummy
+    render :dummy, :layout => false
   end
 
   #
@@ -90,7 +90,7 @@ class ExternalController < ApplicationController
       # @html = `cd ./app/external; php reg_upload.php`
       # @html = `echo php reg_upload.php file=\"#{@tname}\"`
       @html = `cd ./app/external; php reg_upload.php gid=\"#{@gid}\" file=\"#{@tname}\" rails_env=\"#{Rails.env}\" debug_mode=\"#{debug_mode}\"`
-      render :dummy
+      render :dummy, :layout => false
     else
       # @html = "GID: " + @gid + "\n<BR>"
       flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
@@ -128,7 +128,7 @@ class ExternalController < ApplicationController
 
     if not @tname.nil? then
       @html = `cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\"`
-      render :dummy
+      render :dummy, :layout => false
       return
     else
       if params[:file].nil? then
@@ -153,7 +153,7 @@ class ExternalController < ApplicationController
       end
       @filename.slice!(/\.\w+$/)
       @html = `cd ./app/external; php sht_field_checker.php file=\"#{@tname}\" sname=\"#{@filename}\" debug_mode=\"#{debug_mode}\"`
-      render :dummy
+      render :dummy, :layout => false
     else
       flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
       redirect_to :controller => 'faxocr'
@@ -192,7 +192,7 @@ class ExternalController < ApplicationController
 
     if not @tname.nil? then
       @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" msg=\"#{@msg}\" target=\"#{@target}\" debug_mode=\"#{debug_mode}\"`
-      render :dummy
+      render :dummy, :layout => false
       return
     else
       if params[:file].nil? then
@@ -225,7 +225,7 @@ class ExternalController < ApplicationController
       # @html = `echo php reg_upload.php file=\"#{@tname}\"`
       @filename.slice!(/\.\w+$/)
       @html = `cd ./app/external; php sht_field.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@tname}\" target=\"#{@target}\" sname=\"#{@filename}\" debug_mode=\"#{debug_mode}\"`
-      render :dummy
+      render :dummy, :layout => false
     else
       flash[:notice] = "ファイルが不正です・サイズや拡張子を確認して下さい"
       redirect_to :controller => 'faxocr'
@@ -267,7 +267,7 @@ class ExternalController < ApplicationController
     # @group = Group.find(params[:gid])
 
     @html = `cd ./app/external; php sht_marker.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\"`
-    render :dummy
+    render :dummy, :layout => false
   end
 
   def sht_config
@@ -333,7 +333,7 @@ class ExternalController < ApplicationController
     @msg = flash[:notice]
 
     @html = `cd ./app/external; php sht_verify.php gid=\"#{@gid}\" sid=\"#{@sid}\" file=\"#{@file}\" msg=\"#{@msg}\" debug_mode=\"#{debug_mode}\"`
-    render :dummy
+    render :dummy, :layout => false
   end
 
   def sht_commit
