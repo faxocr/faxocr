@@ -37,7 +37,7 @@ class AnswerSheetsController < ApplicationController
 
     begin
     @answer_sheet = AnswerSheet.find(params[:id])
-    @answer_sheet_properties = @answer_sheet.answer_sheet_properties.joins("INNER JOIN survey_properties ON answer_sheet_properties.ocr_name = survey_properties.ocr_name AND survey_properties.survey_id = " + @survey.id.to_s).order(:view_order).sort_by{|asp| asp.ocr_value}
+    @answer_sheet_properties = @answer_sheet.answer_sheet_properties.joins("INNER JOIN survey_properties ON answer_sheet_properties.ocr_name = survey_properties.ocr_name AND survey_properties.survey_id = " + @survey.id.to_s).order('survey_properties.view_order').sort_by{|asp| asp.ocr_value}
     sheets = @survey.sheets
     sheet = sheets.find(@answer_sheet.sheet_id)
     rescue
