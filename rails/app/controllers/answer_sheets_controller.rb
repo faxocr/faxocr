@@ -297,15 +297,6 @@ class AnswerSheetsController < ApplicationController
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:survey_id])
 
-    # XXX: Added for quick updating of answer_sheet (dec 11, 2011)
-    @answer_sheet.answer_sheet_properties.each do |p|
-      pid = "property_" + p.id.to_s
-      if !params[pid].nil?
-	p.ocr_value = params[pid]
-	p.save
-      end
-    end
-
     if @answer_sheet.update_attributes(params.require(:answer_sheet).permit(:date, :sheet_image, :sender_number, :receiver_number, :sheet_code, :candidate_code))
       redirect_to group_survey_answer_sheet_url(@group, @survey, @answer_sheet)
     else
@@ -313,8 +304,19 @@ class AnswerSheetsController < ApplicationController
     end
   end
 
-  # XXX
-  def update_audit
+  def update_answer_sheet_properties
+    @answer_sheet = AnswerSheet.find(params[:id])
+    @group = Group.find(params[:group_id])
+    @survey = @group.surveys.find(params[:survey_id])
+
+    @answer_sheet.answer_sheet_properties.each do |p|
+      pid = "property_" + p.id.to_s
+      if !params[pid].nil?
+        p.ocr_value = params[pid]
+        p.save
+      end
+    end
+
     redirect_to group_survey_answer_sheet_url(@group, @survey, @answer_sheet)
   end
 

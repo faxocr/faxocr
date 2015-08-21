@@ -3,7 +3,7 @@
 
 <center>
 
-<%= form_for([@group,@survey,@answer_sheet], :action => 'update_audit') do |f| %>
+<%= form_for([@group,@survey,@answer_sheet], :url => {:action => 'update_answer_sheet_properties' }) do |f| %>
 
 <table width="85%">
 <tr>

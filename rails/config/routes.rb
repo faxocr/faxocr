@@ -39,6 +39,7 @@ Faxocr::Application.routes.draw do
       resources :answer_sheets do
         member do
           put :update_recognize
+          patch :update_answer_sheet_properties
           get :image
           get :image_thumb
           get :edit_recognize
