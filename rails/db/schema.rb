@@ -83,9 +83,9 @@ ActiveRecord::Schema.define(version: 20150710043900) do
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
   create_table "sheet_cellattribute_colwidths", force: true do |t|
-    t.integer  "sheet_cellattribute_id", null: false
-    t.integer  "col_number",             null: false
-    t.float    "size",                   null: false
+    t.integer  "sheet_cellattribute_id",            null: false
+    t.integer  "col_number",                        null: false
+    t.float    "size",                   limit: 24, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -101,9 +101,9 @@ ActiveRecord::Schema.define(version: 20150710043900) do
   end
 
   create_table "sheet_cellattribute_rowheights", force: true do |t|
-    t.integer  "sheet_cellattribute_id", null: false
-    t.integer  "row_number",             null: false
-    t.float    "size",                   null: false
+    t.integer  "sheet_cellattribute_id",            null: false
+    t.integer  "row_number",                        null: false
+    t.float    "size",                   limit: 24, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
