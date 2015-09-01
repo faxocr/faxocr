@@ -1,9 +1,8 @@
 
-subversion "fetching cluscore" do
-  repository "http://cluscore.googlecode.com/svn/trunk/"
-  revision "HEAD"
-  action :sync
+git "cluscore" do
+  repository "https://github.com/cluscore/cluscore"
   destination "#{node[:faxocr][:home_dir]}/src/cluscore"
+  action :sync
   user "faxocr"
   group "faxocr"
 end
