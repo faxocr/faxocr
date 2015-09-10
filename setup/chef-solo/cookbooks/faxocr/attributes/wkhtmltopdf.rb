@@ -22,6 +22,6 @@ when "i686"
   os_arch = "i386"
 end
 default[:faxocr][:wkhtmltopdf][:archive] = "wkhtmltox-#{version}_linux-#{codename}-#{os_arch}.deb"
-default[:faxocr][:wkhtmltopdf][:url] = "http://sourceforge.net/projects/wkhtmltopdf/files/archive/#{version}/#{default[:faxocr][:wkhtmltopdf][:archive]}"
+default[:faxocr][:wkhtmltopdf][:url] = "http://download.gna.org/wkhtmltopdf/0.12/#{version}/#{default[:faxocr][:wkhtmltopdf][:archive]}"
 
 # vim:set expandtab shiftwidth=2 tabstop=2 softtabstop=2:
