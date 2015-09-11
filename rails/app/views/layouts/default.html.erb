@@ -11,6 +11,7 @@
   <title>Shinsai FaxOCR</title>
   <%= content_for?(:stylesheet_replace_default) ? yield(:stylesheet_replace_default) : (stylesheet_link_tag 'style') %>
   <%= yield :include_css %>
+  <%= javascript_include_tag 'application' %>
   <%= yield :include_javascript %>
   <%= yield :head %>
   <%= csrf_meta_tag %>
