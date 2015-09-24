@@ -29,7 +29,7 @@ Faxocr::Application.routes.draw do
     resources :surveys do
       member do
         get :report
-        put :update_report
+        patch :report, :action => 'update_report'
       end
       resources :sheets do
         resources :sheet_properties
