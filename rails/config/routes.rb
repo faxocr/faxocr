@@ -5,7 +5,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :role_mappings
 
   map.resources :groups, :member => { :report => :get } do |group|
-    group.resources :surveys do |survey|
+    group.resources :surveys, :member => { :report => :get, :update_report => :put } do |survey|
       survey.resources :sheets do |sheet|
         sheet.resources :sheet_properties
       end
@@ -53,10 +53,6 @@ ActionController::Routing::Routes.draw do |map|
   # Sample of regular route:
   #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'
   # Keep in mind you can assign values other than :controller and :action
-
-  map.connect 'groups/:group_id/surveys/:id/report',
-    :controller => "surveys",
-    :action => "report"
 
   #
   # PHP driver (Target registration)

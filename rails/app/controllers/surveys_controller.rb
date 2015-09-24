@@ -94,13 +94,23 @@ class SurveysController < ApplicationController
 
   # PUT /surveys/1
   # PUT /surveys/1.xml
+  # update survey_name and status
   def update
+    @group = Group.find(params[:group_id])
+    @survey = Survey.find(params[:id])
+    if @survey.update_attributes(params[:survey])
+      redirect_to group_survey_url(@group, @survey)
+    else
+      render :action => "edit"
+    end
+  end
+
+  def update_report
     @group = Group.find(params[:group_id])
     @survey = Survey.find(params[:id])
     survey_attr = params[:survey]
     survey_attr['report_wday_by_array'] = params[:report_wday_by_array]
     @survey.report_wday = ""
-    #if @survey.update_attributes(params[:survey])
     if @survey.update_attributes(survey_attr)
       redirect_to group_survey_url(@group, @survey)
     else
