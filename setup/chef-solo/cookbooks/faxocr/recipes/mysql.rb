@@ -12,9 +12,9 @@ bash "setup faxocr DB for ruby on rails" do
       drop database if exists faxocr_development; \
       drop database if exists faxocr_test; \
       drop database if exists faxocr_production; \
-      create database faxocr_development; \
-      create database faxocr_test; \
-      create database faxocr_production; \
+      create database faxocr_development DEFAULT CHARACTER SET utf8; \
+      create database faxocr_test DEFAULT CHARACTER SET utf8; \
+      create database faxocr_production DEFAULT CHARACTER SET utf8; \
  \
       delete from user where user="faxocr"; \
       insert into user set user="faxocr", password=password("faxocr"), host="localhost"; \
