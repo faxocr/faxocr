@@ -1,4 +1,3 @@
-require 'iconv'
 class ReportController < ApplicationController
   before_filter :verify_survey_authority
   before_filter :report_options

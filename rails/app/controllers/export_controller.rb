@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-require 'iconv'
 class ExportController < ApplicationController
   before_filter :verify_survey_authority
   def csv
@@ -59,9 +58,8 @@ class ExportController < ApplicationController
     disposition_string = "inline; filename=\"#{year}#{month}#{day}_#{@survey.survey_name}.csv\""
     if request.user_agent =~ /windows/i
       #Puts csv in Shift-JIS.
-      ic_shiftjis = Iconv.new('SHIFT_JIS', 'UTF-8')
-      csv_string = ic_shiftjis.iconv(csv_string)
-      disposition_string = ic_shiftjis.iconv(disposition_string)
+      csv_string.encode!("SJIS")
+      disposition_string.encode!("SJIS")
     end
     response.headers['Content-Type'] = 'text/csv'
     response.headers['Content-Disposition'] = disposition_string
