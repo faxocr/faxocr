@@ -1,10 +1,15 @@
 
-default[:faxocr][:wkhtmltopdf][:version] = "0.12.1"
+default[:faxocr][:wkhtmltopdf][:dependentPackages] = %w(xfonts-75dpi)
+default[:faxocr][:wkhtmltopdf][:version] = "0.12.2.1"
 version = default[:faxocr][:wkhtmltopdf][:version]
 
 case node[:platform]
 when "debian"
-  codename = "wheezy"
+  if node[:platform_version].to_i >= 8.0
+    codename = "jessie"
+  elsif node[:platform_version].to_i >= 7.0
+    codename = "wheezy"
+  end
 when "ubuntu"
   if Gem::Version.new(node[:platform_version]) >= Gem::Version.new("14.04")
     codename = "trusty"
