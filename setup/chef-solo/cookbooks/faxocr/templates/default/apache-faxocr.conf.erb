@@ -5,15 +5,18 @@ DocumentRoot <%= node[:faxocr][:home_dir] %>/rails/public
 <Directory <%= node[:faxocr][:home_dir] %>/rails/public >
         Options Indexes FollowSymLinks MultiViews
         AllowOverride None
+        <% if node['apache']['version'] == "2.4" %>
+        Require all granted
+        <% else %>
         Order allow,deny
         allow from all
+        <% end %>
         # This directive allows us to have apache2's default start page
         # in /apache2-default/, but still have / go to the right place
         #RedirectMatch ^/$ /apache2-default/
 </Directory>
 RackEnv <%= node[:faxocr][:rails_mode] %>
 RackBaseURI /
-#SetEnv GEM_HOME <%= node[:faxocr][:home_dir] %>/rails/vendor/bundle/ruby/1.8
 
 ErrorLog /var/log/apache2/error.log
 
