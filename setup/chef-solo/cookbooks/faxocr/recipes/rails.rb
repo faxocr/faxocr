@@ -35,9 +35,21 @@ bash "completely precompiling assets" do
   user "faxocr"
   group "faxocr"
   code <<-EOH
-    bundle exec rake assets:clean
+    bundle exec rake assets:clobber
     bundle exec rake assets:precompile
     EOH
+  only_if { node[:faxocr][:setup_mode] == "initial_setup" }
+end
+
+bash "precompiling assets and removed unnecessary ones" do
+  cwd "#{node[:faxocr][:home_dir]}/rails"
+  user "faxocr"
+  group "faxocr"
+  code <<-EOH
+    bundle exec rake assets:precompile
+    bundle exec rake assets:clean
+    EOH
+  only_if { node[:faxocr][:setup_mode] == "production_update" }
 end
 
 # vim:set expandtab shiftwidth=2 tabstop=2 softtabstop=2:
