@@ -1,3 +1,4 @@
+include_recipe 'faxocr::libtool'
 
 git "#{node[:faxocr][:home_dir]}/src/kocr" do
   repository "https://github.com/faxocr/kocr"
