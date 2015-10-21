@@ -30,4 +30,14 @@ bash "db migration of RoR" do
   only_if { node[:faxocr][:setup_mode] == "production_update" }
 end
 
+bash "completely precompiling assets" do
+  cwd "#{node[:faxocr][:home_dir]}/rails"
+  user "faxocr"
+  group "faxocr"
+  code <<-EOH
+    bundle exec rake assets:clean
+    bundle exec rake assets:precompile
+    EOH
+end
+
 # vim:set expandtab shiftwidth=2 tabstop=2 softtabstop=2:
