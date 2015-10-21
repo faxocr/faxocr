@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-%w{ruby1.8 rubygems1.8}.each do |pkg|
+%w{ruby1.9.1}.each do |pkg|
   describe package(pkg) do
     it { should be_installed }
   end

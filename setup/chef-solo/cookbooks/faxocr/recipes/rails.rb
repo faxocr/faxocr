@@ -1,17 +1,7 @@
-
-bash "change ruby and gem to ruby1.8 base" do
-  # XXX: It is dangerous to use a relative number of "1"
-  code <<-EOH
-    echo 1 | update-alternatives --config ruby
-    echo 1 | update-alternatives --config gem
-    EOH
-  action :nothing
-end
-
 bash "installing bundler and bundle install" do
   cwd "#{node[:faxocr][:home_dir]}/rails"
   code <<-EOH
-    gem1.8 install bundler
+    gem install bundler
     bundle install
     EOH
 end
