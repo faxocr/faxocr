@@ -9,6 +9,8 @@ end
 
 bash "compiling cluscore" do
   cwd "#{node[:faxocr][:home_dir]}/src/cluscore"
+  user "faxocr"
+  group "faxocr"
   code <<-EOH
     ./configure --prefix=/usr/local
     make

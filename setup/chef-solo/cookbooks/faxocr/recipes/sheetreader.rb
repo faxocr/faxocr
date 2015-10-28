@@ -10,6 +10,8 @@ end
 
 bash "compiling sheetreader" do
   cwd "#{node[:faxocr][:home_dir]}/src/sheet-reader"
+  user "faxocr"
+  group "faxocr"
   code <<-EOH
     ./configure CFLAGS="-O3" --prefix=/usr/local
     make
