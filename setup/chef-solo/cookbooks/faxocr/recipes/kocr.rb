@@ -18,7 +18,6 @@ bash "installing kocr binary and libraries to the system" do
   cwd "#{node[:faxocr][:home_dir]}/src/kocr/src"
   user "root"
   group "root"
-  group "faxocr"
   code <<-EOH
     make install
     ldconfig
