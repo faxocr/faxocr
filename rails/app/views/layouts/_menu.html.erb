@@ -3,7 +3,7 @@
 	<ul class="clearfix">
 		<li><%= link_to "調査対象", group_candidates_path(@selected_group.id)%></li>
 
-	<% if @group.nil? %>
+	<% if @group.nil? or @group.id.nil? %>
 		<li><%= link_to "調査", groups_url %></li>
 	<% else %>
 		<li><%= link_to "調査", group_surveys_path(@group) %></li>
