@@ -93,7 +93,7 @@ ls "$MAIL_QUEUE_DIR" | (export \
 	FAX_SEND_TYPE="$FAX_SEND_TYPE" \
 	; \
 	IFS=""; \
-	RESULT_MESSAGE=`parallel -N1 --jobs "$GNU_PARALLEL_LEVEL" "(export MAIL_FILE_NAME={}; \
+	RESULT_MESSAGE=`parallel --gnu -N1 --jobs "$GNU_PARALLEL_LEVEL" "(export MAIL_FILE_NAME={}; \
 		./bin/procfax_1mail.sh > \"$PROCFAX_TMP_DIR\"/{}.log 2>&1; \
 		echo $? > \"$PROCFAX_TMP_DIR\"/{}.exit_status; \
 		cat \"$PROCFAX_TMP_DIR\"/{}.log \
