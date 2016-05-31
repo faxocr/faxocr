@@ -19,6 +19,7 @@ gem 'activerecord-session_store'
 #gem 'sqlite3'
 # Use SCSS for stylesheets
 gem 'sass-rails'
+gem 'sass', '3.4.21'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier'
 # Use CoffeeScript for .coffee assets and views
