@@ -21,7 +21,7 @@ describe service('mysql') do
 end
 
 describe command('echo quit |  mysql -u faxocr --password=faxocr faxocr_development') do
-  it { should return_exit_status 0 }
+  its(:exit_status) { should eq 0 }
 end
 
 # vim:set expandtab shiftwidth=2 tabstop=2 softtabstop=2:

@@ -1,7 +1,7 @@
 <h1>ユーザ編集</h1>
 <p style="color: green"><%= flash[:notice] %></p>
 
-<% form_for :user, :url => {:action => :update_self} do |f| %>
+<%= form_for :user, :url => {:action => :update_self} do |f| %>
   <%= f.error_messages %>
 
     <h2 class="surveysobject">ユーザ名</h2>

@@ -14,7 +14,7 @@ describe port(25) do
 end
 
 describe command('postfix check') do
-  it { should return_exit_status 0 }
+  its(:exit_status) { should eq 0 }
 end
 
 # vim:set expandtab shiftwidth=2 tabstop=2 softtabstop=2:

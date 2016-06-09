@@ -51,7 +51,7 @@ class SurveyCandidatesController < ApplicationController
   def create
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:survey_id])
-    @survey_candidate = @survey.survey_candidates.build(params[:survey_candidate])
+    @survey_candidate = @survey.survey_candidates.build(survey_candidate_params)
     if @survey_candidate.save
       redirect_to group_survey_survey_candidates_url(@group, @survey)
     else
@@ -66,7 +66,7 @@ class SurveyCandidatesController < ApplicationController
     @survey = Survey.find(params[:survey_id])
     @survey_candidate = SurveyCandidate.find(params[:id])
     @survey_candidate.role = ""
-    if @survey_candidate.update_attributes(params[:survey_candidate])
+    if @survey_candidate.update_attributes(survey_candidate_params)
       redirect_to group_survey_survey_candidates_path(@group, @survey)
     else
       render :action => "edit"
@@ -84,5 +84,11 @@ class SurveyCandidatesController < ApplicationController
       format.html { redirect_to group_survey_survey_candidates_path(@group, @survey) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+
+  def survey_candidate_params
+    params.require(:survey_candidate).permit(:survey_id, :candidate_id, :role_by_array => [])
   end
 end

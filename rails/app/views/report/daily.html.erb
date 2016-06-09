@@ -4,8 +4,7 @@
 <table class="report">
 <%
 # Collect
-survey_properties = SurveyProperty.find_all_by_survey_id(@survey.id,
-  :order => 'view_order')
+survey_properties = SurveyProperty.where(:survey_id => @survey.id).order(view_order: :asc)
 columns = []
 data_types = Hash.new
 sums = Hash.new
@@ -36,12 +35,11 @@ line_num = 1
 
   <% for column in columns do %>
     <%
-    rp = AnswerSheetProperty.find(:first,
-      :conditions => ['answer_sheet_id = ? and ocr_name = ?', a.id, column])
+    rp = AnswerSheetProperty.where(['answer_sheet_id = ? and ocr_name = ?', a.id, column]).first
     cell_str = rp != nil ? rp.ocr_value : '-'
     cell_img = rp != nil ? rp.ocr_image : nil
 
-    if data_types[column] == 'number' && cell_str =~ /^[0-9]+$/
+    if data_types[column] == 'number' && cell_str =~ /\A[0-9]+\z/
       sums[column] = sums[column] + cell_str.to_i
     end
 
@@ -59,7 +57,7 @@ line_num = 1
 		end
       %>
     <% end %>
-    <td align="center"><%= cell_item %></td>
+    <td align="center"><%== cell_item %></td>
   <% end %>
   </tr>
   <% line_num = line_num + 1 %>
@@ -73,7 +71,7 @@ line_num = 1
 
   <% for column in columns do %>
     <% cell_item = (data_types[column] == 'number') ? sums[column] : '&nbsp;' %>
-    <td align="center"><%= cell_item %></td>
+    <td align="center"><%== cell_item %></td>
   <% end %>
   </tr>
 <% end %>

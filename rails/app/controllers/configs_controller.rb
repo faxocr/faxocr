@@ -11,8 +11,8 @@ class ConfigsController < ApplicationController
     @raw_config = File.read(@config_file_path)
   end
 
-  def update
-    @body = params[:body].to_s.gsub("\r\n", "\n")
+  def update_system_config
+    @body = params[:body].join.to_s.gsub("\r\n", "\n")
 
     @config_file_path = "#{Rails.root}/../etc/faxocr.conf"
     File.open(@config_file_path, "w") do |f|
@@ -93,7 +93,7 @@ class ConfigsController < ApplicationController
   end
 
   def note_update
-    @body = params[:body].to_s.gsub("\r\n", "\n")
+    @body = params[:body].join.to_s.gsub("\r\n", "\n").to_s
 
     @config_file_path = "#{Rails.root}/../etc/note.txt"
     File.open(@config_file_path, "w") do |f|
@@ -162,7 +162,7 @@ class ConfigsController < ApplicationController
     @group = Group.find(group_id)
     @survey = @group.surveys.find(survey_id)
     sheet_ids = @survey.sheet_ids
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids, :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).order(date: :desc)
   end
 
 private

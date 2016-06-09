@@ -1,12 +1,12 @@
 <h1>FAX受信調査シート編集</h1>
 <p style="color: green"><%= flash[:notice] %></p>
 
-<% form_for([@group,@survey,@answer_sheet]) do |f| %>
+<%= form_for([@group,@survey,@answer_sheet]) do |f| %>
   <%= f.error_messages %>
 
   <p>
     受信日時<br />
-    <%= f.datetime_select :date %>
+    <%= f.datetime_select :date, :use_month_numbers => true %>
   </p>
   <p>
     送信FAX番号<br />

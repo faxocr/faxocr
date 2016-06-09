@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+  <title>Shinsai FaxOCR</title>
+  <%= content_for?(:stylesheet_replace_default) ? yield(:stylesheet_replace_default) : (stylesheet_link_tag 'style') %>
+  <%= yield :include_css %>
+  <%= javascript_include_tag 'application' %>
+  <%= yield :include_javascript %>
+  <%= yield :head %>
+  <%= csrf_meta_tag %>
+</head>
+
+<body>
+<%= yield :headnav %>
+<!-- container STR -->
+<div id="container" class="clearfix">
+
+<!-- contents STR -->
+<% if content_for?(:sidemenu) %>
+  <%= content_for(:sidemenu) %>
+  <div id="contents">
+<% else %>
+  <div id="contents_1c">
+<% end %>
+
+<%= yield %>
+
+  </div>
+  <!-- contents END -->
+<!-- container END -->
+</div>
+
+<!-- footer STR -->
+<div id="footer">
+  <p id="pagetop">
+    <a href="#">
+    <%= image_tag("pagetop.gif", :alt => "このページの先頭へ") %>
+  </a>
+  </p>
+  <div class="inner">
+  </div>
+</div>
+<!-- footer END -->
+
+</body>
+</html>

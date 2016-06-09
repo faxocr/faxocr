@@ -3,7 +3,7 @@
 		"contact": "root"
 	},
 	"passenger": {
-		"version": "4.0.48"
+		"version": "5.0.20"
 	},
 	"postfix": {
 		"main": {
@@ -34,8 +34,9 @@
 		"recipe[postfix::aliases]",
 		"recipe[python]",
 		"recipe[imagemagick]",
+		"recipe[passenger_apache2::source]",
+		"recipe[passenger_apache2::mod_rails]",
 		"recipe[faxocr::default]",
-		"recipe[passenger_apache2::default]",
 		"recipe[faxocr::final]"
 	]
 }

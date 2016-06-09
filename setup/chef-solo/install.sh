@@ -3,11 +3,16 @@
 apt-get update
 apt-get upgrade -y
 
-apt-get install -y git wget
+apt-get install -y git wget make
 
-apt-get install -y rubygems1.8 ruby1.8-dev
-gem1.8 install bundler --no-ri --no-rdoc
+# Debian 8
+if [ -f /etc/debian_version ] && `grep '^8' /etc/debian_version >/dev/null 2>&1`; then
+        apt-get install -y ruby ruby-dev build-essential libffi-dev
+else
+        apt-get install -y ruby1.9.1-dev
+fi
 
+gem install bundler --no-ri --no-rdoc
 
 wget -q https://raw.githubusercontent.com/faxocr/faxocr/master/setup/chef-solo/Gemfile
 wget -q https://raw.githubusercontent.com/faxocr/faxocr/master/setup/chef-solo/Gemfile.lock

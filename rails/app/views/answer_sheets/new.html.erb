@@ -1,7 +1,7 @@
 <h1>New answer_sheet</h1>
 <p style="color: green"><%= flash[:notice] %></p>
 
-<% form_for(@answer_sheet) do |f| %>
+<%= form_for(@answer_sheet) do |f| %>
   <%= f.error_messages %>
 
   <p>

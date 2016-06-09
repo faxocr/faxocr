@@ -65,7 +65,7 @@ class Survey < ActiveRecord::Base
 
   def sheet_ids
     sheet_ids = []
-    sheets = Sheet.find_all_by_survey_id(self.id)
+    sheets = Sheet.where(:survey_id => self.id).to_a
     sheets.each do |sheet|
       sheet_ids << sheet.id
     end
@@ -89,7 +89,7 @@ class Survey < ActiveRecord::Base
   
   def get_srml(accept_sheet_statuses)
     srmlstr = ""
-    sheets = self.sheets.find_all_by_status(accept_sheet_statuses)
+    sheets = self.sheets.where(:status => accept_sheet_statuses)
     if sheets != nil
       sheets.each do |sheet|
         srmlstr = srmlstr + sheet.get_one_srml_entry

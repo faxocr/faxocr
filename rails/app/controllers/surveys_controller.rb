@@ -28,16 +28,14 @@ class SurveysController < ApplicationController
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:id])
     @survey_candidates = @survey.survey_candidates
-    @survey_properties = @survey.survey_properties.all(:order => "view_order")
+    @survey_properties = @survey.survey_properties.order(view_order: :asc)
     @sheets = @survey.sheets
     sheet_ids = @survey.sheet_ids
     datetime = DateTime.now
     @today = datetime.strftime("%Y/%m/%d")
     datetime = datetime - 1
     date_begin = datetime.strftime("%Y/%m/%d %H:%M:%S")
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids,
-        :conditions => ['date >= ?', date_begin],
-        :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).where('date >= ?', date_begin).order(date: :desc).to_a
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @survey }
@@ -74,7 +72,7 @@ class SurveysController < ApplicationController
   # POST /surveys.xml
   def create
     @group = Group.find(params[:group_id])
-    @survey = @group.surveys.build(params[:survey])
+    @survey = @group.surveys.build(params.require(:survey).permit(:group_id, :survey_name, :status))
     @candidates = @group.candidates
     @candidates.each do |candidate|
       survey_candidate = SurveyCandidate.new
@@ -98,7 +96,7 @@ class SurveysController < ApplicationController
   def update
     @group = Group.find(params[:group_id])
     @survey = Survey.find(params[:id])
-    if @survey.update_attributes(params[:survey])
+    if @survey.update_attributes(params.require(:survey).permit(:group_id, :survey_name, :status))
       redirect_to group_survey_url(@group, @survey)
     else
       render :action => "edit"
@@ -108,10 +106,10 @@ class SurveysController < ApplicationController
   def update_report
     @group = Group.find(params[:group_id])
     @survey = Survey.find(params[:id])
-    survey_attr = params[:survey]
+    survey_attr = params.require(:survey)
     survey_attr['report_wday_by_array'] = params[:report_wday_by_array]
     @survey.report_wday = ""
-    if @survey.update_attributes(survey_attr)
+    if @survey.update_attributes(survey_attr.permit(:group_id, 'report_time(1i)', 'report_time(2i)', 'report_time(3i)', 'report_time(4i)', 'report_time(5i)', :report_header, :report_footer, {:report_wday_by_array=>[]}, :survey_name, :status))
       redirect_to group_survey_url(@group, @survey)
     else
       render :action => "edit"

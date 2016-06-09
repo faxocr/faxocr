@@ -80,7 +80,7 @@ class AnswerSheetPropertiesController < ApplicationController
     @survey = @group.surveys.find(params[:survey_id])
     #TODO:
     @answer_sheet = AnswerSheet.find(params[:answer_sheet_id])
-    @answer_sheet_property = @answer_sheet.answer_sheet_properties.build(params[answer_sheet_property])
+    @answer_sheet_property = @answer_sheet.answer_sheet_properties.build(answer_sheet_property_params)
       if @answer_sheet_property.save
         redirect_to group_survey_answer_sheet_answer_sheet_properties_url(@group, @survey, @answer_sheet)
       else
@@ -107,7 +107,7 @@ class AnswerSheetPropertiesController < ApplicationController
     #TODO:
     @answer_sheet = AnswerSheet.find(params[:answer_sheet_id])
     @answer_sheet_property = AnswerSheetProperty.find(params[:id])
-    if @answer_sheet_property.update_attributes(params[:answer_sheet_property])
+    if @answer_sheet_property.update_attributes(answer_sheet_property_params)
       redirect_to group_survey_answer_sheet_answer_sheet_properties_url(@group, @survey, @answer_sheet)
     else
       render :action => "edit"
@@ -126,5 +126,11 @@ class AnswerSheetPropertiesController < ApplicationController
       format.html { redirect_to(answer_sheet_properties_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+
+  def answer_sheet_property_params
+    params.require(:answer_sheet_property).permit(:ocr_name, :ocr_value)
   end
 end

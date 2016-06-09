@@ -1,18 +1,8 @@
-
-bash "change ruby and gem to ruby1.8 base" do
-  # XXX: It is dangerous to use a relative number of "1"
-  code <<-EOH
-    echo 1 | update-alternatives --config ruby
-    echo 1 | update-alternatives --config gem
-    EOH
-  action :nothing
-end
-
 bash "installing bundler and bundle install" do
   cwd "#{node[:faxocr][:home_dir]}/rails"
   code <<-EOH
-    gem1.8 install bundler
-    bundle install
+    gem install bundler
+    bundle install --path vendor/bundler
     EOH
 end
 
@@ -36,6 +26,28 @@ bash "db migration of RoR" do
   code <<-EOH
     bundle exec rake db:migrate RAILS_ENV=development
     bundle exec rake db:migrate RAILS_ENV=production
+    EOH
+  only_if { node[:faxocr][:setup_mode] == "production_update" }
+end
+
+bash "completely precompiling assets" do
+  cwd "#{node[:faxocr][:home_dir]}/rails"
+  user "faxocr"
+  group "faxocr"
+  code <<-EOH
+    bundle exec rake assets:clobber
+    bundle exec rake assets:precompile
+    EOH
+  only_if { node[:faxocr][:setup_mode] == "initial_setup" }
+end
+
+bash "precompiling assets and removed unnecessary ones" do
+  cwd "#{node[:faxocr][:home_dir]}/rails"
+  user "faxocr"
+  group "faxocr"
+  code <<-EOH
+    bundle exec rake assets:precompile
+    bundle exec rake assets:clean
     EOH
   only_if { node[:faxocr][:setup_mode] == "production_update" }
 end

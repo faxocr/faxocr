@@ -1,5 +1,5 @@
 <p style="color: green"><%= flash[:notice] %></p>
-<% form_tag :action => :group_select do %>
+<%= form_tag :action => :group_select do %>
 <fieldset>
   <div>
     <%= select_tag(:gid, options_from_collection_for_select(@current_user.groups, :id, :group_name)) %>

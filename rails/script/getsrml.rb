@@ -1,15 +1,14 @@
 #!/usr/bin/env ruby
-require File.expand_path('../../config/boot',  __FILE__)
-rails_prefix = RAILS_ROOT
+require File.expand_path('../../config/environment',  __FILE__)
 require "rubygems"
 require "active_record"
 require "yaml"
 require "cgi"
-config_db = rails_prefix + "/config/database.yml"
-db_env = "development"
+config_db = "#{Rails.root}/config/database.yml"
+db_env = :development
 ActiveRecord::Base.configurations = YAML.load_file(config_db)
 ActiveRecord::Base.establish_connection(db_env)
-Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |model|
+Dir.glob("#{Rails.root}/app/models/*.rb").each do |model|
   load model
 end
 
@@ -27,10 +26,10 @@ accept_sheet_statuses << 1
 #accept_sheet_statuses << 3
 
 print "<srMl>\n"
-groups = Group.find(:all)
+groups = Group.all
 groups.each do |group|
   #print "  <!-- Group:#{group.group_name} -->\n"
-  surveys = group.surveys.find_all_by_status(accept_survey_statuses)
+  surveys = group.surveys.where(:status => accept_survey_statuses)
   if surveys != nil
     surveys.each do |survey|
       #print "  <!-- Survey:#{survey.survey_name} -->\n"

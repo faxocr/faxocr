@@ -53,7 +53,7 @@ class GroupsController < ApplicationController
   # POST /groups
   # POST /groups.xml
   def create
-    @group = Group.new(params[:group])
+    @group = Group.new(group_params)
 
     respond_to do |format|
       if @group.save
@@ -73,7 +73,7 @@ class GroupsController < ApplicationController
     @group = Group.find(params[:id])
 
     respond_to do |format|
-      if @group.update_attributes(params[:group])
+      if @group.update_attributes(group_params)
         flash[:notice] = 'グループを更新しました'
         format.html { redirect_to(@group) }
         format.xml  { head :ok }
@@ -134,5 +134,11 @@ class GroupsController < ApplicationController
       format.html # show.html.erb
       format.xml  { render :xml => @group }
     end
+  end
+
+  private
+
+  def group_params
+    params.require(:group).permit(:group_name)
   end
 end

@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
 
   validates_presence_of :login_name, :full_name
   validates_uniqueness_of :login_name
-  validates_format_of :login_name, :with => /^[0-9A-Za-z]/, :message =>"は半角英数字で入力してください。"
+  validates_format_of :login_name, :with => /\A[0-9A-Za-z]/, :message =>"は半角英数字で入力してください。"
   attr_accessor :password_confirmation
   validates_confirmation_of :password
 

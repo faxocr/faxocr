@@ -17,14 +17,14 @@ class InboxController < ApplicationController
   def survey_answer_sheets
     sheet_ids = []
     @authorized_survey.sheets.each {|sheet| sheet_ids << sheet.id}
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids, :order => 'date DESC')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).order(date: :desc)
   end
 
   def answer_sheet_properties
-    @answer_sheet_properties = AnswerSheetProperty.find(:all, :select => "asp.*",
-      :joins => "AS asp INNER JOIN survey_properties AS sp ON asp.ocr_name = sp.ocr_name",
-      :conditions => "asp.answer_sheet_id = #{@authorized_answer_sheet.id} AND sp.survey_id = #{@authorized_survey.id}",
-      :order => "sp.view_order")
+    @answer_sheet_properties = AnswerSheetProperty.select("asp.*").
+      joins("AS asp INNER JOIN survey_properties AS sp ON asp.ocr_name = sp.ocr_name").
+      where("asp.answer_sheet_id = ? AND sp.survey_id = ?", @authorized_answer_sheet.id, @authorized_survey.id).
+      order("sp.view_order")
   end
 
   def update_answer_sheet_properties

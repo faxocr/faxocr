@@ -1,7 +1,11 @@
+.bundle
 .project
 .loadpath
 .cvsignore
+.secret
 .tmp*
+db/*.sqlite3
+db/*.sqlite3-journal
 log/*
 CVS
 files/

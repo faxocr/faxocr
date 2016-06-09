@@ -596,16 +596,16 @@ end
 # sheet_property generation
 #
 survey_properties = @survey.survey_properties
-survey_properties.each do |@survey_property|
+survey_properties.each do |survey_property|
 
-  prop = cellinfo[@survey_property.id]
+  prop = cellinfo[survey_property.id]
   if prop.nil? then
     next
   end
   # survey_propertyからコピー
   sheet_property = SheetProperty.new
   sheet_property.sheet_id = @sheet.object_id
-  sheet_property.survey_property_id = @survey_property.id
+  sheet_property.survey_property_id = survey_property.id
   sheet_property.position_x = prop[0]
   sheet_property.position_y = prop[1]
   sheet_property.colspan = prop[2]

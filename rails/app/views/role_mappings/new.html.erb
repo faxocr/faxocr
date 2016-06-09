@@ -1,16 +1,16 @@
 <h1>New role_mapping</h1>
 <p style="color: green"><%= flash[:notice] %></p>
 
-<% form_for(@role_mapping) do |f| %>
+<%= form_for(@role_mapping) do |f| %>
   <%= f.error_messages %>
 
   <p>
     <%= f.label :group_id %><br />
-    <%= f.collection_select :group_id, Group.find(:all), :id, :group_name %>
+    <%= f.collection_select :group_id, Group.all, :id, :group_name %>
   </p>
   <p>
     <%= f.label :user_id %><br />
-    <%= f.collection_select :user_id, User.find(:all), :id, :full_name %>
+    <%= f.collection_select :user_id, User.all, :id, :full_name %>
   </p>
 <%
   RoleMapping::ROLES.each do |r|

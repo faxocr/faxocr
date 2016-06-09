@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
-require File.expand_path('../../config/boot',  __FILE__)
-rails_prefix = RAILS_ROOT
+require File.expand_path('../../config/environment',  __FILE__)
+rails_prefix = Rails.root
 require "rubygems"
 require "active_record"
 require "yaml"
@@ -36,9 +36,7 @@ class ReportHtml
     @answer_sheets = []
     @survey_candidates.each do |survey_candidate|
       if survey_candidate.has_receivereport_role
-        @answer_sheet = AnswerSheet.find_by_sheet_id_and_candidate_id(sheet_ids, survey_candidate.candidate_id,
-        :conditions => ['date <= ?', @datetime_end],
-        :order => 'date desc')
+        @answer_sheet = AnswerSheet.where(:sheet_id => sheet_ids).where(:candidate_id => survey_candidate.candidate_id).where('date <= ?', @datetime_end).order(date: :desc).take
         if @answer_sheet == nil
           @answer_sheet = AnswerSheet.new
           @answer_sheet.candidate_id = survey_candidate.candidate_id
@@ -75,19 +73,19 @@ if time !~ /\A\d{2}\d{2}\d{2}\z/
   exit(1)
 end
 
-config_db = rails_prefix + "/config/database.yml"
-db_env = "development"
+config_db = "#{rails_prefix}/config/database.yml"
+db_env = :development
 ActiveRecord::Base.configurations = YAML.load_file(config_db)
 ActiveRecord::Base.establish_connection(db_env)
-Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |model|
+Dir.glob("#{Rails.root}/app/models/*.rb").each do |model|
   load model
 end
 Time::DATE_FORMATS[:date_nomal] = "%Y/%m/%d"
 Time::DATE_FORMATS[:date_jp] = "%Y年%m月%d日"
 Time::DATE_FORMATS[:datetime_jp] = "%Y年%m月%d日 %k時%M分"
 Time::DATE_FORMATS[:time_jp] = "%k時%M分"
-erb = File.open(RAILS_ROOT + '/app/views/report/fax_preview.html.erb') {|f| ERB.new(f.read)}
-erb.def_method(ReportHtml, 'render()', RAILS_ROOT + '/app/views/report/fax_preview.html.erb')
+erb = File.open("#{Rails.root}/app/views/report/fax_preview.html.erb") {|f| ERB.new(f.read)}
+erb.def_method(ReportHtml, 'render()', "#{Rails.root}/app/views/report/fax_preview.html.erb")
 
 rep = ReportHtml.new
 rep.set_datetime(datetime)
@@ -101,10 +99,10 @@ accept_sheet_statuses = []
 # sheet is opened
 accept_sheet_statuses << 1
 
-groups = Group.find(:all)
+groups = Group.all
 groups.each do |group|
   print "#Group:#{group.group_name}\n"
-  surveys = group.surveys.find_all_by_status(accept_survey_statuses)
+  surveys = group.surveys.where(:status => accept_survey_statuses)
   next if surveys == nil
   surveys.each do |survey|
     print "#Survey:#{survey.survey_name}\n"

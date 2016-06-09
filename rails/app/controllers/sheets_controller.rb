@@ -54,7 +54,7 @@ class SheetsController < ApplicationController
   def create
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:survey_id])
-    @sheet = @survey.sheets.build(params[:sheet])
+    @sheet = @survey.sheets.build(sheet_params)
       
     survey_properties = @survey.survey_properties
     survey_properties.each do |survey_property|
@@ -79,7 +79,7 @@ class SheetsController < ApplicationController
     @group = Group.find(params[:group_id])
     @survey = Survey.find(params[:survey_id])
     @sheet = Sheet.find(params[:id])
-    if @sheet.update_attributes(params[:sheet])
+    if @sheet.update_attributes(sheet_params)
       redirect_to group_survey_sheet_url(@group, @survey, @sheet)
     else
       render :action => "edit"
@@ -98,5 +98,11 @@ class SheetsController < ApplicationController
       format.html { redirect_to group_survey_sheets_path(@group, @survey) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+
+  def sheet_params
+    params.require(:sheet).permit(:survey_id, :sheet_name, :status, :sheet_code, :block_width, :block_height)
   end
 end

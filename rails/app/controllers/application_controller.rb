@@ -22,7 +22,7 @@ protected
       # First, this code runs a session that it is start.
       # It is going to set a user to a session in the 
       # login of faxocr.
-      session[:return_uri] = request.request_uri
+      session[:return_uri] = request.url
       flash[:notice] = "ログインして下さい"
       redirect_to :controller => 'faxocr', :action => 'login'
       return
@@ -44,7 +44,7 @@ protected
         return
       elsif @authorized_groups.length > 1
         session[:wait_group_selection] = true
-        #session[:return_uri] = request.request_uri
+        #session[:return_uri] = request.url
         flash[:notice] = "ユーザ #{@current_user.full_name} は、複数のグループに属しています。一つを選択して下さい。"
         redirect_to :controller => 'faxocr', :action => 'group_select'
         return
@@ -156,7 +156,7 @@ protected
     group_id = args[:group_id] || @current_group.id
     user_id = args[:user_id] || @current_user.id
     role_like = "%#{role_char}%"
-    if RoleMapping.find_all_by_group_id_and_user_id(group_id, user_id, :conditions => ['role like ?', role_like]).length > 0
+    if RoleMapping.where(['group_id = ? and user_id = ? and role like ?', group_id, user_id, role_like]).length > 0
       true
     else
       false

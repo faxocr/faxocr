@@ -8,8 +8,7 @@ class AnswerSheetsController < ApplicationController
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:survey_id])
     sheet_ids = @survey.sheet_ids
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids,
-        :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).order(date: :desc)
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @answer_sheets }
@@ -23,7 +22,7 @@ class AnswerSheetsController < ApplicationController
     @group = Group.find(group_id)
     @survey = @group.surveys.find(survey_id)
     sheet_ids = @survey.sheet_ids
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(sheet_ids, :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).order(date: :desc)
 
     respond_to do |format|
       format.html # index_all.html.erb
@@ -38,7 +37,7 @@ class AnswerSheetsController < ApplicationController
 
     begin
     @answer_sheet = AnswerSheet.find(params[:id])
-    @answer_sheet_properties = @answer_sheet.answer_sheet_properties.find(:all, :joins=>"INNER JOIN survey_properties ON answer_sheet_properties.ocr_name = survey_properties.ocr_name AND survey_properties.survey_id = " + @survey.id.to_s, :order => "view_order").sort_by{|asp| asp.ocr_value}
+    @answer_sheet_properties = @answer_sheet.answer_sheet_properties.joins("INNER JOIN survey_properties ON answer_sheet_properties.ocr_name = survey_properties.ocr_name AND survey_properties.survey_id = " + @survey.id.to_s).order('survey_properties.view_order').sort_by{|asp| asp.ocr_value}
     sheets = @survey.sheets
     sheet = sheets.find(@answer_sheet.sheet_id)
     rescue
@@ -49,8 +48,7 @@ class AnswerSheetsController < ApplicationController
     #
     # Finds prev and next
     #
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(@survey.sheet_ids,
-						      :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => @survey.sheet_ids).order(date: :desc)
     nsheets = @answer_sheets.length
     case nsheets
     when 0
@@ -117,7 +115,7 @@ class AnswerSheetsController < ApplicationController
 
     begin
       @answer_sheet = AnswerSheet.find(params[:id])
-      @answer_sheet_properties = @answer_sheet.answer_sheet_properties.find(:all, :joins=>"INNER JOIN survey_properties ON answer_sheet_properties.ocr_name = survey_properties.ocr_name AND survey_properties.survey_id = " + @survey.id.to_s, :order => "view_order")
+      @answer_sheet_properties = @answer_sheet.answer_sheet_properties.joins("INNER JOIN survey_properties ON answer_sheet_properties.ocr_name = survey_properties.ocr_name AND survey_properties.survey_id = " + @survey.id.to_s).order(:view_order)
       sheets = @survey.sheets
       sheet = sheets.find(@answer_sheet.sheet_id)
     rescue
@@ -126,7 +124,7 @@ class AnswerSheetsController < ApplicationController
     @sheet_orientation = (sheet.block_width > sheet.block_height) ? :landscape : :portrait 
 
     # Finds prev and next
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id(@survey.sheet_ids, :order => 'date desc')
+    @answer_sheets = AnswerSheet.where(:sheet_id => @survey.sheet_ids).order(date: :desc)
     nsheets = @answer_sheets.length
     case nsheets
     when 0
@@ -299,24 +297,26 @@ class AnswerSheetsController < ApplicationController
     @group = Group.find(params[:group_id])
     @survey = @group.surveys.find(params[:survey_id])
 
-    # XXX: Added for quick updating of answer_sheet (dec 11, 2011)
-    @answer_sheet.answer_sheet_properties.each do |p|
-      pid = "property_" + p.id.to_s
-      if !params[pid].nil?
-	p.ocr_value = params[pid]
-	p.save
-      end
-    end
-
-    if @answer_sheet.update_attributes(params[:answer_sheet])
+    if @answer_sheet.update_attributes(params.require(:answer_sheet).permit(:date, :sheet_image, :sender_number, :receiver_number, :sheet_code, :candidate_code))
       redirect_to group_survey_answer_sheet_url(@group, @survey, @answer_sheet)
     else
       render :action => "edit"
     end
   end
 
-  # XXX
-  def update_audit
+  def update_answer_sheet_properties
+    @answer_sheet = AnswerSheet.find(params[:id])
+    @group = Group.find(params[:group_id])
+    @survey = @group.surveys.find(params[:survey_id])
+
+    @answer_sheet.answer_sheet_properties.each do |p|
+      pid = "property_" + p.id.to_s
+      if !params[pid].nil?
+        p.ocr_value = params[pid]
+        p.save
+      end
+    end
+
     redirect_to group_survey_answer_sheet_url(@group, @survey, @answer_sheet)
   end
 

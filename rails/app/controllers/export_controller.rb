@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-require 'iconv'
 class ExportController < ApplicationController
   before_filter :verify_survey_authority
   def csv
@@ -31,11 +30,9 @@ class ExportController < ApplicationController
       end
     end
     sheet_ids = @survey.sheet_ids
-    @answer_sheets = AnswerSheet.find_all_by_sheet_id_and_candidate_id(sheet_ids, candidate_ids,
-    :conditions => ['date like ?', date_range],
-    :order => 'date')
+    @answer_sheets = AnswerSheet.where(:sheet_id => sheet_ids).where(:candidate_id => candidate_ids).where('date like ?', date_range).order(date: :asc)
     #Makes the header of csv.
-    survey_properties = SurveyProperty.find_all_by_survey_id(@survey.id, :order => 'view_order')
+    survey_properties = SurveyProperty.where(:survey_id => @survey.id).order(view_order: :asc)
     csv_string = "日付,調査対象,電話番号"
     columnames = []
     survey_properties.each do |rp|
@@ -59,9 +56,8 @@ class ExportController < ApplicationController
     disposition_string = "inline; filename=\"#{year}#{month}#{day}_#{@survey.survey_name}.csv\""
     if request.user_agent =~ /windows/i
       #Puts csv in Shift-JIS.
-      ic_shiftjis = Iconv.new('SHIFT_JIS', 'UTF-8')
-      csv_string = ic_shiftjis.iconv(csv_string)
-      disposition_string = ic_shiftjis.iconv(disposition_string)
+      csv_string.encode!("SJIS")
+      disposition_string.encode!("SJIS")
     end
     response.headers['Content-Type'] = 'text/csv'
     response.headers['Content-Disposition'] = disposition_string

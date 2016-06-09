@@ -29,7 +29,7 @@
    	<td class="surveysobject"><%=h survey_property.printable_data_type %></td>
 	<% if params[:controller] == "survey_properties" %>
     <% if @current_user.has_survey_role(@group.id) %>
-    <td class="surveysobject_manage"><%= link_to '削除', group_survey_survey_property_path(@group, @survey, survey_property), :confirm => '削除してもよろしいですか？', :method => :delete %></td>
+    <td class="surveysobject_manage"><%= link_to '削除', group_survey_survey_property_path(@group, @survey, survey_property), data: {confirm: '削除してもよろしいですか？'}, :method => :delete %></td>
     <% else %>
     <td class="surveysobject_manage">操作できません</td>
     <% end %>

@@ -1,7 +1,7 @@
 <h1>FAX受信調査シートのコード指定による再読み込み</h1>
 <p style="color: green"><%= flash[:notice] %></p>
 
-<% form_for([@group,@survey,@answer_sheet]) do |f| %>
+<%= form_for([@group,@survey,@answer_sheet]) do |f| %>
   <%= f.error_messages %>
   <%= f.hidden_field :date %>
   <%= f.hidden_field :sheet_image %>
