@@ -15,8 +15,8 @@
 		</mysql>
 		<rails>
 			<code>
-				<![CDATA[
-				#!/usr/bin/ruby
+				<![CDATA[#!/usr/bin/ruby
+				# -*- encoding: utf-8 -*-
 				require "rubygems"
 				require "active_record"
 				require "yaml"
