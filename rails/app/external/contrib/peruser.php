@@ -228,9 +228,27 @@ class Excel_Peruser
 			return $this->raiseError("ERROR Cannot read file ${Fname} \nProbably there is not reading permission whether there is not a file");
 		}
 		$this->Flag_Magic_Quotes = get_magic_quotes_runtime();
-		if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime(0);
+		if ($this->Flag_Magic_Quotes) {
+			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+				set_magic_quotes_runtime(false);
+			} else {
+				//Doesn't exist in PHP 5.4, but we don't need to check because
+				//get_magic_quotes_runtime always returns false in 5.4+
+				//so it will never get here
+				ini_set('magic_quotes_runtime', false);
+			}
+		}
 		$ole_data = @file_get_contents($Fname);
-		if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+		if ($this->Flag_Magic_Quotes) {
+			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+				set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+			} else {
+				//Doesn't exist in PHP 5.4, but we don't need to check because
+				//get_magic_quotes_runtime always returns false in 5.4+
+				//so it will never get here
+				ini_set('magic_quotes_runtime', $this->Flag_Magic_Quotes);
+			}
+		}
 		if (!$ole_data) { 
 			return $this->raiseError("ERROR Cannot open file ${Fname} \n");
 		}

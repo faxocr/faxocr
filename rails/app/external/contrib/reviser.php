@@ -847,9 +847,27 @@ class Excel_Reviser
 		}
 	// 2007.11.19
 		$this->Flag_Magic_Quotes = get_magic_quotes_runtime();
-		if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime(0);
+		if ($this->Flag_Magic_Quotes) {
+			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+				set_magic_quotes_runtime(false);
+			} else {
+				//Doesn't exist in PHP 5.4, but we don't need to check because
+				//get_magic_quotes_runtime always returns false in 5.4+
+				//so it will never get here
+				ini_set('magic_quotes_runtime', false);
+			}
+		}
 		$ole_data = @file_get_contents($Fname);
-		if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+		if ($this->Flag_Magic_Quotes) {
+			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+				set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+			} else {
+				//Doesn't exist in PHP 5.4, but we don't need to check because
+				//get_magic_quotes_runtime always returns false in 5.4+
+				//so it will never get here
+				ini_set('magic_quotes_runtime', $this->Flag_Magic_Quotes);
+			}
+		}
 		if (!$ole_data) { 
 			return $this->raiseError("ERROR Cannot open file ${Fname} \n");
 		}
@@ -2780,10 +2798,28 @@ $tmp.=$this->_makeImageOBJ($sn);
 					$ermes[]="Couldn't open $imgname";
 					break;
 				}
-				if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime(0);
+				if ($this->Flag_Magic_Quotes) {
+					if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+						set_magic_quotes_runtime(false);
+					} else {
+						//Doesn't exist in PHP 5.4, but we don't need to check because
+						//get_magic_quotes_runtime always returns false in 5.4+
+						//so it will never get here
+						ini_set('magic_quotes_runtime', false);
+					}
+				}
 		        $data = fread($bmh, filesize($imgname));
 				fclose($bmh);
-				if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+				if ($this->Flag_Magic_Quotes) {
+					if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+						set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+					} else {
+						//Doesn't exist in PHP 5.4, but we don't need to check because
+						//get_magic_quotes_runtime always returns false in 5.4+
+						//so it will never get here
+						ini_set('magic_quotes_runtime', $this->Flag_Magic_Quotes);
+					}
+				}
 		        if (strlen($data) <= 0x36) {
 					$ermes[]="$imgname is too small.";
 					break;
