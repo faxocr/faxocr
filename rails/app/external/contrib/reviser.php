@@ -1390,10 +1390,10 @@ $tmp.=$this->_makeImageOBJ($sn);
 			$tmp.=$this->sheetbin[$sno]['tail'];
 		} else {
 			if ($this->opt_ref3d){
-				$search='5110130001020000b0000b003b....';
+				$search='/5110130001020000b0000b003b..../';
 				$change='5110130001020000b0000b003b'.bin2hex(pack("v",$ref));
-				$this->sheetbin[$sno]['preMG']=pack("H*",ereg_replace($search,$change,bin2hex($this->sheetbin[$sno]['preMG'])));
-				$this->sheetbin[$sno]['tail']=pack("H*",ereg_replace($search,$change,bin2hex($this->sheetbin[$sno]['tail'])));
+				$this->sheetbin[$sno]['preMG']=pack("H*",preg_replace($search,$change,bin2hex($this->sheetbin[$sno]['preMG'])));
+				$this->sheetbin[$sno]['tail']=pack("H*",preg_replace($search,$change,bin2hex($this->sheetbin[$sno]['tail'])));
 			}
 			$tmp.=$this->resetSelectFlag($this->sheetbin[$sno]['preMG']);
 			$tmp.=$this->makemergecells($sn);
