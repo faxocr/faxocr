@@ -2227,7 +2227,7 @@ $tmp.=$this->_makeImageOBJ($sn);
 	function asc2utf($ascii){
 		$utfname='';
 		for ($i = 0; $i < strlen($ascii); $i++) {
-			$utfname.=$ascii{$i}."\x00";
+			$utfname.=$ascii[$i]."\x00";
 		}
 		return $utfname;
 	}
