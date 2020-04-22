@@ -197,8 +197,12 @@ class Excel_Peruser
 		);
 	var $siData = array();
 
-	function Excel_Peruser(){
+	function __construct(){
 		$this->charset = Default_CHARSET;
+	}
+
+	function Excel_Peruser(){
+		self::__construct();
 	}
 
 
@@ -2009,7 +2013,8 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 */
 class ErrMess {
     var $message = '';
-    function ErrMess($message){$this->message = $message;}
+    function __construct($message){$this->message = $message;}
+    function ErrMess($message){self::__construct($message);}
     function getMessage() {return ($this->message);}
 }
 

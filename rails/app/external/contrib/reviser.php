@@ -229,7 +229,7 @@ class Excel_Reviser
 	var $celmergeinfo = array();
 
 	// Constructor
-	function Excel_Reviser(){
+	function __construct(){
 //error_reporting(E_ALL ^ E_NOTICE);
 		$this->charset = Default_CHARSET;
 		$this->opt_ref3d = 0;
@@ -242,6 +242,10 @@ class Excel_Reviser
 		$this->globaldat['name']='';
 		$this->globaldat['namerecord']='';
 		$this->globaldat['exsstbin']='';
+	}
+
+	function Excel_Reviser(){
+		self::__construct();
 	}
 
 	/**
@@ -2950,7 +2954,8 @@ class ErrMess {
 	* @param string $message Error message
 	* @access public
 	*/
-    function ErrMess($message){$this->message = $message;}
+    function __construct($message){$this->message = $message;}
+    function ErrMess($message){self::__construct($message);}
 	/**
 	* @return string Error message
 	* @access public
