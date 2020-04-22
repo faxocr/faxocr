@@ -1722,11 +1722,11 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 		$str=mb_ereg_replace ('&F', $fname ,$str);
 		$str=mb_ereg_replace ('&Z', $path ,$str);
 		$str=mb_ereg_replace ('&G', '' ,$str);
-		if (ereg('.*&R(.*)$',$str)){
+		if (preg_match('/.*&R(.*)$/',$str)){
 			$s['right'] = mb_ereg_replace ('.*&R(.*)$', "\\1" ,$str);
 			$str= mb_ereg_replace ("&R.*$", "" ,$str);
 		}
-		if (ereg(".*&C(.*)$",$str)){
+		if (preg_match("/.*&C(.*)$/",$str)){
 			$s['center'] = mb_ereg_replace ('.*&C(.*)$', "\\1" ,$str);
 			$str= mb_ereg_replace ('&C.*$', '' ,$str);
 		}
