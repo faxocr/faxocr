@@ -26,6 +26,7 @@ class UtilController < ApplicationController
       end
       srmlstr
     end
+    render :xml => @srml_contents
   end
 
   def get_srml_entries_for_a_survey
@@ -34,6 +35,7 @@ class UtilController < ApplicationController
   def get_one_srml_entry
     sheet = Sheet.find_by_sheet_code(params[:sheet_code])
     @srml_contents = sheet.get_one_srml_entry
+    render :xml => @srml_contents
   end
 
   def generate_srml_contents(&cb)
