@@ -77,7 +77,7 @@ end
 
 config_db = rails_prefix + "/config/database.yml"
 db_env = ENV['RAILS_ENV'] || ENV['RACK_ENV'] || "development"
-ActiveRecord::Base.configurations = YAML.load_file(config_db)
+ActiveRecord::Base.configurations = YAML.load(ERB.new(Pathname.new(config_db).read).result)
 ActiveRecord::Base.establish_connection(db_env)
 Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |model|
   load model
