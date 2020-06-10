@@ -10,6 +10,10 @@ if [ -z "$SERVER_TYPE" ]; then
     SERVER_TYPE="default"
 fi
 
+if [ -z "$DEBUG_MODE" ]; then
+    DEBUG_MODE="false"
+fi
+
 if [ "$OCR_ENGINE" = "kocr" ]; then
     OCR_DIR="-l ./etc/"
 fi
@@ -66,6 +70,10 @@ fi
 
 if [ -z "$SMTP_HOST" ] ; then
     SMTP_HOST="no"
+fi
+
+if [ -z "$FAX_RECV_SETTING" ] ; then
+    FAX_RECV_SETTING="smtp"
 fi
 
 ERROR_PDF_FILE_FOR_FAX_SENDER=${ERRORPDF:="/home/faxocr/etc/error.pdf"}
