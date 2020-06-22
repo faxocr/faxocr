@@ -15,7 +15,7 @@ if [ -z "$DEBUG_MODE" ]; then
 fi
 
 if [ "$OCR_ENGINE" = "kocr" ]; then
-    OCR_DIR="-l ./etc/"
+    OCR_DIR="-l /usr/local/share/kocr/databases/"
 fi
 OCR_DIR=${OCR_DIR:=""}
 
