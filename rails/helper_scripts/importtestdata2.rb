@@ -15,10 +15,6 @@ SHEET_CODE1 = "00000"
 ActiveRecord::Base.configurations = YAML.load_file(config_db)
 ActiveRecord::Base.establish_connection(db_env)
 
-Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |model|
-  load model
-end
-
 survey = Survey.find_by_id(3)
 
 SurveyProperty.new(:survey_id => survey.id, :ocr_name => 'accept_child', :ocr_name_full => '小児重症患者受入可否', :view_order => 60, :data_type => 'rating').save

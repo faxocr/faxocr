@@ -15,10 +15,6 @@ SHEET_CODE1 = "00000"
 ActiveRecord::Base.configurations = YAML.load_file(config_db)
 ActiveRecord::Base.establish_connection(db_env)
 
-Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |model|
-  load model
-end
-
 user = User.new
 user.login_name = 'miyata'
 user.password = 'doraemon'

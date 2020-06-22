@@ -8,9 +8,6 @@ config_db = "#{Rails.root}/config/database.yml"
 db_env = :development
 ActiveRecord::Base.configurations = YAML.load_file(config_db)
 ActiveRecord::Base.establish_connection(db_env)
-Dir.glob("#{Rails.root}/app/models/*.rb").each do |model|
-  load model
-end
 
 accept_survey_statuses = []
 # survey is opened
