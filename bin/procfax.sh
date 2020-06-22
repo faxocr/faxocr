@@ -67,14 +67,14 @@ mkdir "$SESSION_LOG_DIR" 2> /dev/null
 #
 # main
 #
-ruby rails/script/getsrml.rb > "$SHEETREADER_CONF_DIR"/srml/faxocr.xml
-show_cmd_result_and_logfile $? generating faxocr.xml
-
 RAILS_ENV=${RAILS_ENV:="undefined"}
 if [ x"$RAILS_ENV" = x"undefined" ]; then
 	rails_current_running_mode=`get_current_running_mode_of_rails`
 	export RAILS_ENV=${rails_current_running_mode:="production"}
 fi
+
+ruby rails/script/getsrml.rb > "$SHEETREADER_CONF_DIR"/srml/faxocr.xml
+show_cmd_result_and_logfile $? generating faxocr.xml
 
 ls "$MAIL_QUEUE_DIR" | (export \
 	LOG_FILE_FOR_THIS_SESSION="$LOG_FILE_FOR_THIS_SESSION" \
