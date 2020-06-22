@@ -466,7 +466,7 @@ group = ARGV[1] || exit(0)
 filename = "{$sheet_name}" || "自動生成調査" # XXX
 
 config_db = rails_prefix + "/config/database.yml"
-db_env = "{$rails_env}" || "development" # XXX
+db_env = "{$rails_env}".intern || :development # XXX
 cellinfo = Hash.new()
 
 ActiveRecord::Base.configurations = YAML.load_file(config_db)

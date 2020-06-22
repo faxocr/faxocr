@@ -11,7 +11,7 @@
 				image_prefix = ARGV[1] || "./"
 				echo_prefix = ARGV[2] || "./"
 				config_db = rails_prefix + "/config/database.yml"
-				db_env = ENV['RAILS_ENV'] || "development"
+				db_env = ENV['RAILS_ENV'] && ENV['RAILS_ENV'].intern || :development
 				ActiveRecord::Base.configurations = YAML.load_file(config_db)
 				ActiveRecord::Base.establish_connection(db_env)
 				Dir.glob(rails_prefix + '/app/models/*.rb').each do |model|

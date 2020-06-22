@@ -100,7 +100,7 @@ rails_prefix = ARGV[0] || "./"
 group = ARGV[1] || exit(0)
 
 config_db = rails_prefix + "/config/database.yml"
-db_env = "{$rails_env}"
+db_env = "{$rails_env}".intern
 
 ActiveRecord::Base.configurations = YAML.load_file(config_db)
 ActiveRecord::Base.establish_connection(db_env)
