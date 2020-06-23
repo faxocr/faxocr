@@ -7,7 +7,7 @@ require "active_record"
 require "yaml"
 
 config_db = RAILS_ROOT + "/config/database.yml"
-db_env = "development"
+db_env = ENV['RAILS_ENV'] || ENV['RACK_ENV'] || "development"
 
 GROUP_NAME1 = '沖縄県新型インフルエンザ小児医療情報ネットワーク'
 SHEET_CODE1 = "00000"

@@ -76,7 +76,7 @@ if time !~ /\A\d{2}\d{2}\d{2}\z/
 end
 
 config_db = rails_prefix + "/config/database.yml"
-db_env = "development"
+db_env = ENV['RAILS_ENV'] || ENV['RACK_ENV'] || "development"
 ActiveRecord::Base.configurations = YAML.load_file(config_db)
 ActiveRecord::Base.establish_connection(db_env)
 Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |model|
