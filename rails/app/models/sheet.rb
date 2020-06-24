@@ -57,7 +57,7 @@ class Sheet < ActiveRecord::Base
           srmlstr = srmlstr + " x=\"" + (property.position_x).to_s + "\""
           srmlstr = srmlstr + " y=\"" + (property.position_y).to_s + "\""
           srmlstr = srmlstr + " colspan=\"#{property.colspan}\""
-          srmlstr = srmlstr + " margin=\"15\""
+          srmlstr = srmlstr + " margin-pixel=\"6\""
           srmlstr = srmlstr + "/>\n"
         else
           srmlstr = srmlstr + "      <blockOcr"
@@ -72,7 +72,7 @@ class Sheet < ActiveRecord::Base
           srmlstr = srmlstr + " x=\"" + (property.position_x).to_s + "\""
           srmlstr = srmlstr + " y=\"" + (property.position_y).to_s + "\""
           srmlstr = srmlstr + " colspan=\"#{property.colspan}\""
-          srmlstr = srmlstr + " margin=\"15\""
+          srmlstr = srmlstr + " margin-pixel=\"6\""
           srmlstr = srmlstr + "/>\n"
         end
       end
