@@ -54,7 +54,7 @@ end
 
 t = Time.now
 datestr = t.strftime "%Y%m%d"
-timestr = t.strftime "%H%M"
+timestr = t.strftime "%H%M%S"
 date = ARGV[0] || datestr
 time = ARGV[1] || timestr
 image_prefix = ARGV[2] || "."
