@@ -16,7 +16,7 @@
     </div>
   <div align="right">
   <span>  送信先FAX番号
-    <%= text_field :dest_fax_num, '' %>
+    <%= text_field_tag :dest_fax_num %>
   <!-- (数字のみを入力してください)-->
   </span>
   <%= submit_tag '送信', :onclick => "DisableButton(this);" %><br>
