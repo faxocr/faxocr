@@ -307,15 +307,15 @@ class ExternalController < ApplicationController
       @orient = params[:orient]
 
       @ret = `cd #{Rails.root}; xvfb-run -a wkhtmltopdf --page-size A4 -O #{@orient} #{@file_html} #{@file_prefix}.pdf`
-      @ret = `pdftk #{@file_prefix}.pdf cat 2-end output #{@file_prefix}-00000.pdf`
-      @ret = `pdftk #{@file_prefix}-00000.pdf burst output #{@file_prefix}-%05d.pdf`
-      @ret = `rm -f #{@file_prefix}-00000.pdf`
-      @ret = `convert #{@file_prefix}-00001.pdf #{@file_prefix}.png`
-      @ret = `rm -f #{@file_prefix}.zip; zip -j #{@file_prefix}.zip #{@file_prefix}-*.pdf`
-      @ret = `cp #{@file_prefix}-00001.pdf #{@file_prefix}.pdf`
-      @ret = `rm -f #{@file_prefix}-*.pdf`
-      @ret = `rm -f doc_data.txt`
+      @ret = `pdfseparate -f 2 #{@file_prefix}.pdf #{@file_prefix}-%05d.pdf`
+      @ret = `convert #{@file_prefix}-00002.pdf #{@file_prefix}.png`
+      @ret = `cp #{@file_prefix}-00002.pdf #{@file_prefix}.pdf`
       @ret = `cp -p #{@file_html} #{@file_prefix}.html`
+      @ret = `pdfunite #{@file_prefix}-[0-9]*.pdf #{@file_prefix}-united.pdf`
+      @ret = `rm -f #{@file_prefix}-[0-9]*.pdf`
+      @ret = `pdfseparate #{@file_prefix}-united.pdf #{@file_prefix}-%05d.pdf`
+      @ret = `rm -f #{@file_prefix}.zip; zip -j #{@file_prefix}.zip #{@file_prefix}-[0-9]*.pdf`
+      @ret = `rm -f #{@file_prefix}-*.pdf`
     else
       @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{Rails.env}\" debug_mode=\"#{debug_mode}\"`
       # flash[:notice] = @errmsg
