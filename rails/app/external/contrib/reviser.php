@@ -229,7 +229,7 @@ class Excel_Reviser
 	var $celmergeinfo = array();
 
 	// Constructor
-	function Excel_Reviser(){
+	function __construct(){
 //error_reporting(E_ALL ^ E_NOTICE);
 		$this->charset = Default_CHARSET;
 		$this->opt_ref3d = 0;
@@ -242,6 +242,10 @@ class Excel_Reviser
 		$this->globaldat['name']='';
 		$this->globaldat['namerecord']='';
 		$this->globaldat['exsstbin']='';
+	}
+
+	function Excel_Reviser(){
+		self::__construct();
 	}
 
 	/**
@@ -841,25 +845,43 @@ class Excel_Reviser
 	* @param  $Fname:filename
 	* @access private
 	*/
-	function __oleread($Fname){
+	function _oleread($Fname){
 		if(!is_readable($Fname)) {
 			return $this->raiseError("ERROR Cannot read file ${Fname} \nProbably there is not reading permission whether there is not a file");
 		}
 	// 2007.11.19
 		$this->Flag_Magic_Quotes = get_magic_quotes_runtime();
-		if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime(0);
+		if ($this->Flag_Magic_Quotes) {
+			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+				set_magic_quotes_runtime(false);
+			} else {
+				//Doesn't exist in PHP 5.4, but we don't need to check because
+				//get_magic_quotes_runtime always returns false in 5.4+
+				//so it will never get here
+				ini_set('magic_quotes_runtime', false);
+			}
+		}
 		$ole_data = @file_get_contents($Fname);
-		if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+		if ($this->Flag_Magic_Quotes) {
+			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+				set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+			} else {
+				//Doesn't exist in PHP 5.4, but we don't need to check because
+				//get_magic_quotes_runtime always returns false in 5.4+
+				//so it will never get here
+				ini_set('magic_quotes_runtime', $this->Flag_Magic_Quotes);
+			}
+		}
 		if (!$ole_data) { 
 			return $this->raiseError("ERROR Cannot open file ${Fname} \n");
 		}
 		if (substr($ole_data, 0, 8) != pack("CCCCCCCC",0xd0,0xcf,0x11,0xe0,0xa1,0xb1,0x1a,0xe1)) {
 			return $this->raiseError("ERROR Template file(${Fname}) is not EXCEL file.\n");
 	   	}
-		$numDepots = $this->__get4($ole_data, 0x2c);
-		$sStartBlk = $this->__get4($ole_data, 0x3c);
-		$ExBlock = $this->__get4($ole_data, 0x44);
-		$numExBlks = $this->__get4($ole_data, 0x48);
+		$numDepots = $this->_get4($ole_data, 0x2c);
+		$sStartBlk = $this->_get4($ole_data, 0x3c);
+		$ExBlock = $this->_get4($ole_data, 0x44);
+		$numExBlks = $this->_get4($ole_data, 0x48);
 
 		$len_ole = strlen($ole_data);
 		if ($numDepots > ($len_ole / 65536 +1))
@@ -876,7 +898,7 @@ class Excel_Reviser
 		$dBlks = $numDepots;
 		if ($numExBlks != 0) $dBlks = (0x200 - 0x4c)/4;
 		for ($i = 0; $i < $dBlks; $i++) {
-			$DepotBlks[$i] = $this->__get4($ole_data, $pos);
+			$DepotBlks[$i] = $this->_get4($ole_data, $pos);
 			$pos += 4;
 		}
 
@@ -884,11 +906,11 @@ class Excel_Reviser
 			$pos = ($ExBlock + 1) * 0x200;
 			$ReadBlks = min($numDepots - $dBlks, 0x200 / 4 - 1);
 			for ($i = $dBlks; $i < $dBlks + $ReadBlks; $i++) {
-				$DepotBlks[$i] = $this->__get4($ole_data, $pos);
+				$DepotBlks[$i] = $this->_get4($ole_data, $pos);
 				$pos += 4;
 			}   
 			$dBlks += $ReadBlks;
-			if ($dBlks < $numDepots) $ExBlock = $this->__get4($ole_data, $pos);
+			if ($dBlks < $numDepots) $ExBlock = $this->_get4($ole_data, $pos);
 		}
 
 		$pos = 0;
@@ -897,7 +919,7 @@ class Excel_Reviser
 		for ($i = 0; $i < $numDepots; $i++) {
 			$pos = ($DepotBlks[$i] + 1) * 0x200;
 			for ($j = 0 ; $j < 0x200 / 4; $j++) {
-				$BlkChain[$index] = $this->__get4($ole_data, $pos);
+				$BlkChain[$index] = $this->_get4($ole_data, $pos);
 				$pos += 4 ;
 				$index++;
 			}
@@ -910,7 +932,7 @@ class Excel_Reviser
 		while ($sStartBlk != $eoc) {
 			$pos = ($sStartBlk + 1) * 0x200;
 			for ($j = 0; $j < 0x80; $j++) {
-				$sBlkChain[$index] = $this->__get4($ole_data, $pos);
+				$sBlkChain[$index] = $this->_get4($ole_data, $pos);
 				$pos += 4 ;
 				$index++;
 			}
@@ -921,7 +943,7 @@ class Excel_Reviser
 			}
 		}
 		unset($chk);
-		$block = $this->__get4($ole_data, 0x30);
+		$block = $this->_get4($ole_data, 0x30);
 		$pos = 0;
 		$entry = '';
 		while ($block != $eoc)  {
@@ -937,19 +959,19 @@ class Excel_Reviser
 		$offset = 0;
 		$bookKey=0;
 		$tmpDir=array();
-		$rootBlock =$this->__get4($entry, 0x74);
+		$rootBlock =$this->_get4($entry, 0x74);
 		while ($offset < strlen($entry)) {
 			  $d = substr($entry, $offset, 0x80);
-			  $name = str_replace("\x00", "", substr($d,0,$this->__get2($d,0x40)));
+			  $name = str_replace("\x00", "", substr($d,0,$this->_get2($d,0x40)));
 			if (($name == "Workbook") || ($name == "Book")) {
-				$wbstartBlock =$this->__get4($d, 0x74);
-				$wbsize = $this->__get4($d, 0x78);
+				$wbstartBlock =$this->_get4($d, 0x74);
+				$wbsize = $this->_get4($d, 0x78);
 			}
 			if ($name == "Root Entry" || $name == "R") {
-//				$rootBlock =$this->__get4($d, 0x74);
+//				$rootBlock =$this->_get4($d, 0x74);
 			} else if (strlen($name)>0){
-				$tmpDir['startB']=$this->__get4($d, 0x74);
-				$tmpDir['size']=$this->__get4($d, 0x78);
+				$tmpDir['startB']=$this->_get4($d, 0x74);
+				$tmpDir['size']=$this->_get4($d, 0x78);
 				$tmpDir['dat']='';
 				if (($name == "Workbook") || ($name == "Book")) $bookKey=$name;
 				if ($this->Flag_inherit_Info != 1){
@@ -1017,10 +1039,10 @@ class Excel_Reviser
 	* parse sheetblock
 	* @access private
 	*/
-	function __parsesheet(&$dat,$sn,$spos){
+	function _parsesheet(&$dat,$sn,$spos){
 		$code = 0;
-		$version = $this->__get2($dat,$spos + 4);
-		$substreamType = $this->__get2($dat,$spos + 6);
+		$version = $this->_get2($dat,$spos + 4);
+		$substreamType = $this->_get2($dat,$spos + 6);
 		if ($version != Code_BIFF8) {
 			return $this->raiseError("Contents(included sheet) is not BIFF8 format.\n");
 		}
@@ -1035,8 +1057,8 @@ class Excel_Reviser
 			if ($spos > $sposlimit) {
 				return $this->raiseError("Sheet $sn Read ERROR\nTemplate file is broken.\n");
 			}
-			$code = $this->__get2($dat,$spos);
-			$length = $this->__get2($dat,$spos + 2);
+			$code = $this->_get2($dat,$spos);
+			$length = $this->_get2($dat,$spos + 2);
 			if ($code == Type_BOF) $bof_num++;
 			if ($bof_num > 1){
 				$tmp.=substr($dat, $spos, $length+4);
@@ -1045,14 +1067,14 @@ class Excel_Reviser
 						return $this->raiseError("Parse-Sheet Error\n");
 					}
 					$spos += $length+4;
-					$code = $this->__get2($dat,$spos);
-					$length = $this->__get2($dat,$spos + 2);
+					$code = $this->_get2($dat,$spos);
+					$length = $this->_get2($dat,$spos + 2);
 					$tmp.=substr($dat, $spos, $length+4);
 				}
 				$bof_num--;
 				$spos += $length+4;
-				$code = $this->__get2($dat,$spos);
-				$length = $this->__get2($dat,$spos + 2);
+				$code = $this->_get2($dat,$spos);
+				$length = $this->_get2($dat,$spos + 2);
 				$tmp.=substr($dat, $spos, $length+4);
 			}else
 			switch ($code) {
@@ -1075,21 +1097,21 @@ class Excel_Reviser
 					$this->sheetbin[$sn]['preBT']=$tmp;
 					$tmp='';
 
-					$this->defcolW[$sn]=$this->__get2($dat,$spos+4);
+					$this->defcolW[$sn]=$this->_get2($dat,$spos+4);
 					break;
 				case Type_DEFAULTROWHEIGHT:
 					$tmp.=substr($dat, $spos, $length+4);
-					$this->defrowH[$sn]=$this->__get2($dat,$spos+6);
+					$this->defrowH[$sn]=$this->_get2($dat,$spos+6);
 					break;
 				case Type_COLINFO:
 					$work['head']=substr($dat, $spos, 4);
-					$colst=$this->__get2($dat,$spos + 4);
-					$colen=$this->__get2($dat,$spos + 6);
+					$colst=$this->_get2($dat,$spos + 4);
+					$colen=$this->_get2($dat,$spos + 6);
 					if ($colen >255) $colen=255;
-					$work['width']=$this->__get2($dat,$spos + 8);
-					$work['xf']=$this->__get2($dat,$spos + 10);
-					$work['opt']=$this->__get2($dat,$spos + 12);
-					$work['unk']=$this->__get2($dat,$spos + 14);
+					$work['width']=$this->_get2($dat,$spos + 8);
+					$work['xf']=$this->_get2($dat,$spos + 10);
+					$work['opt']=$this->_get2($dat,$spos + 12);
+					$work['unk']=$this->_get2($dat,$spos + 14);
 					for ($i=$colst;$i<=$colen;$i++){
 						$work['colst']=$i;
 						$work['colen']=$i;
@@ -1109,15 +1131,15 @@ class Excel_Reviser
 	$dimnum++;
 					break;
 				case Type_ROW:
-					$row=$this->__get2($dat,$spos + 4);
+					$row=$this->_get2($dat,$spos + 4);
 					$this->rowblock[$sn][$row]['rowhead']=bin2hex(substr($dat, $spos, 4));
-					$this->rowblock[$sn][$row]['col1st']=$this->__get2($dat,$spos + 6);
-					$this->rowblock[$sn][$row]['collast']=$this->__get2($dat,$spos + 8);
-					$this->rowblock[$sn][$row]['height']=$this->__get2($dat,$spos + 10);
-					$this->rowblock[$sn][$row]['notused0']=$this->__get2($dat,$spos + 12);
-					$this->rowblock[$sn][$row]['notused1']=$this->__get2($dat,$spos + 14);
-					$this->rowblock[$sn][$row]['opt0']=$this->__get2($dat,$spos + 16);
-					$this->rowblock[$sn][$row]['opt1']=$this->__get2($dat,$spos + 18);
+					$this->rowblock[$sn][$row]['col1st']=$this->_get2($dat,$spos + 6);
+					$this->rowblock[$sn][$row]['collast']=$this->_get2($dat,$spos + 8);
+					$this->rowblock[$sn][$row]['height']=$this->_get2($dat,$spos + 10);
+					$this->rowblock[$sn][$row]['notused0']=$this->_get2($dat,$spos + 12);
+					$this->rowblock[$sn][$row]['notused1']=$this->_get2($dat,$spos + 14);
+					$this->rowblock[$sn][$row]['opt0']=$this->_get2($dat,$spos + 16);
+					$this->rowblock[$sn][$row]['opt1']=$this->_get2($dat,$spos + 18);
 					break;
 				case Type_RK2:
 				case Type_LABEL:
@@ -1126,34 +1148,34 @@ class Excel_Reviser
 				case Type_FORMULA2:
 				case Type_BOOLERR:
 				case Type_BLANK:
-					$row=$this->__get2($dat,$spos + 4);
-					$col=$this->__get2($dat,$spos + 6);
-					$this->cellblock[$sn][$row][$col]['xf']=$this->__get2($dat,$spos + 8);
+					$row=$this->_get2($dat,$spos + 4);
+					$col=$this->_get2($dat,$spos + 6);
+					$this->cellblock[$sn][$row][$col]['xf']=$this->_get2($dat,$spos + 8);
 					$this->cellblock[$sn][$row][$col]['type']=$code;
 					$this->cellblock[$sn][$row][$col]['dat']=bin2hex(substr($dat, $spos+10, $length-6));
 					$this->cellblock[$sn][$row][$col]['record']=bin2hex(substr($dat, $spos, $length+4));
 					$this->cellblock[$sn][$row][$col]['string']='';
 	if ($code == Type_FORMULA2){
 		$dispnum = substr($dat, $spos+10, 8);
-		$opflag = $this->__get2($dat,$spos + 18) | 0x02; // Calculate on open
+		$opflag = $this->_get2($dat,$spos + 18) | 0x02; // Calculate on open
 		$tokens = substr($dat, $spos+20, $length - 16);
 		$this->cellblock[$sn][$row][$col]['dat']=bin2hex($dispnum . pack("v",$opflag) . $tokens);
 		$this->cellblock[$sn][$row][$col]['record']='';
 		if ($this->exp_mode & 0x01) {
-			if ($this->__get2($dat,$spos + $length + 4) == Type_SharedFormula){
+			if ($this->_get2($dat,$spos + $length + 4) == Type_SharedFormula){
 				$spos += $length + 4;
-				$length = $this->__get2($dat,$spos + 2);
-				$sharedform[$row][$col]['firstR'] = $this->__get2($dat,$spos + 4);
-				$sharedform[$row][$col]['lastR'] = $this->__get2($dat,$spos + 6);
-				$sharedform[$row][$col]['firstC'] = $this->__get1($dat,$spos + 8);
-				$sharedform[$row][$col]['lastC'] = $this->__get1($dat,$spos + 9);
+				$length = $this->_get2($dat,$spos + 2);
+				$sharedform[$row][$col]['firstR'] = $this->_get2($dat,$spos + 4);
+				$sharedform[$row][$col]['lastR'] = $this->_get2($dat,$spos + 6);
+				$sharedform[$row][$col]['firstC'] = $this->_get1($dat,$spos + 8);
+				$sharedform[$row][$col]['lastC'] = $this->_get1($dat,$spos + 9);
 				$sharedform[$row][$col]['formula'] = bin2hex(substr($dat,$spos+ 12,$length-8));
-				$cur[$row][$col]=$this->__detrelcel($this->cellblock[$sn][$row-1][$col]['dat'],$sharedform[$row][$col]['formula'],$row-1,$col);
+				$cur[$row][$col]=$this->_detrelcel($this->cellblock[$sn][$row-1][$col]['dat'],$sharedform[$row][$col]['formula'],$row-1,$col);
 			}
 			$sfdat=pack("H*", $this->cellblock[$sn][$row][$col]['dat']);
-			if((($this->__get2($sfdat,8) & 8) == 8) && ($this->__get2($sfdat,14) == 5) && ($this->__get1($sfdat,16) == 1)){
-				$refr =$this->__get2($sfdat,17);
-		        	$refc =$this->__get2($sfdat,19);
+			if((($this->_get2($sfdat,8) & 8) == 8) && ($this->_get2($sfdat,14) == 5) && ($this->_get1($sfdat,16) == 1)){
+				$refr =$this->_get2($sfdat,17);
+		        	$refc =$this->_get2($sfdat,19);
 				if (isset($sharedform[$refr][$refc]['formula'])){
 					$this->cellblock[$sn][$row][$col]['record']='';
 					$this->cellblock[$sn][$row][$col]['dat']=substr($sfdat, 0, 8);
@@ -1161,19 +1183,19 @@ class Excel_Reviser
 					$this->cellblock[$sn][$row][$col]['dat'].=substr($sfdat, 10, 4);
 					$this->cellblock[$sn][$row][$col]['dat']=bin2hex($this->cellblock[$sn][$row][$col]['dat']);
 	//			$this->cellblock[$sn][$row][$col]['dat'].=$sharedform[$refr][$refc]['formula'];
-					$this->cellblock[$sn][$row][$col]['dat'].=bin2hex($this->__editformula($cur[$refr][$refc], pack("H*",$sharedform[$refr][$refc]['formula']), $row, $col));
+					$this->cellblock[$sn][$row][$col]['dat'].=bin2hex($this->_editformula($cur[$refr][$refc], pack("H*",$sharedform[$refr][$refc]['formula']), $row, $col));
 				}
 			}
 		} else {
-			if ($this->__get2($dat,$spos + $length + 4) == Type_SharedFormula){
+			if ($this->_get2($dat,$spos + $length + 4) == Type_SharedFormula){
 				$spos += $length + 4;
-				$length = $this->__get2($dat,$spos + 2);
+				$length = $this->_get2($dat,$spos + 2);
 				$this->cellblock[$sn][$row][$col]['sharedform']=substr($dat,$spos,$length+4);
 			}
 	  	}
-		if ($this->__get2($dat,$spos + $length + 4) == Type_STRING){
+		if ($this->_get2($dat,$spos + $length + 4) == Type_STRING){
 			$spos += $length + 4;
-			$length = $this->__get2($dat,$spos + 2);
+			$length = $this->_get2($dat,$spos + 2);
 			$this->cellblock[$sn][$row][$col]['string']=substr($dat,$spos,$length+4);
 		}
 	}
@@ -1181,11 +1203,11 @@ class Excel_Reviser
 					break;
 				case Type_MULBLANK:
 					$muln=($length-6)/2;
-					$row=$this->__get2($dat,$spos + 4);
-					$col=$this->__get2($dat,$spos + 6);
+					$row=$this->_get2($dat,$spos + 4);
+					$col=$this->_get2($dat,$spos + 6);
 					$i=-1;
 					while(++$i < $muln){
-						$this->cellblock[$sn][$row][$i+$col]['xf']=$this->__get2($dat,$spos+8+$i*2);
+						$this->cellblock[$sn][$row][$i+$col]['xf']=$this->_get2($dat,$spos+8+$i*2);
 						$this->cellblock[$sn][$row][$i+$col]['type']=Type_BLANK;
 						$this->cellblock[$sn][$row][$i+$col]['dat']='';
 						$this->cellblock[$sn][$row][$i+$col]['record']=bin2hex(pack("vvvv", 0x0201, 0x06, $row, $i+$col). substr($dat, $spos+8+$i*2, 2));
@@ -1193,23 +1215,23 @@ class Excel_Reviser
 					break;
 				case Type_MULRK:
 					$muln=($length-6)/6;
-					$row=$this->__get2($dat,$spos + 4);
-					$col=$this->__get2($dat,$spos + 6);
+					$row=$this->_get2($dat,$spos + 4);
+					$col=$this->_get2($dat,$spos + 6);
 					$i=-1;
 					while(++$i < $muln){
-						$this->cellblock[$sn][$row][$i+$col]['xf']=$this->__get2($dat,$spos+8+$i*6);
+						$this->cellblock[$sn][$row][$i+$col]['xf']=$this->_get2($dat,$spos+8+$i*6);
 						$this->cellblock[$sn][$row][$i+$col]['type']=Type_RK;
 						$this->cellblock[$sn][$row][$i+$col]['dat']=bin2hex(substr($dat, $spos+10+$i*6, 4));
 						$this->cellblock[$sn][$row][$i+$col]['record']=bin2hex(pack("vvvv", 0x027e, 0x0a, $row, $i+$col). substr($dat, $spos+8+$i*6, 6));
 					}
 					break;
 				case Type_MERGEDCELLS:
-					$numrange=$this->__get2($dat,$spos+4);
+					$numrange=$this->_get2($dat,$spos+4);
 					for($i=0;$i<$numrange;$i++){
-						$mtmp['rows']=$this->__get2($dat,$spos+6+$i*8);
-						$mtmp['rowe']=$this->__get2($dat,$spos+8+$i*8);
-						$mtmp['cols']=$this->__get2($dat,$spos+10+$i*8);
-						$mtmp['cole']=$this->__get2($dat,$spos+12+$i*8);
+						$mtmp['rows']=$this->_get2($dat,$spos+6+$i*8);
+						$mtmp['rowe']=$this->_get2($dat,$spos+8+$i*8);
+						$mtmp['cols']=$this->_get2($dat,$spos+10+$i*8);
+						$mtmp['cole']=$this->_get2($dat,$spos+12+$i*8);
 						$this->mergecells[$sn][]=$mtmp;
 
 						// XXX
@@ -1230,7 +1252,7 @@ class Excel_Reviser
 					break;
 				case Type_SELECTION:
 					$tmp.= substr($dat, $spos, $length+4);
-					if ($this->__get2($dat,$spos+$length+4)==Type_SELECTION) break;
+					if ($this->_get2($dat,$spos+$length+4)==Type_SELECTION) break;
 					$this->sheetbin[$sn]['preMG']=$tmp;
 					$tmp='';
 					break;
@@ -1252,7 +1274,7 @@ class Excel_Reviser
 	* detect some type of relative token in formula-record
 	* @access private
 	*/
-	function __detrelcel($org,$share,$row,$col){
+	function _detrelcel($org,$share,$row,$col){
 		$org=pack("H*",$org);
 		$org=substr($org,14);
 		$share=pack("H*",$share);
@@ -1261,9 +1283,9 @@ class Excel_Reviser
 		if ($lenorg != $lenshare) return;
 		$i=0;
 		while($i < $lenorg - 3){
-			if (($this->__get1($org,$i)==0x44) && ($this->__get1($share,$i)==0x4c)){
-				if (((($this->__get2($org,$i+1)-$row) & 0xffff)== $this->__get2($share,$i+1)) &&
-					((($this->__get1($org,$i+3)-$col) & 0xff)== $this->__get1($share,$i+3))){
+			if (($this->_get1($org,$i)==0x44) && ($this->_get1($share,$i)==0x4c)){
+				if (((($this->_get2($org,$i+1)-$row) & 0xffff)== $this->_get2($share,$i+1)) &&
+					((($this->_get1($org,$i+3)-$col) & 0xff)== $this->_get1($share,$i+3))){
 					$tmp[$i]=1;
 				}
 			}
@@ -1276,15 +1298,15 @@ class Excel_Reviser
 	* change relative token to absolute
 	* @access private
 	*/
-	function __editformula($cur, $formula, $row, $col){
+	function _editformula($cur, $formula, $row, $col){
 		$i=0;
 		$tmp='';
 		$lenform=strlen($formula);
 		while($i < $lenform){
 			if ($cur[$i]){
 				$tmp.=chr(0x44);
-				$tmp.=pack("v",$this->__get2($formula,$i+1)+$row);
-				$tmp.=pack("C",$this->__get1($formula,$i+3)+$col);
+				$tmp.=pack("v",$this->_get2($formula,$i+1)+$row);
+				$tmp.=pack("C",$this->_get1($formula,$i+3)+$col);
 				$i+=3;
 			} else {
 				$tmp.=substr($formula,$i,1);
@@ -1298,7 +1320,7 @@ class Excel_Reviser
 	* remake Row records
 	* @access private
 	*/
-	function __makeRowRecord($sn){
+	function _makeRowRecord($sn){
 		$tmp='';
 		if(isset($this->rowblock[$sn]))
 		foreach((array)$this->rowblock[$sn] as $key => $val) {
@@ -1313,7 +1335,7 @@ class Excel_Reviser
 	* remake Column records
 	* @access private
 	*/
-	function __makeColRecord($sn){
+	function _makeColRecord($sn){
 		$tmp='';
 		if(isset($this->colblock[$sn]))
 		foreach((array)$this->colblock[$sn] as $key => $val) {
@@ -1333,7 +1355,7 @@ class Excel_Reviser
 	* remake Cell records
 	* @access private
 	*/
-	function __makeCellRecord($sn){
+	function _makeCellRecord($sn){
 		$tmp='';
 		if(isset($this->cellblock[$sn]))
 		foreach((array)$this->cellblock[$sn] as $keyR => $rowval) {
@@ -1360,7 +1382,7 @@ class Excel_Reviser
 	* remake sheet-block
 	* @access private
 	*/
-	function __makeSheet($sn,$ref){
+	function _makeSheet($sn,$ref){
 		$this->makeMergeinfo($sn);
 		$sno=$this->stable[$sn];
 		$tmp='';
@@ -1377,11 +1399,11 @@ class Excel_Reviser
 		$tmp.=$this->sheetbin[$sno]['footer'];
 // 2007.04.15 change start by ume
 		$tmp.=$this->sheetbin[$sno]['preBT'];
-		$tmp.=$this->__makeColRecord($sn);
+		$tmp.=$this->_makeColRecord($sn);
 // 2007.04.15 change end
 		$tmp.=$this->sheetbin[$sno]['preCB'];
-		$tmp.=$this->__makeRowRecord($sn);
-		$tmp.=$this->__makeCellRecord($sn);
+		$tmp.=$this->_makeRowRecord($sn);
+		$tmp.=$this->_makeCellRecord($sn);
 // TEST
 $tmp.=$this->_makeImageOBJ($sn);
 		if ($sn == $sno) {
@@ -1390,10 +1412,10 @@ $tmp.=$this->_makeImageOBJ($sn);
 			$tmp.=$this->sheetbin[$sno]['tail'];
 		} else {
 			if ($this->opt_ref3d){
-				$search='5110130001020000b0000b003b....';
+				$search='/5110130001020000b0000b003b..../';
 				$change='5110130001020000b0000b003b'.bin2hex(pack("v",$ref));
-				$this->sheetbin[$sno]['preMG']=pack("H*",ereg_replace($search,$change,bin2hex($this->sheetbin[$sno]['preMG'])));
-				$this->sheetbin[$sno]['tail']=pack("H*",ereg_replace($search,$change,bin2hex($this->sheetbin[$sno]['tail'])));
+				$this->sheetbin[$sno]['preMG']=pack("H*",preg_replace($search,$change,bin2hex($this->sheetbin[$sno]['preMG'])));
+				$this->sheetbin[$sno]['tail']=pack("H*",preg_replace($search,$change,bin2hex($this->sheetbin[$sno]['tail'])));
 			}
 			$tmp.=$this->resetSelectFlag($this->sheetbin[$sno]['preMG']);
 			$tmp.=$this->makemergecells($sn);
@@ -1440,14 +1462,14 @@ $tmp.=$this->_makeImageOBJ($sn);
 		$spos=0;
 		$limit=strlen($dat);
 		while($spos < $limit){
-			$code=$this->__get2($dat,$spos);
+			$code=$this->_get2($dat,$spos);
 			if ($code == Type_WINDOW2){
 				$chdat  = substr($dat, 0, $spos+5);
-				$chdat .= pack("C", $this->__get1($dat, $spos + 5) & 0xf9);
+				$chdat .= pack("C", $this->_get1($dat, $spos + 5) & 0xf9);
 				$chdat .= substr($dat, $spos + 6);
 				return $chdat;
 			}
-			$spos += $this->__get2($dat,$spos + 2) + 4;
+			$spos += $this->_get2($dat,$spos + 2) + 4;
 		}
 		return $dat;
 	}
@@ -1456,34 +1478,34 @@ $tmp.=$this->_makeImageOBJ($sn);
 	* parse sst-record
 	* @access private
 	*/
-	function __parsesst(&$dat, $pos, $length) {
-		$numref=$this->__get4($dat,$pos+8);
+	function _parsesst(&$dat, $pos, $length) {
+		$numref=$this->_get4($dat,$pos+8);
 		$sspos =12;
 		$sstnum=0;
 		$limit=$pos + $length +4;
 		while ($sstnum < $numref) {
 			if ($pos+$sspos+2 > $limit) {
-				if ($this->__get2($dat,$limit) == Type_CONTINUE) {
+				if ($this->_get2($dat,$limit) == Type_CONTINUE) {
 					$pos = $limit;
-					$length = $this->__get2($dat,$pos + 2);
+					$length = $this->_get2($dat,$pos + 2);
 					$limit += $length + 4;
 					$sspos = 4;
 				} else break;
 			}
-			$slen=$this->__get2($dat,$pos+$sspos);
+			$slen=$this->_get2($dat,$pos+$sspos);
 			$tempsst['len']=$slen;
-			$opt=$this->__get1($dat,$pos+$sspos+2);
+			$opt=$this->_get1($dat,$pos+$sspos+2);
 			$sspos += 3;
 			if ($opt & 0x01) $slen *=2;
 			if ($opt & 0x04) $optlen =4; else $optlen =0;
 			if ($opt & 0x08) {
 				$optlen +=2;
-				$rtnum = $this->__get2($dat,$pos+$sspos);
-				if ($opt & 0x04) $apnum = $this->__get4($dat,$pos+$sspos+2);
+				$rtnum = $this->_get2($dat,$pos+$sspos);
+				if ($opt & 0x04) $apnum = $this->_get4($dat,$pos+$sspos+2);
 				else $apnum = 0;
 			} else {
 				$rtnum = 0;
-				if ($opt & 0x04) $apnum = $this->__get4($dat,$pos+$sspos);
+				if ($opt & 0x04) $apnum = $this->_get4($dat,$pos+$sspos);
 				else $apnum = 0;
 			}
 			$tempsst['opt']=$opt;
@@ -1493,38 +1515,38 @@ $tmp.=$this->_makeImageOBJ($sn);
 			if ($pos+$sspos+$slen > $limit) {
 				$fusoku=($pos+$sspos+$slen)-$limit;
 				$slen -= $fusoku;
-				$sststr=$this->__to_utf16(substr($dat,$pos+$sspos,$slen),$opt);
+				$sststr=$this->_to_utf16(substr($dat,$pos+$sspos,$slen),$opt);
 				if ($opt & 0x01) $fusoku /=2;
 				while ($fusoku >0 ) {
-					if ($this->__get2($dat,$pos + $length + 4) == Type_CONTINUE) {
+					if ($this->_get2($dat,$pos + $length + 4) == Type_CONTINUE) {
 						$pos += $length +4;
-						$length = $this->__get2($dat,$pos + 2);
-						$opt = $this->__get1($dat,$pos + 4);
+						$length = $this->_get2($dat,$pos + 2);
+						$opt = $this->_get1($dat,$pos + 4);
 						$limit = $pos + $length + 4;
 						$sspos = 5;
 						if ($opt == 1) $fusoku *= 2;
 						if ($pos + $sspos + $fusoku > $limit) {
 							$fusoku = ($pos + $sspos+ $fusoku) - $limit;
-							$sststr.=$this->__to_utf16(substr($dat,$pos + $sspos,$limit-($pos + $sspos)),$opt);
+							$sststr.=$this->_to_utf16(substr($dat,$pos + $sspos,$limit-($pos + $sspos)),$opt);
 							if ($opt & 0x01) $fusoku /=2;
 						} else {
-							$sststr.=$this->__to_utf16(substr($dat,$pos + $sspos,$fusoku),$opt);
+							$sststr.=$this->_to_utf16(substr($dat,$pos + $sspos,$fusoku),$opt);
 							$sspos += $fusoku;
 							$fusoku=0;
 						}
 					} else break 2;
 				}
 			} else {
-				$sststr=$this->__to_utf16(substr($dat,$pos+$sspos,$slen),$opt);
+				$sststr=$this->_to_utf16(substr($dat,$pos+$sspos,$slen),$opt);
 				$sspos += $slen;
 			}
 			if ($rtnum) {
 				if ($pos+$sspos+4*$rtnum > $limit) {
 					$fusoku=($pos+$sspos+4*$rtnum)-$limit;
 					$rt=substr($dat,$pos+$sspos,4*$rtnum - $fusoku);
-					if ($this->__get2($dat,$pos + $length + 4) == Type_CONTINUE) {
+					if ($this->_get2($dat,$pos + $length + 4) == Type_CONTINUE) {
 						$pos += $length + 4;
-						$length =$this->__get2($dat,$pos + 2);
+						$length =$this->_get2($dat,$pos + 2);
 						$limit = $pos + $length + 4;
 						$sspos = 4;
 						$rt.=substr($dat,$limit + $sspos, $fusoku);
@@ -1539,10 +1561,10 @@ $tmp.=$this->_makeImageOBJ($sn);
 				if ($pos+$sspos+$apnum > $limit) {
 					$fusoku=$pos+$sspos+$apnum-$limit;
 					$ap=substr($dat,$pos+$sspos,$apnum-$fusoku);
-					if ($this->__get2($dat,$limit) == Type_CONTINUE) {
+					if ($this->_get2($dat,$limit) == Type_CONTINUE) {
 //						$pos = $limit;
 						$pos += $length + 4;
-						$length = $this->__get2($dat,$pos + 2);
+						$length = $this->_get2($dat,$pos + 2);
 //						$limit += $length + 4;
 						$limit = $pos + $length + 4;
 						$sspos = 4;
@@ -1571,7 +1593,7 @@ $tmp.=$this->_makeImageOBJ($sn);
 	* @return UTF16 string
 	* @access private
 	*/
-	function __to_utf16(&$str,$opt=0)
+	function _to_utf16(&$str,$opt=0)
 	{
 		return ($opt & 0x01) ? $str : mb_convert_encoding($str, "UTF-16LE", "ASCII");
 	}
@@ -1582,7 +1604,7 @@ $tmp.=$this->_makeImageOBJ($sn);
 	* @return number
 	* @access private
 	*/
-	function __get4(&$d, $p) {
+	function _get4(&$d, $p) {
 		return ord($d[$p]) | (ord($d[$p+1]) << 8) |
 			(ord($d[$p+2]) << 16) | (ord($d[$p+3]) << 24);
 	}
@@ -1590,14 +1612,14 @@ $tmp.=$this->_makeImageOBJ($sn);
 	/**
 	* @access private
 	*/
-	function __get2(&$d, $p) {
+	function _get2(&$d, $p) {
 		return ord($d[$p]) | (ord($d[$p+1]) << 8);
 	}
 
 	/**
 	* @access private
 	*/
-	function __get1(&$d, $p) {
+	function _get1(&$d, $p) {
 		return ord($d[$p]);
 	}
 
@@ -1605,7 +1627,7 @@ $tmp.=$this->_makeImageOBJ($sn);
 	* remake sst record
 	* @access private
 	*/
-	function __makesst(&$sstarray,$totalref) {
+	function _makesst(&$sstarray,$totalref) {
 		$numref = count($sstarray);
 		if (!$numref) return;
 		$sstbin='';
@@ -1694,15 +1716,15 @@ $tmp.=$this->_makeImageOBJ($sn);
 	*/
 	function parseFile($filename,$mode=null){
 		if ($mode == 1) $this->opt_parsemode = 1;
-		$dat = $this->__oleread($filename);
+		$dat = $this->_oleread($filename);
 		if ($this->isError($dat)) return $dat;
 		if (strlen($dat) < 256) {
 			return $this->raiseError("Contents is too small (".strlen($dat).")\nProbably template file is not right Excel file.\n");
 		}
 		$presheet=1;
 		$pos = 0;
-		$version = $this->__get2($dat,$pos + 4);
-		$substreamType = $this->__get2($dat,$pos + 6);
+		$version = $this->_get2($dat,$pos + 4);
+		$substreamType = $this->_get2($dat,$pos + 6);
 		if ($version != Code_BIFF8) {
 			return $this->raiseError("Contents is not BIFF8 format.\n");
 		}
@@ -1715,8 +1737,8 @@ $tmp.=$this->_makeImageOBJ($sn);
 			if ($pos > $poslimit){
 				return $this->raiseError("Global Area Read Error\nTemplate file is broken");
 			}
-		    $code = $this->__get2($dat,$pos);
-		    $length = $this->__get2($dat,$pos+2);
+		    $code = $this->_get2($dat,$pos);
+		    $length = $this->_get2($dat,$pos+2);
 		    switch ($code) {
 			case Type_FILEPASS:
 				return $this->raiseError("Cannot read contents. \nThis file is protected.");
@@ -1724,10 +1746,10 @@ $tmp.=$this->_makeImageOBJ($sn);
 			case Type_SST:
 				$this->globaldat['presst']=$this->wbdat;
 				$this->wbdat='';
-				$this->eachsst = $this->__parsesst($dat, $pos, $length);
-				while ($this->__get2($dat,$pos + $length + 4) == Type_CONTINUE){
+				$this->eachsst = $this->_parsesst($dat, $pos, $length);
+				while ($this->_get2($dat,$pos + $length + 4) == Type_CONTINUE){
 					$pos += $length + 4;
-					$length = $this->__get2($dat,$pos+2);
+					$length = $this->_get2($dat,$pos+2);
 				}
 			    break;
 			case Type_EXTSST:
@@ -1742,7 +1764,7 @@ $tmp.=$this->_makeImageOBJ($sn);
 					$this->wbdat='';
 					$presheet=0;
 				}
-				$rec_offset = $this->__get4($dat, $pos+4);
+				$rec_offset = $this->_get4($dat, $pos+4);
 			    $sheetno['code'] = substr($dat, $pos, 2);
 			    $sheetno['length'] = substr($dat, $pos+2, 2);
 			    $sheetno['offsetbin'] = substr($dat, $pos+4, 4);
@@ -1776,21 +1798,21 @@ $tmp.=$this->_makeImageOBJ($sn);
 				}
 				$this->globaldat['extsheet']=substr($dat, $pos, $length+4);
 				$this->globaldat['name']='';
-				while($this->__get2($dat, $pos+$length+4)==Type_NAME){
+				while($this->_get2($dat, $pos+$length+4)==Type_NAME){
 					$pos +=$length+4;
-					$length = $this->__get2($dat,$pos+2);
-					if ($this->__get2($dat,$pos+4)!=0x20 || $this->__get1($dat,$pos+11)!=0 || $this->__get1($dat,$pos+12)==0){
+					$length = $this->_get2($dat,$pos+2);
+					if ($this->_get2($dat,$pos+4)!=0x20 || $this->_get1($dat,$pos+11)!=0 || $this->_get1($dat,$pos+12)==0){
 //						$this->globaldat['name'].=substr($dat, $pos, $length+4);
 					} else {
 						$this->globaldat['namerecord'].=substr($dat, $pos, $length+4);
-						$lenform=$this->__get2($dat,$pos+8);
-						$namtype=$this->__get1($dat,$pos+19);
+						$lenform=$this->_get2($dat,$pos+8);
+						$namtype=$this->_get1($dat,$pos+19);
 						$tmp['flags2notu']=substr($dat, $pos, 12);
-						$tmp['sheetindex']=$this->__get2($dat,$pos+12);
+						$tmp['sheetindex']=$this->_get2($dat,$pos+12);
 						$tmp['menu2name']=substr($dat, $pos+14, 6);
 						$tmp['formula']=$this->analizeform(substr($dat,$pos+20,$lenform));
 						$tmp['remain']=substr($dat,$pos+20+$lenform,$length-(16+$lenform));
-						$this->boundsheets[$this->__get2($dat,$pos+12)-1]['namerecord'][$namtype]=$tmp;
+						$this->boundsheets[$this->_get2($dat,$pos+12)-1]['namerecord'][$namtype]=$tmp;
 					}
 				}
 			    break;
@@ -1827,7 +1849,7 @@ $tmp.=$this->_makeImageOBJ($sn);
 			$pos += $length + 4;
 		}
 		foreach ($this->boundsheets as $key=>$val){
-		    $res = $this->__parsesheet($dat,$key,$val['offset']);
+		    $res = $this->_parsesheet($dat,$key,$val['offset']);
 			if ($this->isError($res)) return $res;
 		}
 	}
@@ -1841,7 +1863,7 @@ $tmp.=$this->_makeImageOBJ($sn);
 	function makeFile($filename,$path=null){
 		$this->_makesupblock();
 		$totalref = count($this->eachsst);	// FIXME
-		$sstbin=$this->__makesst($this->eachsst,$totalref);
+		$sstbin=$this->_makesst($this->eachsst,$totalref);
 		$tmplen=strlen($this->globaldat['presheet']);
 		$tmplen += strlen($this->globaldat['presst']);
 		$tmplen += strlen($this->globaldat['last']);
@@ -1859,8 +1881,8 @@ $tmp.=$this->_makeImageOBJ($sn);
 			$tmplen += strlen($val['visible']);
 			$tmplen += strlen($val['type']);
 			$tmplen += strlen($val['name']);
-//			$sheetdat[$key]=$this->__makeSheet($key,$refnum1++);
-			$sheetdat[$key]=$this->__makeSheet($key,$key);
+//			$sheetdat[$key]=$this->_makeSheet($key,$refnum1++);
+			$sheetdat[$key]=$this->_makeSheet($key,$key);
 		}
 	
 		foreach ((array)$sheetdat as $key=>$val){
@@ -1947,8 +1969,8 @@ $tmp.=$this->_makeImageOBJ($sn);
 						if ($shname[$this->boundsheets[$tmpsn+$i]['name']] > 0){
 							$shname[$this->boundsheets[$tmpsn+$i]['name']]++;
 							$dupstr = '('.($shname[$this->boundsheets[$tmpsn+$i]['name']] -1).')';
-							$strcnt=$this->__get1($this->boundsheets[$tmpsn+$i]['name'],0) + strlen($dupstr);
-							if ($this->__get1($this->boundsheets[$tmpsn+$i]['name'],1) == 0) {
+							$strcnt=$this->_get1($this->boundsheets[$tmpsn+$i]['name'],0) + strlen($dupstr);
+							if ($this->_get1($this->boundsheets[$tmpsn+$i]['name'],1) == 0) {
 								$this->boundsheets[$tmpsn+$i]['name'] .= $dupstr;
 							} else {
 								$this->boundsheets[$tmpsn+$i]['name'] .= mb_convert_encoding($dupstr, "UTF-16LE", "ASCII");
@@ -1981,7 +2003,7 @@ $tmp.=$this->_makeImageOBJ($sn);
 // Start of Experimental code on 2007/10/13
 		if (isset($this->revise_dat['option']))
 		foreach((array)$this->revise_dat['option'] as $key => $val) {
-			if (($this->__get2($val['record'],2)+4) != strlen($val['record'])) continue;
+			if (($this->_get2($val['record'],2)+4) != strlen($val['record'])) continue;
 			if ($val['refsheet'] === null) $val['refsheet'] = $val['sheet'];
 			if (($val['refrow'] !== null) && ($val['refcol'] !== null)) {
 				$xf= (isset($this->cellblock[$val['refsheet']][$val['refrow']][$val['refcol']]['xf'])) ? $this->cellblock[$val['refsheet']][$val['refrow']][$val['refcol']]['xf'] : $this->_getcolxf($val['refsheet'],$val['refcol']);
@@ -2205,7 +2227,7 @@ $tmp.=$this->_makeImageOBJ($sn);
 	function asc2utf($ascii){
 		$utfname='';
 		for ($i = 0; $i < strlen($ascii); $i++) {
-			$utfname.=$ascii{$i}."\x00";
+			$utfname.=$ascii[$i]."\x00";
 		}
 		return $utfname;
 	}
@@ -2221,7 +2243,7 @@ $tmp.=$this->_makeImageOBJ($sn);
 				break;
 			case Type_FORMAT:
 				$fmt=$this->cnvstring(substr($dat,6),2);
-				$this->recFORMAT[$this->__get2($dat,4)]=$fmt;
+				$this->recFORMAT[$this->_get2($dat,4)]=$fmt;
 				break;
 			case Type_XF:
 				$this->recXF[]=$dat;
@@ -2236,10 +2258,10 @@ $tmp.=$this->_makeImageOBJ($sn);
 	function cnvstring(&$chars,$len){
 		if ($len==1) {
 			$strpos=2;
-			$opt=$this->__get1($chars,1);
+			$opt=$this->_get1($chars,1);
 		} elseif ($len==2){
 			$strpos=3;
-			$opt=$this->__get1($chars,2);
+			$opt=$this->_get1($chars,2);
 		} else return substr($chars,2);
 		if ($opt)
 			return mb_convert_encoding(substr($chars,$strpos),$this->charset,'UTF-16LE');
@@ -2265,13 +2287,13 @@ $tmp.=$this->_makeImageOBJ($sn);
 					$desc=$this->cnvstring(pack("H*",$cell['dat']),2);
 					break;
 				case Type_LABELSST:
-					$strnum=$this->__get2(pack("H*",$cell['dat']),0);
+					$strnum=$this->_get2(pack("H*",$cell['dat']),0);
 					$sstr=$this->eachsst[$strnum]['str'];
 					$desc=mb_convert_encoding(pack("H*",$sstr),$this->charset,'UTF-16LE');
 					break;
 				case Type_RK:
 				case Type_RK2:
-					$rknum = $this->__get4(pack("H*",$cell['dat']),0);
+					$rknum = $this->_get4(pack("H*",$cell['dat']),0);
 					if (($rknum & 0x02) != 0) {
 						$value = $rknum >> 2;
 					} else {
@@ -2314,9 +2336,9 @@ $tmp.=$this->_makeImageOBJ($sn);
 					break;
 				case Type_BOOLERR:
 					$result=pack("H*",$cell['dat']);
-					if ($this->__get1($result,1) !=0) {
+					if ($this->_get1($result,1) !=0) {
 						$desc='#ERROR!';
-					} elseif ($this->__get1($result,0) !=0) {
+					} elseif ($this->_get1($result,0) !=0) {
 						$desc = "TRUE";
 					} else {
 						$desc = "FALSE";
@@ -2351,55 +2373,55 @@ $tmp.=$this->_makeImageOBJ($sn);
 		$xfno=$this->cellblock[$sn][$row][$col]['xf'];
 		if ($xfno !== null) {
 			$dat=$this->recXF[$xfno];
-			$xf['attrib']=($this->__get1($dat,13) & 0xfc) >> 2;
-			$xf['stylexf']=($this->__get1($dat,8) & 0x4) >> 2;
-			$oya=($this->__get2($dat,8) & 0xfff0) >> 4;
+			$xf['attrib']=($this->_get1($dat,13) & 0xfc) >> 2;
+			$xf['stylexf']=($this->_get1($dat,8) & 0x4) >> 2;
+			$oya=($this->_get2($dat,8) & 0xfff0) >> 4;
 			if ($oya != 0xfff) $xf['parent']=$oya;
 			$cond = $xf['stylexf'] ? ~$xf['attrib'] : $xf['attrib'];
 			if ($cond & 0x2)
-				$xf['fontindex']=$this->__get2($dat,4)-1;
+				$xf['fontindex']=$this->_get2($dat,4)-1;
 				else $xf['fontindex']=0;
 			if ($cond & 0x1)
-				$xf['formindex']=$this->__get2($dat,6);
+				$xf['formindex']=$this->_get2($dat,6);
 				else $xf['formindex']=0;
 //			if ($cond & 0x4){
-				$xf['halign']=$this->__get1($dat,10) & 0x7;
-				$xf['wrap']=($this->__get1($dat,10) & 0x8) >> 3;
-				$xf['valign']=($this->__get1($dat,10) & 0x70)>> 4;
-				$xf['rotation']=$this->__get1($dat,11);
+				$xf['halign']=$this->_get1($dat,10) & 0x7;
+				$xf['wrap']=($this->_get1($dat,10) & 0x8) >> 3;
+				$xf['valign']=($this->_get1($dat,10) & 0x70)>> 4;
+				$xf['rotation']=$this->_get1($dat,11);
 //			}
 //			if ($cond & 0x8){
-				$xf['Lstyle']=$this->__get1($dat,14) & 0x0f;
-				$xf['Rstyle']=($this->__get1($dat,14) & 0xf0) >> 4;
-				$xf['Tstyle']=$this->__get1($dat,15) & 0x0f;
-				$xf['Bstyle']=($this->__get1($dat,15) & 0xf0) >> 4;
-				$xf['Lcolor']=$this->__get1($dat,16) & 0x7f;
-				$xf['Rcolor']=($this->__get2($dat,16) & 0x3f80) >> 7;
-				$xf['diagonalL2R']=($this->__get1($dat,17) & 0x40) >> 6;
-				$xf['diagonalR2L']=($this->__get1($dat,17) & 0x80) >> 7;
-				$xf['Tcolor']=$this->__get1($dat,18) & 0x7f;
-				$xf['Bcolor']=($this->__get2($dat,18) & 0x3f80) >> 7;
-				$xf['Dcolor']=($this->__get4($dat,18) & 0x1fc000) >> 14;
-				$xf['Dstyle']=($this->__get2($dat,20) & 0x1e0) >> 5;
+				$xf['Lstyle']=$this->_get1($dat,14) & 0x0f;
+				$xf['Rstyle']=($this->_get1($dat,14) & 0xf0) >> 4;
+				$xf['Tstyle']=$this->_get1($dat,15) & 0x0f;
+				$xf['Bstyle']=($this->_get1($dat,15) & 0xf0) >> 4;
+				$xf['Lcolor']=$this->_get1($dat,16) & 0x7f;
+				$xf['Rcolor']=($this->_get2($dat,16) & 0x3f80) >> 7;
+				$xf['diagonalL2R']=($this->_get1($dat,17) & 0x40) >> 6;
+				$xf['diagonalR2L']=($this->_get1($dat,17) & 0x80) >> 7;
+				$xf['Tcolor']=$this->_get1($dat,18) & 0x7f;
+				$xf['Bcolor']=($this->_get2($dat,18) & 0x3f80) >> 7;
+				$xf['Dcolor']=($this->_get4($dat,18) & 0x1fc000) >> 14;
+				$xf['Dstyle']=($this->_get2($dat,20) & 0x1e0) >> 5;
 //			}
 //			if ($cond & 0x10){
-				$xf['fillpattern']=($this->__get1($dat,21) & 0xfc) >> 2;
-				$xf['PtnFRcolor']=$this->__get1($dat,22) & 0x7f;
-				$xf['PtnBGcolor']=($this->__get2($dat,22)>> 7) & 0x7f;
+				$xf['fillpattern']=($this->_get1($dat,21) & 0xfc) >> 2;
+				$xf['PtnFRcolor']=$this->_get1($dat,22) & 0x7f;
+				$xf['PtnBGcolor']=($this->_get2($dat,22)>> 7) & 0x7f;
 //			}
 			$tmp['xf']=$xf;
 			if ($xf['formindex']==0) $tmp['format']='';
 			else $tmp['format']=$this->recFORMAT[$xf['formindex']];
 
 			$dat=$this->recFONT[$xf['fontindex']];
-			$font['height']=$this->__get2($dat,4);
-			$font['style']=$this->__get2($dat,6);
-			$font['color']= $this->__get2($dat,8);
-			$font['weight']=$this->__get2($dat,10);
-			$font['escapement']=$this->__get2($dat,12);
-			$font['underline']=$this->__get1($dat,14);
-			$font['family']=$this->__get1($dat,15);
-			$font['charset']=$this->__get1($dat,16);
+			$font['height']=$this->_get2($dat,4);
+			$font['style']=$this->_get2($dat,6);
+			$font['color']= $this->_get2($dat,8);
+			$font['weight']=$this->_get2($dat,10);
+			$font['escapement']=$this->_get2($dat,12);
+			$font['underline']=$this->_get1($dat,14);
+			$font['family']=$this->_get1($dat,15);
+			$font['charset']=$this->_get1($dat,16);
 			$font['fontname']=$this->cnvstring(substr($dat,18),1);
 			$tmp['font']=$font;
 
@@ -2559,7 +2581,7 @@ $tmp.=$this->_makeImageOBJ($sn);
 		$flen=strlen($form);
 		$ret='';
 		while ($fpos < $flen){
-			$token=$this->__get1($form,$fpos);
+			$token=$this->_get1($form,$fpos);
 			if ($token > 0x3F) $token -=0x20;
 			if ($token > 0x3F) $token -=0x20;
 			switch ($token){
@@ -2780,23 +2802,41 @@ $tmp.=$this->_makeImageOBJ($sn);
 					$ermes[]="Couldn't open $imgname";
 					break;
 				}
-				if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime(0);
+				if ($this->Flag_Magic_Quotes) {
+					if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+						set_magic_quotes_runtime(false);
+					} else {
+						//Doesn't exist in PHP 5.4, but we don't need to check because
+						//get_magic_quotes_runtime always returns false in 5.4+
+						//so it will never get here
+						ini_set('magic_quotes_runtime', false);
+					}
+				}
 		        $data = fread($bmh, filesize($imgname));
 				fclose($bmh);
-				if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+				if ($this->Flag_Magic_Quotes) {
+					if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+						set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+					} else {
+						//Doesn't exist in PHP 5.4, but we don't need to check because
+						//get_magic_quotes_runtime always returns false in 5.4+
+						//so it will never get here
+						ini_set('magic_quotes_runtime', $this->Flag_Magic_Quotes);
+					}
+				}
 		        if (strlen($data) <= 0x36) {
 					$ermes[]="$imgname is too small.";
 					break;
 				}
 		        if (substr($data,0,2) != "BM") $ermes[]="$imgname isn't BMP image.";
-				$planes = $this->__get2($data,26);
-				$bits  = $this->__get2($data,28);
-		        $compress = $this->__get4($data,30);
+				$planes = $this->_get2($data,26);
+				$bits  = $this->_get2($data,28);
+		        $compress = $this->_get4($data,30);
 		        if ($planes != 1) $ermes[]="$imgname: only 1 plane supported.";
 		        if ($compress != 0) $ermes[]="$imgname: compression not supported.";
-		        $size   = $this->__get4($data,2) - 0x36 + 0x0C;
-		        $width  = $this->__get4($data,18);
-		        $height = $this->__get4($data,22);
+		        $size   = $this->_get4($data,2) - 0x36 + 0x0C;
+		        $width  = $this->_get4($data,18);
+		        $height = $this->_get4($data,22);
 				if ( count($ermes)==0 )
 		        if ($bits == 24 ) {
 			        $data = substr($data, 0x36);
@@ -2914,7 +2954,8 @@ class ErrMess {
 	* @param string $message Error message
 	* @access public
 	*/
-    function ErrMess($message){$this->message = $message;}
+    function __construct($message){$this->message = $message;}
+    function ErrMess($message){self::__construct($message);}
 	/**
 	* @return string Error message
 	* @access public

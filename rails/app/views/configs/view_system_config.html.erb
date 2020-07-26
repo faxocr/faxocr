@@ -4,7 +4,7 @@
 <br>
 <%= form_tag('/configs/update_system_config', {:method => 'post'}) do %>
 <center>
-  <%= text_area :body, '', :style => 'width: 95%; height: 250px;', :value => @raw_config %>
+  <%= text_area_tag :body, @raw_config, :style => 'width: 95%; height: 250px;' %>
 </center>
 <br>
 

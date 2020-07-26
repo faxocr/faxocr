@@ -119,13 +119,12 @@ if [ "$attached_tiff_files" != "" ]; then
 	# command generates "single%d.tif" instead of "single0.tif".
 	# On the other hand a newer version of converter command
 	# generates "single0.tif".
-	convert "$attached_tiff_files" "$munpack_tmp_dir"/single%d.tif
+	convert "$attached_tiff_files" "$munpack_tmp_dir"/single%05d.tif
 	show_cmd_result $? extracting tiff files by convert command
-	if [ -e "$munpack_tmp_dir"/single%d.tif ]; then
-		mv "$munpack_tmp_dir"/single%d.tif "$munpack_tmp_dir"/single.tif
+	if [ -e "$munpack_tmp_dir"/single%05d.tif ]; then
+		mv "$munpack_tmp_dir"/single%05d.tif "$munpack_tmp_dir"/single.tif
 	fi
 fi
-
 
 #
 # process each tiff file

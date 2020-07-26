@@ -7,12 +7,13 @@
 				require "rubygems"
 				require "active_record"
 				require "yaml"
+				require "erb"
 				rails_prefix = ARGV[0] || "./"
 				image_prefix = ARGV[1] || "./"
 				echo_prefix = ARGV[2] || "./"
 				config_db = rails_prefix + "/config/database.yml"
-				db_env = ENV['RAILS_ENV'] && ENV['RAILS_ENV'].intern || :development
-				ActiveRecord::Base.configurations = YAML.load_file(config_db)
+				db_env = ENV['RAILS_ENV'] && ENV['RAILS_ENV'].intern || ENV['RACK_ENV'] && ENV['RACK_ENV'].intern || :development
+				ActiveRecord::Base.configurations = YAML.load(ERB.new(Pathname.new(config_db).read).result)
 				ActiveRecord::Base.establish_connection(db_env)
 				Dir.glob(rails_prefix + '/app/models/*.rb').each do |model|
 				  load model

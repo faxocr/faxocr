@@ -5,14 +5,15 @@ require File.expand_path('../../config/boot',  __FILE__)
 require "rubygems"
 require "active_record"
 require "yaml"
+require "erb"
 
 config_db = RAILS_ROOT + "/config/database.yml"
-db_env = :development
+db_env = ENV['RAILS_ENV'] && ENV['RAILS_ENV'].intern || ENV['RACK_ENV'] && ENV['RACK_ENV'].intern || :development
 
 GROUP_NAME1 = '沖縄県新型インフルエンザ小児医療情報ネットワーク'
 SHEET_CODE1 = "00000"
 
-ActiveRecord::Base.configurations = YAML.load_file(config_db)
+ActiveRecord::Base.configurations = YAML.load(ERB.new(Pathname.new(config_db).read).result)
 ActiveRecord::Base.establish_connection(db_env)
 
 user = User.new

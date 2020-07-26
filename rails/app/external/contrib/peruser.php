@@ -197,8 +197,12 @@ class Excel_Peruser
 		);
 	var $siData = array();
 
-	function Excel_Peruser(){
+	function __construct(){
 		$this->charset = Default_CHARSET;
+	}
+
+	function Excel_Peruser(){
+		self::__construct();
 	}
 
 
@@ -220,7 +224,7 @@ class Excel_Peruser
 	** @input  $Fname:filename
 	** @access private
 	*/
-	function __oleread($Fname){
+	function _oleread($Fname){
 		if (strlen(dechex(-1)) != 8){
 //			return $this->raiseError("ERROR I cannot work on this OS. 32bits-OS only");
 		}
@@ -228,19 +232,37 @@ class Excel_Peruser
 			return $this->raiseError("ERROR Cannot read file ${Fname} \nProbably there is not reading permission whether there is not a file");
 		}
 		$this->Flag_Magic_Quotes = get_magic_quotes_runtime();
-		if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime(0);
+		if ($this->Flag_Magic_Quotes) {
+			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+				set_magic_quotes_runtime(false);
+			} else {
+				//Doesn't exist in PHP 5.4, but we don't need to check because
+				//get_magic_quotes_runtime always returns false in 5.4+
+				//so it will never get here
+				ini_set('magic_quotes_runtime', false);
+			}
+		}
 		$ole_data = @file_get_contents($Fname);
-		if ($this->Flag_Magic_Quotes) set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+		if ($this->Flag_Magic_Quotes) {
+			if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+				set_magic_quotes_runtime($this->Flag_Magic_Quotes);
+			} else {
+				//Doesn't exist in PHP 5.4, but we don't need to check because
+				//get_magic_quotes_runtime always returns false in 5.4+
+				//so it will never get here
+				ini_set('magic_quotes_runtime', $this->Flag_Magic_Quotes);
+			}
+		}
 		if (!$ole_data) { 
 			return $this->raiseError("ERROR Cannot open file ${Fname} \n");
 		}
 		if (substr($ole_data, 0, 8) != pack("CCCCCCCC",0xd0,0xcf,0x11,0xe0,0xa1,0xb1,0x1a,0xe1)) {
 			return $this->raiseError("ERROR Template file(${Fname}) is not EXCEL file.\n");
 	   	}
-		$numDepots = $this->__get4($ole_data, 0x2c);
-		$sStartBlk = $this->__get4($ole_data, 0x3c);
-		$ExBlock = $this->__get4($ole_data, 0x44);
-		$numExBlks = $this->__get4($ole_data, 0x48);
+		$numDepots = $this->_get4($ole_data, 0x2c);
+		$sStartBlk = $this->_get4($ole_data, 0x3c);
+		$ExBlock = $this->_get4($ole_data, 0x44);
+		$numExBlks = $this->_get4($ole_data, 0x48);
 
 		$len_ole = strlen($ole_data);
 		if ($numDepots > ($len_ole / 65536 +1))
@@ -257,7 +279,7 @@ class Excel_Peruser
 		$dBlks = $numDepots;
 		if ($numExBlks != 0) $dBlks = (0x200 - 0x4c)/4;
 		for ($i = 0; $i < $dBlks; $i++) {
-			$DepotBlks[$i] = $this->__get4($ole_data, $pos);
+			$DepotBlks[$i] = $this->_get4($ole_data, $pos);
 			$pos += 4;
 		}
 
@@ -265,11 +287,11 @@ class Excel_Peruser
 			$pos = ($ExBlock + 1) * 0x200;
 			$ReadBlks = min($numDepots - $dBlks, 0x200 / 4 - 1);
 			for ($i = $dBlks; $i < $dBlks + $ReadBlks; $i++) {
-				$DepotBlks[$i] = $this->__get4($ole_data, $pos);
+				$DepotBlks[$i] = $this->_get4($ole_data, $pos);
 				$pos += 4;
 			}   
 			$dBlks += $ReadBlks;
-			if ($dBlks < $numDepots) $ExBlock = $this->__get4($ole_data, $pos);
+			if ($dBlks < $numDepots) $ExBlock = $this->_get4($ole_data, $pos);
 		}
 
 		$pos = 0;
@@ -278,20 +300,20 @@ class Excel_Peruser
 		for ($i = 0; $i < $numDepots; $i++) {
 			$pos = ($DepotBlks[$i] + 1) * 0x200;
 			for ($j = 0 ; $j < 0x200 / 4; $j++) {
-				$BlkChain[$index] = $this->__get4($ole_data, $pos);
+				$BlkChain[$index] = $this->_get4($ole_data, $pos);
 				$pos += 4 ;
 				$index++;
 			}
 		}
 		$eoc=pack("H*","FEFFFFFF");
-		$eoc= $this->__get4($eoc,0);
+		$eoc= $this->_get4($eoc,0);
 		$pos = 0;
 		$index = 0;
 		$sBlkChain = array();
 		while ($sStartBlk != $eoc) {
 			$pos = ($sStartBlk + 1) * 0x200;
 			for ($j = 0; $j < 0x80; $j++) {
-				$sBlkChain[$index] = $this->__get4($ole_data, $pos);
+				$sBlkChain[$index] = $this->_get4($ole_data, $pos);
 				$pos += 4 ;
 				$index++;
 			}
@@ -302,7 +324,7 @@ class Excel_Peruser
 			}
 		}
 		unset($chk);
-		$block = $this->__get4($ole_data, 0x30);
+		$block = $this->_get4($ole_data, 0x30);
 		$pos = 0;
 		$entry = '';
 		while ($block != $eoc)  {
@@ -320,21 +342,21 @@ class Excel_Peruser
 		$dsistartBlock=null;
 		$sisize=0;
 		$dsisize=0;
-		$rootBlock =$this->__get4($entry, 0x74);
+		$rootBlock =$this->_get4($entry, 0x74);
 		while ($offset < strlen($entry)) {
 			  $d = substr($entry, $offset, 0x80);
-			  $name = str_replace("\x00", "", substr($d,0,$this->__get2($d,0x40)));
+			  $name = str_replace("\x00", "", substr($d,0,$this->_get2($d,0x40)));
 			if (($name == "Workbook") || ($name == "Book")) {
-				$wbstartBlock =$this->__get4($d, 0x74);
-				$wbsize = $this->__get4($d, 0x78);
+				$wbstartBlock =$this->_get4($d, 0x74);
+				$wbsize = $this->_get4($d, 0x78);
 //			} else if ($name == "Root Entry" || $name == "R") {
-//				$rootBlock =$this->__get4($d, 0x74);
+//				$rootBlock =$this->_get4($d, 0x74);
 			} else if ($name =="\x05SummaryInformation"){
-				$sistartBlock =$this->__get4($d, 0x74);
-				$sisize =$this->__get4($d, 0x78);
+				$sistartBlock =$this->_get4($d, 0x74);
+				$sisize =$this->_get4($d, 0x78);
 			} else if ($name =="\x05DocumentSummaryInformation"){
-				$dsistartBlock =$this->__get4($d, 0x74);
-				$dsisize =$this->__get4($d, 0x78);
+				$dsistartBlock =$this->_get4($d, 0x74);
+				$dsisize =$this->_get4($d, 0x78);
 			}
 			$offset += 0x80;
 		}
@@ -435,10 +457,10 @@ class Excel_Peruser
 	** parse sheetblock
 	** @access private
 	*/
-	function __parsesheet(&$dat,$sn,$spos){
+	function _parsesheet(&$dat,$sn,$spos){
 		$code = 0;
-		$version = $this->__get2($dat,$spos + 4);
-		$substreamType = $this->__get2($dat,$spos + 6);
+		$version = $this->_get2($dat,$spos + 4);
+		$substreamType = $this->_get2($dat,$spos + 6);
 		if ($version != Code_BIFF8) {
 //			return $this->raiseError("Contents(included sheet) is not BIFF8 format.\n");
 		}
@@ -453,8 +475,8 @@ class Excel_Peruser
 			if ($spos > $sposlimit) {
 				return $this->raiseError("Sheet $sn Read ERROR\nTemplate file is broken.\n");
 			}
-			$code = $this->__get2($dat,$spos);
-			$length = $this->__get2($dat,$spos + 2);
+			$code = $this->_get2($dat,$spos);
+			$length = $this->_get2($dat,$spos + 2);
 			if ($code == Type_BOF) $bof_num++;
 			if ($bof_num > 1){
 				$tmp.=substr($dat, $spos, $length+4);
@@ -463,31 +485,31 @@ class Excel_Peruser
 						return $this->raiseError("Parse-Sheet(${sn}) Error\n");
 					}
 					$spos += $length+4;
-					$code = $this->__get2($dat,$spos);
-					$length = $this->__get2($dat,$spos + 2);
+					$code = $this->_get2($dat,$spos);
+					$length = $this->_get2($dat,$spos + 2);
 					$tmp.=substr($dat, $spos, $length+4);
 				}
 				$bof_num--;
 				$spos += $length+4;
-				$code = $this->__get2($dat,$spos);
-				$length = $this->__get2($dat,$spos + 2);
+				$code = $this->_get2($dat,$spos);
+				$length = $this->_get2($dat,$spos + 2);
 				$tmp.=substr($dat, $spos, $length+4);
 			} else
 			switch ($code) {
 //-------
 					case Type_DEFAULTROWHEIGHT:
-						$defheight=$this->__get2($dat,$spos+6)/15;
+						$defheight=$this->_get2($dat,$spos+6)/15;
 						$this->rowheight[$sn][-1]=$defheight;
 						break;
 					case Type_DEFCOLWIDTH:
-						$defwidth=$this->__get2($dat,$spos+4);
+						$defwidth=$this->_get2($dat,$spos+4);
 						$this->colwidth[$sn][-1]=$defwidth * 9;
 						break;
 					case Type_COLINFO:
-						$st=$this->__get2($dat,$spos+4);
-						$en=$this->__get2($dat,$spos+6);
-						$wd=$this->__get2($dat,$spos+8);
-						$defxf=$this->__get2($dat,$spos + 10);
+						$st=$this->_get2($dat,$spos+4);
+						$en=$this->_get2($dat,$spos+6);
+						$wd=$this->_get2($dat,$spos+8);
+						$defxf=$this->_get2($dat,$spos + 10);
 						for ($i=$st;$i<=$en;$i++){
 							$this->colwidth[$sn][$i]=$wd/32;
 							$this->coldefxf[$sn][$i]=$defxf;
@@ -506,12 +528,12 @@ class Excel_Peruser
 						$this->headfoot[$sn]['footer']=$this->getstring(substr($dat, $spos+4, $length),2);
 						break;
 				case Type_MERGEDCELLS:
-					$numrange=$this->__get2($dat,$spos+4);
+					$numrange=$this->_get2($dat,$spos+4);
 					for($i=0;$i<$numrange;$i++){
-						$rows=$this->__get2($dat,$spos+6+$i*8);
-						$rowe=$this->__get2($dat,$spos+8+$i*8);
-						$cols=$this->__get2($dat,$spos+10+$i*8);
-						$cole=$this->__get2($dat,$spos+12+$i*8);
+						$rows=$this->_get2($dat,$spos+6+$i*8);
+						$rowe=$this->_get2($dat,$spos+8+$i*8);
+						$cols=$this->_get2($dat,$spos+10+$i*8);
+						$cole=$this->_get2($dat,$spos+12+$i*8);
 						for($r=$rows;$r<=$rowe;$r++)
 						for($c=$cols;$c<=$cole;$c++){
 							$this->celmergeinfo[$sn][$r][$c]['cond']=-1;
@@ -522,12 +544,12 @@ class Excel_Peruser
 					}
 					break;
 				case Type_HLINK:
-					$hlrow = $this->__get2($dat,$spos+4);
-					$hlcol = $this->__get2($dat,$spos+8);
-					$hlopt = $this->__get2($dat,$spos+32);
+					$hlrow = $this->_get2($dat,$spos+4);
+					$hlcol = $this->_get2($dat,$spos+8);
+					$hlopt = $this->_get2($dat,$spos+32);
 					if(($hlopt & 0x1)==0x1){
-						$sspos = ($hlopt & 0x14) ? $this->__get2($dat,$spos+36) * 2 + 4: 0;
-						$hlnum = $this->__get4($dat,$spos+52+$sspos)-1;
+						$sspos = ($hlopt & 0x14) ? $this->_get2($dat,$spos+36) * 2 + 4: 0;
+						$hlnum = $this->_get4($dat,$spos+52+$sspos)-1;
 						if(52+$sspos+$hlnum > $length) break;
 						$hypl = mb_convert_encoding(substr($dat,$spos+56+$sspos,$hlnum),$this->charset,'UTF-16LE');
 						$hypl = preg_replace('/\x00.*/','',$hypl);
@@ -551,12 +573,12 @@ class Excel_Peruser
 	$dimnum++;
 					break;
 				case Type_ROW:
-					$row=$this->__get2($dat,$spos + 4);
-					$this->rowblock[$sn][$row]['col1st']=$this->__get2($dat,$spos + 6);
-					$this->rowblock[$sn][$row]['collast']=$this->__get2($dat,$spos + 8);
+					$row=$this->_get2($dat,$spos + 4);
+					$this->rowblock[$sn][$row]['col1st']=$this->_get2($dat,$spos + 6);
+					$this->rowblock[$sn][$row]['collast']=$this->_get2($dat,$spos + 8);
 					$this->rowblock[$sn][$row]['rowfoot']=substr($dat, $spos+10, 10);
-					if ($this->__get1($dat,$spos + 16) & 0x80) {
-						$this->rowdefxf[$sn][$row]=$this->__get2($dat,$spos + 18) & 0x0FFF;
+					if ($this->_get1($dat,$spos + 16) & 0x80) {
+						$this->rowdefxf[$sn][$row]=$this->_get2($dat,$spos + 18) & 0x0FFF;
 					}
 					break;
 				case Type_RK2:
@@ -566,25 +588,25 @@ class Excel_Peruser
 				case Type_FORMULA2:
 				case Type_BOOLERR:
 				case Type_BLANK:
-					$row=$this->__get2($dat,$spos + 4);
-					$col=$this->__get2($dat,$spos + 6);
-					$this->cellblock[$sn][$row][$col]['xf']=$this->__get2($dat,$spos + 8);
+					$row=$this->_get2($dat,$spos + 4);
+					$col=$this->_get2($dat,$spos + 6);
+					$this->cellblock[$sn][$row][$col]['xf']=$this->_get2($dat,$spos + 8);
 					$this->cellblock[$sn][$row][$col]['type']=$code;
 					$this->cellblock[$sn][$row][$col]['dat']=substr($dat, $spos+10, $length-6);
 					$this->cellblock[$sn][$row][$col]['string']='';
 	if ($code == Type_FORMULA2){
 		$dispnum = substr($dat, $spos+10, 8);
-		$opflag = $this->__get2($dat,$spos + 18) | 0x02; // Calculate on open
+		$opflag = $this->_get2($dat,$spos + 18) | 0x02; // Calculate on open
 		$tokens = substr($dat, $spos+20, $length - 16);
 		$this->cellblock[$sn][$row][$col]['dat']=$dispnum . pack("v",$opflag) . $tokens;
-		if ($this->__get2($dat,$spos + $length + 4) == Type_SharedFormula){
+		if ($this->_get2($dat,$spos + $length + 4) == Type_SharedFormula){
 			$spos += $length + 4;
-			$length = $this->__get2($dat,$spos + 2);
+			$length = $this->_get2($dat,$spos + 2);
 			$this->cellblock[$sn][$row][$col]['sharedform']=substr($dat,$spos,$length+4);
 		}
-		if ($this->__get2($dat,$spos + $length + 4) == Type_STRING){
+		if ($this->_get2($dat,$spos + $length + 4) == Type_STRING){
 			$spos += $length + 4;
-			$length = $this->__get2($dat,$spos + 2);
+			$length = $this->_get2($dat,$spos + 2);
 			$this->cellblock[$sn][$row][$col]['string']=substr($dat,$spos,$length+4);
 		}
 	}
@@ -592,22 +614,22 @@ class Excel_Peruser
 					break;
 				case Type_MULBLANK:
 					$muln=($length-6)/2;
-					$row=$this->__get2($dat,$spos + 4);
-					$col=$this->__get2($dat,$spos + 6);
+					$row=$this->_get2($dat,$spos + 4);
+					$col=$this->_get2($dat,$spos + 6);
 					$i=-1;
 					while(++$i < $muln){
-						$this->cellblock[$sn][$row][$i+$col]['xf']=$this->__get2($dat,$spos+8+$i*2);
+						$this->cellblock[$sn][$row][$i+$col]['xf']=$this->_get2($dat,$spos+8+$i*2);
 						$this->cellblock[$sn][$row][$i+$col]['type']=Type_BLANK;
 						$this->cellblock[$sn][$row][$i+$col]['dat']='';
 					}
 					break;
 				case Type_MULRK:
 					$muln=($length-6)/6;
-					$row=$this->__get2($dat,$spos + 4);
-					$col=$this->__get2($dat,$spos + 6);
+					$row=$this->_get2($dat,$spos + 4);
+					$col=$this->_get2($dat,$spos + 6);
 					$i=-1;
 					while(++$i < $muln){
-						$this->cellblock[$sn][$row][$i+$col]['xf']=$this->__get2($dat,$spos+8+$i*6);
+						$this->cellblock[$sn][$row][$i+$col]['xf']=$this->_get2($dat,$spos+8+$i*6);
 						$this->cellblock[$sn][$row][$i+$col]['type']=Type_RK;
 						$this->cellblock[$sn][$row][$i+$col]['dat']=substr($dat, $spos+10+$i*6, 4);
 					}
@@ -630,35 +652,35 @@ class Excel_Peruser
 	** parse sst-record
 	** @access private
 	*/
-	function __parsesst(&$dat, $pos, $length) {
+	function _parsesst(&$dat, $pos, $length) {
 		$sstarray=array();
-		$numref=$this->__get4($dat,$pos+8);
+		$numref=$this->_get4($dat,$pos+8);
 		$sspos =12;
 		$sstnum=0;
 		$limit=$pos + $length +4;
 		while ($sstnum < $numref) {
 			if ($pos+$sspos+2 > $limit) {
-				if ($this->__get2($dat,$limit) == Type_CONTINUE) {
+				if ($this->_get2($dat,$limit) == Type_CONTINUE) {
 					$pos = $limit;
-					$length = $this->__get2($dat,$pos + 2);
+					$length = $this->_get2($dat,$pos + 2);
 					$limit += $length + 4;
 					$sspos = 4;
 				} else break;
 			}
-			$slen=$this->__get2($dat,$pos+$sspos);
+			$slen=$this->_get2($dat,$pos+$sspos);
 			$tempsst['len']=$slen;
-			$opt=$this->__get1($dat,$pos+$sspos+2);
+			$opt=$this->_get1($dat,$pos+$sspos+2);
 			$sspos += 3;
 			if ($opt & 0x01) $slen *=2;
 			if ($opt & 0x04) $optlen =4; else $optlen =0;
 			if ($opt & 0x08) {
 				$optlen +=2;
-				$rtnum = $this->__get2($dat,$pos+$sspos);
-				if ($opt & 0x04) $apnum = $this->__get4($dat,$pos+$sspos+2);
+				$rtnum = $this->_get2($dat,$pos+$sspos);
+				if ($opt & 0x04) $apnum = $this->_get4($dat,$pos+$sspos+2);
 				else $apnum = 0;
 			} else {
 				$rtnum = 0;
-				if ($opt & 0x04) $apnum = $this->__get4($dat,$pos+$sspos);
+				if ($opt & 0x04) $apnum = $this->_get4($dat,$pos+$sspos);
 				else $apnum = 0;
 			}
 			$tempsst['opt']=$opt;
@@ -668,38 +690,38 @@ class Excel_Peruser
 			if ($pos+$sspos+$slen > $limit) {
 				$fusoku=($pos+$sspos+$slen)-$limit;
 				$slen -= $fusoku;
-				$sststr=$this->__to_utf16(substr($dat,$pos+$sspos,$slen),$opt);
+				$sststr=$this->_to_utf16(substr($dat,$pos+$sspos,$slen),$opt);
 				if ($opt & 0x01) $fusoku /=2;
 				while ($fusoku >0 ) {
-					if ($this->__get2($dat,$pos + $length + 4) == Type_CONTINUE) {
+					if ($this->_get2($dat,$pos + $length + 4) == Type_CONTINUE) {
 						$pos += $length +4;
-						$length = $this->__get2($dat,$pos + 2);
-						$opt = $this->__get1($dat,$pos + 4);
+						$length = $this->_get2($dat,$pos + 2);
+						$opt = $this->_get1($dat,$pos + 4);
 						$limit = $pos + $length + 4;
 						$sspos = 5;
 						if ($opt == 1) $fusoku *= 2;
 						if ($pos + $sspos + $fusoku > $limit) {
 							$fusoku = ($pos + $sspos+ $fusoku) - $limit;
-							$sststr.=$this->__to_utf16(substr($dat,$pos + $sspos,$limit-($pos + $sspos)),$opt);
+							$sststr.=$this->_to_utf16(substr($dat,$pos + $sspos,$limit-($pos + $sspos)),$opt);
 							if ($opt & 0x01) $fusoku /=2;
 						} else {
-							$sststr.=$this->__to_utf16(substr($dat,$pos + $sspos,$fusoku),$opt);
+							$sststr.=$this->_to_utf16(substr($dat,$pos + $sspos,$fusoku),$opt);
 							$sspos += $fusoku;
 							$fusoku=0;
 						}
 					} else break 2;
 				}
 			} else {
-				$sststr=$this->__to_utf16(substr($dat,$pos+$sspos,$slen),$opt);
+				$sststr=$this->_to_utf16(substr($dat,$pos+$sspos,$slen),$opt);
 				$sspos += $slen;
 			}
 			if ($rtnum) {
 				if ($pos+$sspos+4*$rtnum > $limit) {
 					$fusoku=($pos+$sspos+4*$rtnum)-$limit;
 					$rt=substr($dat,$pos+$sspos,4*$rtnum - $fusoku);
-					if ($this->__get2($dat,$pos + $length + 4) == Type_CONTINUE) {
+					if ($this->_get2($dat,$pos + $length + 4) == Type_CONTINUE) {
 						$pos += $length + 4;
-						$length =$this->__get2($dat,$pos + 2);
+						$length =$this->_get2($dat,$pos + 2);
 						$limit = $pos + $length + 4;
 						$sspos = 4;
 						$rt.=substr($dat,$limit + $sspos, $fusoku);
@@ -714,9 +736,9 @@ class Excel_Peruser
 				if ($pos+$sspos+$apnum > $limit) {
 					$fusoku=$pos+$sspos+$apnum-$limit;
 					$ap=substr($dat,$pos+$sspos,$apnum-$fusoku);
-					if ($this->__get2($dat,$limit) == Type_CONTINUE) {
+					if ($this->_get2($dat,$limit) == Type_CONTINUE) {
 						$pos = $limit;
-						$length = $this->__get2($dat,$pos + 2);
+						$length = $this->_get2($dat,$pos + 2);
 						$limit += $length + 4;
 						$sspos = 4;
 						$ap.=substr($dat,$pos + $sspos, $fusoku);
@@ -738,7 +760,7 @@ class Excel_Peruser
 	** @output UTF16 string
 	** @access private
 	*/
-	function __to_utf16(&$str,$opt=0)
+	function _to_utf16(&$str,$opt=0)
 	{
 		return ($opt & 0x01) ? $str : mb_convert_encoding($str, "UTF-16LE", "ASCII");
 	}
@@ -749,16 +771,16 @@ class Excel_Peruser
 	** @output number
 	** @access private
 	*/
-	function __get4(&$d, $p) {
+	function _get4(&$d, $p) {
 		$x = ord($d[$p]) | (ord($d[$p+1]) << 8) |
 			(ord($d[$p+2]) << 16) | (ord($d[$p+3]) << 24);
 		if ($x > 0x7FFFFFFF) return $x - 0x100000000;
 		else return $x;
 	}
-	function __get2(&$d, $p) {
+	function _get2(&$d, $p) {
 		return ord($d[$p]) | (ord($d[$p+1]) << 8);
 	}
-	function __get1(&$d, $p) {
+	function _get1(&$d, $p) {
 		return ord($d[$p]);
 	}
 
@@ -769,15 +791,15 @@ class Excel_Peruser
 	*/
 	function parseFile($filename, $mode=null){
 		if ($mode==2) $dat=$filename; else
-		$dat = $this->__oleread($filename);
+		$dat = $this->_oleread($filename);
 		if ($this->isError($dat)) return $dat;
 		if (strlen($dat) < 256) {
 			return $this->raiseError("Contents is too small (".strlen($dat).")\nProbably template file is not right Excel file.\n");
 		}
 		$presheet=1;
 		$pos = 0;
-		$version = $this->__get2($dat,$pos + 4);
-		$substreamType = $this->__get2($dat,$pos + 6);
+		$version = $this->_get2($dat,$pos + 4);
+		$substreamType = $this->_get2($dat,$pos + 6);
 		if ($version != Code_BIFF8) {
 			$this->biff_ver=$version;
 		}
@@ -790,18 +812,18 @@ class Excel_Peruser
 			if ($pos > $poslimit){
 				return $this->raiseError("Global Area Read Error\nTemplate file is broken");
 			}
-		    $code = $this->__get2($dat,$pos);
-		    $length = $this->__get2($dat,$pos+2);
+		    $code = $this->_get2($dat,$pos);
+		    $length = $this->_get2($dat,$pos+2);
 		    switch ($code) {
 				case Type_FONT:
-					$font['height']=$this->__get2($dat,$pos+4);
-					$font['style']=$this->__get2($dat,$pos+6);
-					$font['color']= $this->__get2($dat,$pos+8);
-					$font['weight']=$this->__get2($dat,$pos+10);
-					$font['escapement']=$this->__get2($dat,$pos+12);
-					$font['underline']=$this->__get1($dat,$pos+14);
-					$font['family']=$this->__get1($dat,$pos+15);
-					$font['charset']=$this->__get1($dat,$pos+16);
+					$font['height']=$this->_get2($dat,$pos+4);
+					$font['style']=$this->_get2($dat,$pos+6);
+					$font['color']= $this->_get2($dat,$pos+8);
+					$font['weight']=$this->_get2($dat,$pos+10);
+					$font['escapement']=$this->_get2($dat,$pos+12);
+					$font['underline']=$this->_get1($dat,$pos+14);
+					$font['family']=$this->_get1($dat,$pos+15);
+					$font['charset']=$this->_get1($dat,$pos+16);
 					if ($this->biff_ver == Code_BIFF8)
 					$font['fontname']=$this->getstring(substr($dat,$pos+18,$length-14),1);
 					else
@@ -815,94 +837,94 @@ class Excel_Peruser
 				} else {
 					$fmt=$this->getstring(substr($dat,$pos+6,$length-2),2);
 				}
-					$this->recFORMAT[$this->__get2($dat,$pos+4)]=$fmt;
+					$this->recFORMAT[$this->_get2($dat,$pos+4)]=$fmt;
 					break;
 				case Type_XF:
 				if ($this->biff_ver != Code_BIFF8) {
-					$xf['attrib']=($this->__get1($dat,$pos+11) & 0xfc) >> 2;
-					$xf['stylexf']=($this->__get1($dat,$pos+8) & 0x4) >> 2;
-					$oya=($this->__get2($dat,$pos+8) & 0xfff0) >> 4;
+					$xf['attrib']=($this->_get1($dat,$pos+11) & 0xfc) >> 2;
+					$xf['stylexf']=($this->_get1($dat,$pos+8) & 0x4) >> 2;
+					$oya=($this->_get2($dat,$pos+8) & 0xfff0) >> 4;
 					if ($oya != 0xfff) $xf['parent']=$oya;
 					$cond = $xf['stylexf'] ? ~$xf['attrib'] : $xf['attrib'];
 		//$cond=0xFF;
 					if ($cond & 0x2){
-						if ($this->__get2($dat,$pos+4) >4) {
-						$xf['fontindex']=$this->__get2($dat,$pos+4)-1;
+						if ($this->_get2($dat,$pos+4) >4) {
+						$xf['fontindex']=$this->_get2($dat,$pos+4)-1;
 						} else {
-						$xf['fontindex']=$this->__get2($dat,$pos+4);
+						$xf['fontindex']=$this->_get2($dat,$pos+4);
 						}
 					} else $xf['fontindex']=0;
 					if ($cond & 0x1)
-						$xf['formindex']=$this->__get2($dat,$pos+6);
+						$xf['formindex']=$this->_get2($dat,$pos+6);
 					if ($cond & 0x4){
-						$xf['halign']=$this->__get1($dat,$pos+10) & 0x7;
-						$xf['wrap']=($this->__get1($dat,$pos+10) & 0x8) >> 3;
-						$xf['valign']=($this->__get1($dat,$pos+10) & 0x70)>> 4;
-						$r=$this->__get1($dat,$pos+11) & 0x03;
+						$xf['halign']=$this->_get1($dat,$pos+10) & 0x7;
+						$xf['wrap']=($this->_get1($dat,$pos+10) & 0x8) >> 3;
+						$xf['valign']=($this->_get1($dat,$pos+10) & 0x70)>> 4;
+						$r=$this->_get1($dat,$pos+11) & 0x03;
 						if ($r==0) $xf['rotation']=0;
 						else if ($r==1) $xf['rotation']=255;
 						else if ($r==2) $xf['rotation']=90;
 						else if ($r==3) $xf['rotation']=180;
 					}
 					if ($cond & 0x8){
-						$xf['Lstyle']=($this->__get1($dat,$pos+16) & 0x38) >> 3;
-						$xf['Rstyle']=($this->__get2($dat,$pos+16) & 0x1c0) >> 6;
-						$xf['Tstyle']=$this->__get1($dat,$pos+16) & 0x07;
-						$xf['Bstyle']=($this->__get2($dat,$pos+14) & 0x1c0) >> 6;
-						$xf['Lcolor']=$this->__get1($dat,$pos+18) & 0x7f;
-						$xf['Rcolor']=($this->__get2($dat,$pos+18) & 0x3f80) >> 7;
+						$xf['Lstyle']=($this->_get1($dat,$pos+16) & 0x38) >> 3;
+						$xf['Rstyle']=($this->_get2($dat,$pos+16) & 0x1c0) >> 6;
+						$xf['Tstyle']=$this->_get1($dat,$pos+16) & 0x07;
+						$xf['Bstyle']=($this->_get2($dat,$pos+14) & 0x1c0) >> 6;
+						$xf['Lcolor']=$this->_get1($dat,$pos+18) & 0x7f;
+						$xf['Rcolor']=($this->_get2($dat,$pos+18) & 0x3f80) >> 7;
 //						$xf['diagonalL2R']=0;
 //						$xf['diagonalR2L']=0;
-						$xf['Tcolor']=($this->__get1($dat,$pos+17) & 0xfe) >> 1;
-						$xf['Bcolor']=($this->__get1($dat,$pos+15) & 0xfe) >> 1;
+						$xf['Tcolor']=($this->_get1($dat,$pos+17) & 0xfe) >> 1;
+						$xf['Bcolor']=($this->_get1($dat,$pos+15) & 0xfe) >> 1;
 //						$xf['Dcolor']=0;
 //						$xf['Dstyle']=0;
 					}
 					if ($cond & 0x10){
-						$xf['fillpattern']=$this->__get1($dat,$pos+14) & 0x3f;
-						$xf['PtnFRcolor']=$this->__get1($dat,$pos+12) & 0x7f;
-						$xf['PtnBGcolor']=($this->__get2($dat,$pos+12)>> 7) & 0x7f;
+						$xf['fillpattern']=$this->_get1($dat,$pos+14) & 0x3f;
+						$xf['PtnFRcolor']=$this->_get1($dat,$pos+12) & 0x7f;
+						$xf['PtnBGcolor']=($this->_get2($dat,$pos+12)>> 7) & 0x7f;
 					}
 				} else {
-					$xf['attrib']=($this->__get1($dat,$pos+13) & 0xfc) >> 2;
-					$xf['stylexf']=($this->__get1($dat,$pos+8) & 0x4) >> 2;
-					$oya=($this->__get2($dat,$pos+8) & 0xfff0) >> 4;
+					$xf['attrib']=($this->_get1($dat,$pos+13) & 0xfc) >> 2;
+					$xf['stylexf']=($this->_get1($dat,$pos+8) & 0x4) >> 2;
+					$oya=($this->_get2($dat,$pos+8) & 0xfff0) >> 4;
 					if ($oya != 0xfff) $xf['parent']=$oya;
 					$cond = $xf['stylexf'] ? ~$xf['attrib'] : $xf['attrib'];
 		//$cond=0xFF;
 					if ($cond & 0x2){
-						if ($this->__get2($dat,$pos+4) >4) {
-						$xf['fontindex']=$this->__get2($dat,$pos+4)-1;
+						if ($this->_get2($dat,$pos+4) >4) {
+						$xf['fontindex']=$this->_get2($dat,$pos+4)-1;
 						} else {
-						$xf['fontindex']=$this->__get2($dat,$pos+4);
+						$xf['fontindex']=$this->_get2($dat,$pos+4);
 						}
 					} else $xf['fontindex']=0;
 					if ($cond & 0x1)
-						$xf['formindex']=$this->__get2($dat,$pos+6);
+						$xf['formindex']=$this->_get2($dat,$pos+6);
 					if ($cond & 0x4){
-						$xf['halign']=$this->__get1($dat,$pos+10) & 0x7;
-						$xf['wrap']=($this->__get1($dat,$pos+10) & 0x8) >> 3;
-						$xf['valign']=($this->__get1($dat,$pos+10) & 0x70)>> 4;
-						$xf['rotation']=$this->__get1($dat,$pos+11);
+						$xf['halign']=$this->_get1($dat,$pos+10) & 0x7;
+						$xf['wrap']=($this->_get1($dat,$pos+10) & 0x8) >> 3;
+						$xf['valign']=($this->_get1($dat,$pos+10) & 0x70)>> 4;
+						$xf['rotation']=$this->_get1($dat,$pos+11);
 					}
 					if ($cond & 0x8){
-						$xf['Lstyle']=$this->__get1($dat,$pos+14) & 0x0f;
-						$xf['Rstyle']=($this->__get1($dat,$pos+14) & 0xf0) >> 4;
-						$xf['Tstyle']=$this->__get1($dat,$pos+15) & 0x0f;
-						$xf['Bstyle']=($this->__get1($dat,$pos+15) & 0xf0) >> 4;
-						$xf['Lcolor']=$this->__get1($dat,$pos+16) & 0x7f;
-						$xf['Rcolor']=($this->__get2($dat,$pos+16) & 0x3f80) >> 7;
-						$xf['diagonalL2R']=($this->__get1($dat,$pos+17) & 0x40) >> 6;
-						$xf['diagonalR2L']=($this->__get1($dat,$pos+17) & 0x80) >> 7;
-						$xf['Tcolor']=$this->__get1($dat,$pos+18) & 0x7f;
-						$xf['Bcolor']=($this->__get2($dat,$pos+18) & 0x3f80) >> 7;
-						$xf['Dcolor']=($this->__get4($dat,$pos+18) & 0x1fc000) >> 14;
-						$xf['Dstyle']=($this->__get2($dat,$pos+20) & 0x1e0) >> 5;
+						$xf['Lstyle']=$this->_get1($dat,$pos+14) & 0x0f;
+						$xf['Rstyle']=($this->_get1($dat,$pos+14) & 0xf0) >> 4;
+						$xf['Tstyle']=$this->_get1($dat,$pos+15) & 0x0f;
+						$xf['Bstyle']=($this->_get1($dat,$pos+15) & 0xf0) >> 4;
+						$xf['Lcolor']=$this->_get1($dat,$pos+16) & 0x7f;
+						$xf['Rcolor']=($this->_get2($dat,$pos+16) & 0x3f80) >> 7;
+						$xf['diagonalL2R']=($this->_get1($dat,$pos+17) & 0x40) >> 6;
+						$xf['diagonalR2L']=($this->_get1($dat,$pos+17) & 0x80) >> 7;
+						$xf['Tcolor']=$this->_get1($dat,$pos+18) & 0x7f;
+						$xf['Bcolor']=($this->_get2($dat,$pos+18) & 0x3f80) >> 7;
+						$xf['Dcolor']=($this->_get4($dat,$pos+18) & 0x1fc000) >> 14;
+						$xf['Dstyle']=($this->_get2($dat,$pos+20) & 0x1e0) >> 5;
 					}
 					if ($cond & 0x10){
-						$xf['fillpattern']=($this->__get4($dat,$pos+21) & 0xfc) >> 2;
-						$xf['PtnFRcolor']=$this->__get1($dat,$pos+22) & 0x7f;
-						$xf['PtnBGcolor']=($this->__get2($dat,$pos+22)>> 7) & 0x7f;
+						$xf['fillpattern']=($this->_get4($dat,$pos+21) & 0xfc) >> 2;
+						$xf['PtnFRcolor']=$this->_get1($dat,$pos+22) & 0x7f;
+						$xf['PtnBGcolor']=($this->_get2($dat,$pos+22)>> 7) & 0x7f;
 					}
 				}
 					$this->recXF[]=$xf;
@@ -914,10 +936,10 @@ class Excel_Peruser
 			case Type_SST:
 				$this->globaldat['presst']=$this->wbdat;
 				$this->wbdat='';
-				$this->eachsst = $this->__parsesst($dat, $pos, $length);
-				while ($this->__get2($dat,$pos + $length + 4) == Type_CONTINUE){
+				$this->eachsst = $this->_parsesst($dat, $pos, $length);
+				while ($this->_get2($dat,$pos + $length + 4) == Type_CONTINUE){
 					$pos += $length + 4;
-					$length = $this->__get2($dat,$pos+2);
+					$length = $this->_get2($dat,$pos+2);
 				}
 			    break;
 			case Type_EXTSST:
@@ -932,7 +954,7 @@ class Excel_Peruser
 					$this->wbdat='';
 					$presheet=0;
 				}
-				$rec_offset = $this->__get4($dat, $pos+4);
+				$rec_offset = $this->_get4($dat, $pos+4);
 			    $sheetno['code'] = substr($dat, $pos, 2);
 			    $sheetno['length'] = substr($dat, $pos+2, 2);
 			    $sheetno['offsetbin'] = substr($dat, $pos+4, 4);
@@ -946,18 +968,18 @@ class Excel_Peruser
 				$this->globaldat['presup']=$this->wbdat;
 				$this->wbdat='';
 				$this->globaldat['supbook']=substr($dat, $pos, $length+4);
-				if ($this->__get2($dat, $pos+$length+4)==Type_EXTERNSHEET){
+				if ($this->_get2($dat, $pos+$length+4)==Type_EXTERNSHEET){
 					$pos +=$length+4;
-					$length = $this->__get2($dat,$pos+2);
+					$length = $this->_get2($dat,$pos+2);
 					$this->globaldat['extsheet']=substr($dat, $pos, $length+4);
 					$this->globaldat['name']='';
-					while($this->__get2($dat, $pos+$length+4)==Type_NAME){
+					while($this->_get2($dat, $pos+$length+4)==Type_NAME){
 						$pos +=$length+4;
-						$length = $this->__get2($dat,$pos+2);
-						if ($this->__get2($dat,$pos+12)==0){
+						$length = $this->_get2($dat,$pos+2);
+						if ($this->_get2($dat,$pos+12)==0){
 							$this->globaldat['name'].=substr($dat, $pos, $length+4);
 						} else {
-							$this->boundsheets[$this->__get2($dat,$pos+12)-1]['namerecord']=substr($dat, $pos, $length+4);
+							$this->boundsheets[$this->_get2($dat,$pos+12)-1]['namerecord']=substr($dat, $pos, $length+4);
 						}
 					}
 				}
@@ -971,7 +993,7 @@ class Excel_Peruser
 			$pos += $length + 4;
 		}
 		foreach ($this->boundsheets as $key=>$val){
-		    $resultex=$this->__parsesheet($dat,$key,$val['offset']);
+		    $resultex=$this->_parsesheet($dat,$key,$val['offset']);
 			if ($this->isError($resultex)) return $resultex;
 		}
 	}
@@ -981,7 +1003,7 @@ class Excel_Peruser
 		mb_regex_encoding($this->charset);
 		$this->setconst();
 		$this->infilename=$filename;
-		$this->oledat = $this->__oleread($filename);
+		$this->oledat = $this->_oleread($filename);
 		if ($this->isError($this->oledat)) return $this->oledat;
 		$resultex=$this->parseFile($this->oledat,2);
 		if ($this->isError($resultex)) return $resultex;
@@ -1054,10 +1076,10 @@ class Excel_Peruser
 		if (strlen($chars)<1) return '';
 		if ($len==1) {
 			$strpos=2;
-			$opt=$this->__get1($chars,1);
+			$opt=$this->_get1($chars,1);
 		} elseif ($len==2){
 			$strpos=3;
-			$opt=$this->__get1($chars,2);
+			$opt=$this->_get1($chars,2);
 		} else return substr($chars,2);
 		if ($opt)
 			return mb_convert_encoding(substr($chars,$strpos),$this->charset,'UTF-16LE');
@@ -1515,7 +1537,7 @@ class Excel_Peruser
 if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['formindex']=0;
 		switch ($cell['type']) {
 			case Type_LABELSST:
-				$strnum=$this->__get2($cell['dat'],0);
+				$strnum=$this->_get2($cell['dat'],0);
 				$sstr=$this->eachsst[$strnum]['str'];
 				$desc=mb_convert_encoding($sstr,$this->charset,'UTF-16LE');
 				break;
@@ -1524,7 +1546,7 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 				break;
 			case Type_RK:
 			case Type_RK2:
-				$desc=$this->Getrknum($this->__get4($cell['dat'],0));
+				$desc=$this->Getrknum($this->_get4($cell['dat'],0));
 				if (isset($this->recXF[$cell['xf']]['formindex']))
 				if (isset($this->recFORMAT[$this->recXF[$cell['xf']]['formindex']]))
 				$desc=$this->dispf($desc,$this->recFORMAT[$this->recXF[$cell['xf']]['formindex']],$mode);
@@ -1561,7 +1583,7 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 				}
 				break;
 			case Type_BOOLERR:
-				$desc=($this->__get2($cell['dat'],0)==0)?'FALSE':'TRUE';
+				$desc=($this->_get2($cell['dat'],0)==0)?'FALSE':'TRUE';
 				break;
 			case Type_BLANK:
 				$desc=''; // XXX $desc = ' '; 
@@ -1592,7 +1614,7 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 		for ($sno=0;$sno<$snum;$sno++){
 			if(isset($this->rowblock[$sno]))
 			foreach($this->rowblock[$sno] as $key=>$val){
-				$ph=$this->__get2($val['rowfoot'],0)/15;
+				$ph=$this->_get2($val['rowfoot'],0)/15;
 				if ($ph & 0x8000) $this->rowheight[$sno][$key]=$defheight;
 				else $this->rowheight[$sno][$key]=$ph;
 			}
@@ -1722,11 +1744,11 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 		$str=mb_ereg_replace ('&F', $fname ,$str);
 		$str=mb_ereg_replace ('&Z', $path ,$str);
 		$str=mb_ereg_replace ('&G', '' ,$str);
-		if (ereg('.*&R(.*)$',$str)){
+		if (preg_match('/.*&R(.*)$/',$str)){
 			$s['right'] = mb_ereg_replace ('.*&R(.*)$', "\\1" ,$str);
 			$str= mb_ereg_replace ("&R.*$", "" ,$str);
 		}
-		if (ereg(".*&C(.*)$",$str)){
+		if (preg_match("/.*&C(.*)$/",$str)){
 			$s['center'] = mb_ereg_replace ('.*&C(.*)$', "\\1" ,$str);
 			$str= mb_ereg_replace ('&C.*$', '' ,$str);
 		}
@@ -1735,10 +1757,10 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 	}
 
 	function getProperty($dat){
-		if ($this->__get2($dat, 0) != 0xFFFE) return;
-		if ($this->__get2($dat, 2) != 0) return;
-		$res['osver'] = $this->__get2($dat, 4);
-		$tmp = $this->__get2($dat, 6);
+		if ($this->_get2($dat, 0) != 0xFFFE) return;
+		if ($this->_get2($dat, 2) != 0) return;
+		$res['osver'] = $this->_get2($dat, 4);
+		$tmp = $this->_get2($dat, 6);
 		if ($tmp == 0) $res['OS']='Win16'; else
 		if ($tmp == 1) $res['OS']='Macintosh'; else
 		if ($tmp == 2) $res['OS']='Win32'; else
@@ -1749,39 +1771,39 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 			$pchar="SJIS-win";
 		}
 		$res['CLSID']=bin2hex(substr($dat, 8, 16));
-		$res['cSections'] = $this->__get4($dat, 0x18);
+		$res['cSections'] = $this->_get4($dat, 0x18);
 		if ($res['cSections'] < 1) return;
 		$pos=0x1C;
 		for ($i = 0; $i < $res['cSections']; $i++){
 			$sec['FMTID']= bin2hex(substr($dat, $pos, 16));
-			$sec['offset']= $this->__get4($dat, $pos + 16);
+			$sec['offset']= $this->_get4($dat, $pos + 16);
 			$res['section'][$i]=$sec;
 			$pos += 20;
 
 			$spos=$sec['offset'];
-			$res['section'][$i]['cbSection']=$this->__get4($dat, $spos);
-			$res['section'][$i]['cProperties']=$this->__get4($dat, $spos+4);
+			$res['section'][$i]['cbSection']=$this->_get4($dat, $spos);
+			$res['section'][$i]['cProperties']=$this->_get4($dat, $spos+4);
 			for ($j=0; $j < $res['section'][$i]['cProperties']; $j++) {
-				$prop['propid']=$this->__get4($dat, $spos + 8 + $j*8);
-				$prop['dwOffset']=$this->__get4($dat, $spos + 12 + $j*8);
+				$prop['propid']=$this->_get4($dat, $spos + 8 + $j*8);
+				$prop['dwOffset']=$this->_get4($dat, $spos + 12 + $j*8);
 				$ppos=$sec['offset']+$prop['dwOffset'];
-				$prop['type']=$this->__get4($dat, $ppos);
+				$prop['type']=$this->_get4($dat, $ppos);
 				if ($prop['propid']==0){ //dictionary
 					$dpos=0;;
 					$numdic=$prop['type'];
 					for ($k=0; $k<$numdic; $k++){
-						$dlen=$this->__get4($dat, $ppos+$dpos+8);
+						$dlen=$this->_get4($dat, $ppos+$dpos+8);
 						$cusname=mb_convert_encoding(substr($dat,$ppos+$dpos+12,$dlen), $this->charset,$pchar);
-						$dprop[$this->__get4($dat, $ppos+$dpos+4)]=trim($cusname);
+						$dprop[$this->_get4($dat, $ppos+$dpos+4)]=trim($cusname);
 						$dpos+=$dlen+8;
 					}
 					$res['section'][$i]['dic']=$dprop;
 					unset($dprop);
 				} else {
 
-				switch ($this->__get4($dat, $ppos)) {
+				switch ($this->_get4($dat, $ppos)) {
 				case 2:	//
-					$prop['val']=$this->__get2($dat, $ppos+4);
+					$prop['val']=$this->_get2($dat, $ppos+4);
 					if ($prop['propid']==1){
 						if ($prop['val']==65001) {
 							$pchar="UTF-8";
@@ -1791,32 +1813,32 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 					}
 					break;
 				case 3:	//
-					$prop['val']=$this->__get4($dat, $ppos+4);
+					$prop['val']=$this->_get4($dat, $ppos+4);
 					break;
 				case 6:	//
 					$prop['val']='&H'.bin2hex(substr($dat, $ppos+4,4));
 					break;
 				case 11:	//
-					$prop['val']=($this->__get2($dat, $ppos+4)==0)? 0:-1;
+					$prop['val']=($this->_get2($dat, $ppos+4)==0)? 0:-1;
 					break;
 				case 30:	//
-					$len=$this->__get4($dat, $ppos+4);
+					$len=$this->_get4($dat, $ppos+4);
 					$prop['val']=mb_convert_encoding(substr($dat,$ppos+8,$len), $this->charset, $pchar);
 					break;
 				case 64:	//
-					$uTime = $this->__get4($dat, $ppos+8) * 429.4967296 + $this->__get2($dat, $ppos+6) * 0.0065536 + $this->__get2($dat, $ppos+4)/10000000;
+					$uTime = $this->_get4($dat, $ppos+8) * 429.4967296 + $this->_get2($dat, $ppos+6) * 0.0065536 + $this->_get2($dat, $ppos+4)/10000000;
 					$uTime = floor($uTime) - 11644473600;
 					$prop['val'] = date('Y/m/d H:i:s', $uTime);
 					break;
 				case 65:	//
 					if ($res['section'][$i]['dic'][$prop['propid']]=='_PID_HLINKS'){
 						$dpos=0;
-						$numdic=$this->__get4($dat, $ppos+8);
+						$numdic=$this->_get4($dat, $ppos+8);
 						for ($k=0; $k<$numdic; $k++){
-							switch ($this->__get4($dat, $ppos+$dpos+12)){
+							switch ($this->_get4($dat, $ppos+$dpos+12)){
 							case 31:
-								$dlen=((($this->__get4($dat, $ppos+$dpos+16)+1)>>1)<<1) * 2;
-								if ($this->__get4($dat, $ppos+$dpos+16) > 1)
+								$dlen=((($this->_get4($dat, $ppos+$dpos+16)+1)>>1)<<1) * 2;
+								if ($this->_get4($dat, $ppos+$dpos+16) > 1)
 								$pida[]=trim(mb_convert_encoding(substr($dat,$ppos+$dpos+20,$dlen-2), $this->charset,$pchar));
 								$dpos+=$dlen+8;
 								break;
@@ -1829,18 +1851,18 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 						}
 						$prop['val']=$pida;
 					} else {
-						$len=$this->__get4($dat, $ppos+4);
+						$len=$this->_get4($dat, $ppos+4);
 						$prop['val']=mb_convert_encoding(substr($dat,$ppos+8,$len), $this->charset, "UTF-16LE");
 					}
 					break;
 				case 71:	//
-					$prop['val']=$this->__get4($dat, $ppos+4);
+					$prop['val']=$this->_get4($dat, $ppos+4);
 					break;
 				case 4126:	//
 					$dpos=0;
-					$numdic=$this->__get4($dat, $ppos+4);
+					$numdic=$this->_get4($dat, $ppos+4);
 					for ($k=0; $k<$numdic; $k++){
-						$dlen=$this->__get4($dat, $ppos+$dpos+8);
+						$dlen=$this->_get4($dat, $ppos+$dpos+8);
 						$tparts[$k]=mb_convert_encoding(substr($dat,$ppos+$dpos+12,$dlen), $this->charset,$pchar);
 						$dpos+=$dlen+4;
 					}
@@ -1848,11 +1870,11 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 					break;
 				case 4108:	//
 					$dpos=0;
-					$numdic=$this->__get4($dat, $ppos+4);
+					$numdic=$this->_get4($dat, $ppos+4);
 					for ($k=0; $k<$numdic; $k++){
-						switch ($this->__get4($dat, $ppos+$dpos+8)){
+						switch ($this->_get4($dat, $ppos+$dpos+8)){
 						case 30:
-							$dlen=$this->__get4($dat, $ppos+$dpos+12);
+							$dlen=$this->_get4($dat, $ppos+$dpos+12);
 							$heading=mb_convert_encoding(substr($dat,$ppos+$dpos+16,$dlen), $this->charset,$pchar);
 							$dpos+=$dlen+8;
 							break;
@@ -1991,7 +2013,8 @@ if (!isset($this->recXF[$cell['xf']]['formindex'])) $this->recXF[$cell['xf']]['f
 */
 class ErrMess {
     var $message = '';
-    function ErrMess($message){$this->message = $message;}
+    function __construct($message){$this->message = $message;}
+    function ErrMess($message){self::__construct($message);}
     function getMessage() {return ($this->message);}
 }
 

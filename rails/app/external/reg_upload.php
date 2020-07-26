@@ -95,6 +95,7 @@ if ($xls) {
 require "rubygems"
 require "active_record"
 require "yaml"
+require "erb"
 
 rails_prefix = ARGV[0] || "./"
 group = ARGV[1] || exit(0)
@@ -102,7 +103,7 @@ group = ARGV[1] || exit(0)
 config_db = rails_prefix + "/config/database.yml"
 db_env = "{$rails_env}".intern
 
-ActiveRecord::Base.configurations = YAML.load_file(config_db)
+ActiveRecord::Base.configurations = YAML.load(ERB.new(Pathname.new(config_db).read).result)
 ActiveRecord::Base.establish_connection(db_env)
 Dir.glob(rails_prefix + '/app/models/*.rb').each do |model|
   load model

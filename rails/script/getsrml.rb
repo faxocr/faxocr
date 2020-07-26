@@ -3,10 +3,11 @@ require File.expand_path('../../config/environment',  __FILE__)
 require "rubygems"
 require "active_record"
 require "yaml"
+require "erb"
 require "cgi"
 config_db = "#{Rails.root}/config/database.yml"
-db_env = :development
-ActiveRecord::Base.configurations = YAML.load_file(config_db)
+db_env = ENV['RAILS_ENV'] && ENV['RAILS_ENV'].intern || ENV['RACK_ENV'] && ENV['RACK_ENV'].intern || :development
+ActiveRecord::Base.configurations = YAML.load(ERB.new(Pathname.new(config_db).read).result)
 ActiveRecord::Base.establish_connection(db_env)
 
 accept_survey_statuses = []
