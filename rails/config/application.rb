@@ -1,4 +1,4 @@
-require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
 
 require 'rails/all'
 
@@ -25,8 +25,5 @@ module Faxocr
     config.encoding = "utf-8"
 
     config.action_controller.action_on_unpermitted_parameters = :raise
-
-    # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
   end
 end
