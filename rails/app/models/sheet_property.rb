@@ -1,4 +1,4 @@
-class SheetProperty < ActiveRecord::Base
+class SheetProperty < ApplicationRecord
   belongs_to :survey_property
   belongs_to :sheet
 

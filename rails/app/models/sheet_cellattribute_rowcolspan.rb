@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class SheetCellattributeRowcolspan < ActiveRecord::Base
+class SheetCellattributeRowcolspan < ApplicationRecord
   belongs_to :sheet_cellattribute
 
   def get_one_srml_entry(row_or_col)

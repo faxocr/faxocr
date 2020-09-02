@@ -1,4 +1,4 @@
-class Candidate < ActiveRecord::Base
+class Candidate < ApplicationRecord
   belongs_to  :group
   has_many    :survey_candidates, :dependent => :destroy
   has_many    :surveys, :through => :survey_candidates

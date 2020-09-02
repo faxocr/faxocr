@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class SheetCellattribute < ActiveRecord::Base
+class SheetCellattribute < ApplicationRecord
   belongs_to :sheet
   has_many :sheet_cellattribute_colwidths,   :dependent => :destroy
   has_many :sheet_cellattribute_rowheights,  :dependent => :destroy

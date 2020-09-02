@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-class SurveyProperty < ActiveRecord::Base
+class SurveyProperty < ApplicationRecord
   belongs_to :survey
   DATA_TYPE = [["数字", "number"], ["○△×", "rating"], ["画像", "image"], ["英字（小文字）", "alphabet_lowercase"], ["英字（大文字）", "alphabet_uppercase"], ["英数字", "alphabet_number"]]
 

@@ -2,7 +2,7 @@
 
 require 'rexml/text'
 
-class Survey < ActiveRecord::Base
+class Survey < ApplicationRecord
   belongs_to  :group
 
   has_many    :sheets, :dependent => :destroy

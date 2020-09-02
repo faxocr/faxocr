@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class Sheet < ActiveRecord::Base
+class Sheet < ApplicationRecord
 
   belongs_to :survey
   has_many :answer_sheets, :dependent => :destroy

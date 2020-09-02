@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-class SurveyCandidate < ActiveRecord::Base
+class SurveyCandidate < ApplicationRecord
   belongs_to :survey
   belongs_to :candidate
   ROLES = [['報告受付対象', 'r'], ['集計レポート送信', 's']]

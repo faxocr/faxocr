@@ -1,4 +1,4 @@
-class Group < ActiveRecord::Base
+class Group < ApplicationRecord
   has_many  :surveys, :dependent => :destroy
   has_many  :candidates, :dependent => :destroy
   has_many  :role_mappings, :dependent => :destroy

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class AnswerSheet < ActiveRecord::Base
+class AnswerSheet < ApplicationRecord
   has_many :answer_sheet_properties, :dependent => :destroy
 
   belongs_to :sheet

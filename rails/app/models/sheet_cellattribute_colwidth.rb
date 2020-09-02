@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class SheetCellattributeColwidth < ActiveRecord::Base
+class SheetCellattributeColwidth < ApplicationRecord
   belongs_to :sheet_cellattribute
 
   def get_one_srml_entry

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class RoleMapping < ActiveRecord::Base
+class RoleMapping < ApplicationRecord
   belongs_to :group
   belongs_to :user
   validates_uniqueness_of :user_id, :scope => 'group_id'
