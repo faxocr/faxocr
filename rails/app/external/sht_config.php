@@ -473,6 +473,7 @@ cellinfo = Hash.new()
 ActiveRecord::Base.configurations = YAML.load(ERB.new(Pathname.new(config_db).read).result)
 ActiveRecord::Base.establish_connection(db_env)
 
+load rails_prefix + '/app/models/application_record.rb'
 Dir.glob(rails_prefix + '/app/models/*.rb').each do |model|
   load model
 end
