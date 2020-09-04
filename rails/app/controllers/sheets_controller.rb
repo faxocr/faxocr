@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 class SheetsController < ApplicationController
-  before_filter :verify_group_authority
+  before_action :verify_group_authority
   # GET /sheets
   # GET /sheets.xml
   def index

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 class GroupsController < ApplicationController
-  before_filter :verify_group_authority
+  before_action :verify_group_authority
   def verify_group_authority
     super(:group_id => params[:id])
   end

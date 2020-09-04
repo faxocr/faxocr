@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 class SheetPropertiesController < ApplicationController
-  before_filter :verify_group_authority
+  before_action :verify_group_authority
   # GET /sheet_properties
   # GET /sheet_properties.xml
   def index

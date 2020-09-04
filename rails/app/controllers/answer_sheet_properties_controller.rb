@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 class AnswerSheetPropertiesController < ApplicationController
-  before_filter :verify_group_authority
+  before_action :verify_group_authority
   # GET /answer_sheet_properties
   # GET /answer_sheet_properties.xml
   def index

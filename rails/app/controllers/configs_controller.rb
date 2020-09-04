@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 class ConfigsController < ApplicationController
-  before_filter :administrator_only
+  before_action :administrator_only
 
   def index
     redirect_to note_configs_path

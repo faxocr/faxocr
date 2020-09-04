@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 class RoleMappingsController < ApplicationController
-  before_filter :administrator_only
+  before_action :administrator_only
   # GET /role_mappings
   # GET /role_mappings.xml
   def index

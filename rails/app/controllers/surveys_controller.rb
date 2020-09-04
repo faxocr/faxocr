@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 class SurveysController < ApplicationController
-  before_filter :verify_group_authority
-  before_filter :verify_survey_authority
-  before_filter :verify_role, :except => [:index, :index_group, :show, :show_group]
+  before_action :verify_group_authority
+  before_action :verify_survey_authority
+  before_action :verify_role, :except => [:index, :index_group, :show, :show_group]
 
   def verify_survey_authority
     super(:survey_id => params[:id])

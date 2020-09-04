@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 class FaxocrController < ApplicationController
-  before_filter :verify_group_authority, :only => :direct_masquerade
+  before_action :verify_group_authority, :only => :direct_masquerade
 
   def index
      if (@current_group.is_administrator?)

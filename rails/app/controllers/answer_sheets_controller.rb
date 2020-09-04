@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 class AnswerSheetsController < ApplicationController
-  before_filter :verify_group_authority, :except => [:index_all]
+  before_action :verify_group_authority, :except => [:index_all]
 
   # GET /answer_sheets
   # GET /answer_sheets.xml

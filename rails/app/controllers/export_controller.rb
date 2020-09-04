@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 class ExportController < ApplicationController
-  before_filter :verify_survey_authority
+  before_action :verify_survey_authority
   def csv
     year = params[:year]
     month = params[:month]

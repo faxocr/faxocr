@@ -1,9 +1,9 @@
 class InboxController < ApplicationController
-  before_filter :verify_group_authority,
+  before_action :verify_group_authority,
     :only => :group_surveys
-  before_filter :verify_survey_authority,
+  before_action :verify_survey_authority,
     :only => :survey_answer_sheets
-  before_filter :verify_answer_sheet_authority,
+  before_action :verify_answer_sheet_authority,
     :only => [:answer_sheet_properties, :update_answer_sheet_properties]
 
   def index

@@ -3,7 +3,7 @@ require "net/smtp"
 
 class ExternalController < ApplicationController
 
-  skip_before_filter :verify_authenticity_token ,:only => [:reg_upload, :reg_exec, :sht_field, :sht_script, :sht_marker, :sht_config, :sht_verify, :sht_commit, :sht_field_checker]
+  skip_before_action :verify_authenticity_token ,:only => [:reg_upload, :reg_exec, :sht_field, :sht_script, :sht_marker, :sht_config, :sht_verify, :sht_commit, :sht_field_checker]
 
   # file size limit
   # @@size_limit = 60000

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 class UsersController < ApplicationController
-  before_filter :verify_group_authority
-  before_filter :verify_user_id, :except => [:index, :new, :create]
-  before_filter :verify_role, :except => [:index, :show, :edit, :edit_self, :update_self]
+  before_action :verify_group_authority
+  before_action :verify_user_id, :except => [:index, :new, :create]
+  before_action :verify_role, :except => [:index, :show, :edit, :edit_self, :update_self]
   
   # GET /users
   # GET /users.xml

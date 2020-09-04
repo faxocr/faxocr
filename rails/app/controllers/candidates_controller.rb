@@ -1,6 +1,6 @@
 class CandidatesController < ApplicationController
-  before_filter :verify_group_authority
-  before_filter :verify_candidate_authority, :only => [:show, :edit, :update, :destroy]
+  before_action :verify_group_authority
+  before_action :verify_candidate_authority, :only => [:show, :edit, :update, :destroy]
   def verify_candidate_authority
     super(:candidate_id => params[:id])
   end
