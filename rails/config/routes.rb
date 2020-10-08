@@ -92,13 +92,12 @@ Faxocr::Application.routes.draw do
     get 'sheet/:group_id/:survey_id', :action => 'sheet'
     post 'sht_field', :action => 'sht_field'
     post 'sht_script', :action => 'sht_script'
-    post 'sht_marker', :action => 'sht_marker'  # also get
+    match 'sht_marker', :via => [:get, :post]
     post 'sht_config', :action => 'sht_config'
     post 'sht_verify', :action => 'sht_verify'
     post 'sht_commit', :action => 'sht_commit'
 
     # PHP driver
-    get ':action', :action => 'index'
     get 'download/:group_id/:survey_id', :action => 'download'  #get
     get 'download_zip/:group_id/:survey_id', :action => 'download_zip'
     get 'download_html/:group_id/:survey_id', :action => 'download_html'
