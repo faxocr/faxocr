@@ -53,15 +53,13 @@ class ExportController < ApplicationController
           line_string + "\r\n"
       end
     end
-    disposition_string = "inline; filename=\"#{year}#{month}#{day}_#{@survey.survey_name}.csv\""
+    csv_filename ="#{year}#{month}#{day}_#{@survey.survey_name}.csv"
     if request.user_agent =~ /windows/i
       #Puts csv in Shift-JIS.
       csv_string.encode!("SJIS")
-      disposition_string.encode!("SJIS")
+      csv_filename.encode!("SJIS")
     end
-    response.headers['Content-Type'] = 'text/csv'
-    response.headers['Content-Disposition'] = disposition_string
-    render :text => csv_string, :layout => false
+    send_data csv_string, filename: csv_filename, disposition: 'inline'
   end
 
 end
