@@ -353,7 +353,7 @@ class AnswerSheetsController < ApplicationController
       File.delete(File.join(SHEETREADER_ANALYZED_DIR, @answer_sheet.sheet_image))
     end
     # deletes records in the db;
-    AnswerSheetProperty.destroy_all(["answer_sheet_id = ?", @answer_sheet.id])
+    AnswerSheetProperty.where(["answer_sheet_id = ?", @answer_sheet.id]).destroy_all()
     @answer_sheet.destroy
 
     respond_to do |format|
