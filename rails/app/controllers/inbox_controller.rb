@@ -38,6 +38,6 @@ class InboxController < ApplicationController
         access_violation
       end
     end
-    redirect_to(:back)
+    redirect_back fallback_location: { action: :answer_sheet_properties }
   end
 end
