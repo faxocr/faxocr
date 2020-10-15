@@ -19,7 +19,7 @@
       Survey::REPORT_WDAY.each do |r|
       checked = @survey.report_wday_by_array.include?(r[1]) ? true : false
     %>
-    <%= check_box_tag "report_wday_by_array[]", r[1], checked %><%= r[0] %>
+    <%= check_box_tag "survey[report_wday_by_array][]", r[1], checked %><%= r[0] %>
     <% end %>
   </p>
 
