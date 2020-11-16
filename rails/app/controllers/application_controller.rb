@@ -169,12 +169,12 @@ protected
   end
 
   def debug_mode
-    value = `. #{Rails.root}/../etc/faxocr.conf; echo $DEBUG_MODE`
+    value = `. #{File.join(FAXOCR_ETC_DIR, 'faxocr.conf')}; echo $DEBUG_MODE`
     value.chomp
   end
 
   def page_size
-    value = `. #{Rails.root}/../etc/faxocr.conf; echo $PAGE_SIZE`
+    value = `. #{File.join(FAXOCR_ETC_DIR, 'faxocr.conf')}; echo $PAGE_SIZE`
     value.chomp
     if value.to_i == 0
       value = 10
