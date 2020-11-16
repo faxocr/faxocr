@@ -1,15 +1,17 @@
 #!/bin/sh
 
+script_dir=`dirname "$0"`
+FAXOCR_ROOT=${FAXOCR_ROOT:="`(cd "$script_dir" && cd .. && pwd)`"}
 
 # export PATH=/usr/local/bin:/usr/sbin:$PATH
-export PATH=/usr/local/bin:/usr/sbin:/home/faxocr/bin/:"$PATH"
+export PATH=/usr/local/bin:/usr/sbin:"${FAXOCR_ROOT}"/bin:"$PATH"
 
 #
 # import configuration
 #
-CONF_FILE=~faxocr/etc/faxocr.conf
-CONF_PROC=~faxocr/bin/doconfig.sh
-UTIL_FILE=~faxocr/bin/procfax_utils.sh
+CONF_FILE=${FAXOCR_ROOT}/etc/faxocr.conf
+CONF_PROC=${FAXOCR_ROOT}/bin/doconfig.sh
+UTIL_FILE=${FAXOCR_ROOT}/bin/procfax_utils.sh
 
 . $CONF_FILE
 . $CONF_PROC
@@ -25,7 +27,7 @@ LOG_FILE_FOR_THIS_SESSION="$SESSION_LOG_DIR"/procfax.log
 #
 # set working directory of this script
 #
-cd ~faxocr
+cd "${FAXOCR_ROOT}"
 
 #
 # have not to run multiple instances

@@ -317,7 +317,7 @@ class ExternalController < ApplicationController
       @ret = `rm -f doc_data.txt`
       @ret = `cp -p #{@file_html} #{@file_prefix}.html`
     else
-      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{RAILS_ENV}\" debug_mode=\"#{debug_mode}\"`
+      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{Rails.env}\" debug_mode=\"#{debug_mode}\" faxocr_root=\"#{FAXOCR_DIR}\"`
       # flash[:notice] = @errmsg
       # flash[:notice] = "セーブしました"
     end

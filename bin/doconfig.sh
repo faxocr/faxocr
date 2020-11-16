@@ -76,7 +76,7 @@ if [ -z "$FAX_RECV_SETTING" ] ; then
     FAX_RECV_SETTING="smtp"
 fi
 
-ERROR_PDF_FILE_FOR_FAX_SENDER=${ERRORPDF:="/home/faxocr/etc/error.pdf"}
+ERROR_PDF_FILE_FOR_FAX_SENDER=${ERRORPDF:="etc/error.pdf"}
 
 if [ -z "$BIZFAX_FAX_SIZE" ] ; then
     BIZFAX_FAX_SIZE="A4"
