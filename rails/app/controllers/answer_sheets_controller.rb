@@ -180,13 +180,13 @@ class AnswerSheetsController < ApplicationController
       redirect_to(group_survey_answer_sheets_url(@group, @survey))
     end
 
-    send_file("#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}",
+    send_file(File.join(SHEETREADER_ANALYZED_DIR, @answer_sheet.sheet_image),
               :type => 'image/png',
               :disposition => 'inline')
 
 #    response.headers['Content-Type'] = 'image/png'
 #    image = ""
-#    File.open("#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}").each do |buff|
+#    File.open(File.join(SHEETREADER_ANALYZED_DIR, @answer_sheet.sheet_image)).each do |buff|
 #      image = image + buff
 #    end
 #    render :text => image, :layout => false
@@ -203,9 +203,9 @@ class AnswerSheetsController < ApplicationController
       redirect_to(group_survey_answer_sheets_url(@group, @survey))
     end
 
-    @filename = "#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}".gsub('.png', '_thumb.png')
+    @filename = File.join(SHEETREADER_ANALYZED_DIR, @answer_sheet.sheet_image).gsub('.png', '_thumb.png')
     if !File.exists?(@filename)
-      @filename = "#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}"
+      @filename = File.join(SHEETREADER_ANALYZED_DIR, @answer_sheet.sheet_image)
     end
 
     send_file(@filename,
@@ -229,9 +229,9 @@ class AnswerSheetsController < ApplicationController
       redirect_to(group_survey_answer_sheets_url(@group, @survey))
     end
 
-    @filename = "#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}".gsub('.png', '_thumb.png')
+    @filename = File.join(SHEETREADER_ANALYZED_DIR, @answer_sheet.sheet_image).gsub('.png', '_thumb.png')
     if !File.exists?(@filename)
-      @filename = "#{MyAppConf::IMAGE_PATH_PREFIX}#{@answer_sheet.sheet_image}"
+      @filename = File.join(SHEETREADER_ANALYZED_DIR, @answer_sheet.sheet_image)
     end
 
     send_file(@filename, :type => 'image/png', :disposition => 'inline')
@@ -343,14 +343,14 @@ class AnswerSheetsController < ApplicationController
 
     # deletes files in the file-system;
     @answer_sheet_properties.each do |answer_sheet_propertie|
-      filename = MyAppConf::IMAGE_PATH_PREFIX + answer_sheet_propertie.ocr_image
+      filename = File.join(SHEETREADER_ANALYZED_DIR, answer_sheet_propertie.ocr_image)
       if File.exist?(filename) && File.ftype(filename) == "file"
-          File.delete(MyAppConf::IMAGE_PATH_PREFIX + answer_sheet_propertie.ocr_image)
+          File.delete(File.join(SHEETREADER_ANALYZED_DIR, answer_sheet_propertie.ocr_image))
       end
     end
-    filename = MyAppConf::IMAGE_PATH_PREFIX + @answer_sheet.sheet_image
+    filename = File.join(SHEETREADER_ANALYZED_DIR, @answer_sheet.sheet_image)
     if File.exist?(filename) && File.ftype(filename) == "file"
-      File.delete(MyAppConf::IMAGE_PATH_PREFIX + @answer_sheet.sheet_image)
+      File.delete(File.join(SHEETREADER_ANALYZED_DIR, @answer_sheet.sheet_image))
     end
     # deletes records in the db;
     AnswerSheetProperty.destroy_all(["answer_sheet_id = ?", @answer_sheet.id])

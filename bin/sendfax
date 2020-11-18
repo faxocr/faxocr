@@ -10,10 +10,12 @@
 # % sendfax fax_number "" attachmentfile
 #
 
-# get configuration
+script_dir=`dirname "$0"`
+FAXOCR_ROOT=${FAXOCR_ROOT:="`(cd "$script_dir" && cd .. && pwd)`"}
 
-CONF_FILE=~faxocr/etc/faxocr.conf
-CONF_PROC=~faxocr/bin/doconfig.sh
+# get configuration
+CONF_FILE=${FAXOCR_ROOT}/etc/faxocr.conf
+CONF_PROC=${FAXOCR_ROOT}/bin/doconfig.sh
 
 . $CONF_FILE
 . $CONF_PROC
@@ -23,7 +25,7 @@ FAX_SUBJ=$2
 FAX_IMG=$3
 FAX_TO=$FAX_NO"@"$FAX_SEND_TARGET
 
-cd ~faxocr
+cd "$FAXOCR_ROOT"
 echo "`date +%Y/%m/%d\ %H:%M:%S` to=$FAX_NO subject=$FAX_SUBJ via=$FAX_SEND_TYPE" >> $DIR_FAX/Log/sendfax.log
 
 case "$FAX_SEND_TYPE" in

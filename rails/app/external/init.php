@@ -81,4 +81,8 @@ if (isset($_REQUEST["msg"])) {
 	$errmsg = $_REQUEST["msg"];
 }
 
+if (isset($_REQUEST["faxocr_root"])) {
+	$faxocr_root = $_REQUEST["faxocr_root"];
+}
+
 ?>

@@ -2,8 +2,11 @@
 
 set -u
 
-CONF_FILE=~faxocr/etc/faxocr.conf
-UTIL_FILE=~faxocr/bin/procfax_utils.sh
+script_dir=`dirname "$0"`
+FAXOCR_ROOT=${FAXOCR_ROOT:="`(cd "$script_dir" && cd .. && pwd)`"}
+
+CONF_FILE=${FAXOCR_ROOT}/etc/faxocr.conf
+UTIL_FILE=${FAXOCR_ROOT}/bin/procfax_utils.sh
 
 . $CONF_FILE
 . $UTIL_FILE
