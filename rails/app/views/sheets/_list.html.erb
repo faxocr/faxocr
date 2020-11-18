@@ -36,7 +36,7 @@
 	<% if params[:controller] == "sheets" %>
     <% if @current_user.has_survey_role(@group.id) %>
     <td class="surveysobject_manage">
-      <% file_zip = "#{Rails.root}/files/#{@group.id.to_s}-#{sheet.id.to_s}.zip" %>
+      <% file_zip = File.join(RAILS_FILES_DIR, "#{@group.id.to_s}-#{sheet.id.to_s}.zip") %>
       <% if File.exist?(file_zip) %>
       <%= link_to '[PDF]', "/external/download_zip/#{@group.id}/#{sheet.id}" %>
       <% end %>
@@ -47,7 +47,7 @@
     <% end %>
     <% else %>
     <td class="surveysobject_manage">
-      <% file_zip = "#{Rails.root}/files/#{@group.id.to_s}-#{sheet.sheet_code.to_i.to_s}.zip" %>
+      <% file_zip = File.join(RAILS_FILES_DIR, "#{@group.id.to_s}-#{sheet.sheet_code.to_i.to_s}.zip") %>
       <% if File.exist?(file_zip) %>
       <%= link_to '[PDF]', "/external/download_zip/#{@group.id}/#{sheet.sheet_code.to_i}" %>
       <% end %>

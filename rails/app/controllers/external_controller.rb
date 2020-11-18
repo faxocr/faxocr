@@ -81,7 +81,7 @@ class ExternalController < ApplicationController
     end
 
     if 0 < @size && @size <= @@size_limit && /\.xls$/ =~ @filename then
-      File.open("#{Rails.root}/files/#{@tname}" + ".lst", "wb") {
+      File.open(File.join(RAILS_FILES_DIR, @tname + '.lst'), "wb") {
         |f| f.write(params[:file]['upfile'].read)
       }
       # @html = "GID: " + @gid + "\n<BR>" +
@@ -103,7 +103,7 @@ class ExternalController < ApplicationController
     @file = params[:file]
     @gid = params[:gid]
     @group = Group.find(params[:gid])
-    @result = `ruby #{Rails.root}/files/#{@file}.rb #{Rails.root} #{@gid}`
+    @result = `ruby #{File.join(RAILS_FILES_DIR, @file + '.rb')} #{Rails.root} #{@gid}`
 
     flash[:notice] = "調査対象を一括登録しました"
     redirect_to group_candidates_url(@group)
@@ -143,7 +143,7 @@ class ExternalController < ApplicationController
 
     if 0 < @size && @size <= @@size_limit && /(\.xlsx?)$/ =~ @filename then
       ext = $1
-      outputFileName = "#{Rails.root}/files/#{@tname}"
+      outputFileName = File.join(RAILS_FILES_DIR, @tname)
       outputFileNameWithExt = outputFileName + ext
       File.open(outputFileNameWithExt, "wb") {
         |f| f.write(params[:file]['upfile'].read)
@@ -210,7 +210,7 @@ class ExternalController < ApplicationController
         redirect_to :controller => 'faxocr'
     elsif 0 < @size && @size <= @@size_limit && /(\.xlsx?)$/ =~ @filename then
       ext = $1
-      outputFileName = "#{Rails.root}/files/#{@tname}"
+      outputFileName = File.join(RAILS_FILES_DIR, @tname)
       outputFileNameWithExt = outputFileName + ext
       File.open(outputFileNameWithExt, "wb") {
         |f| f.write(params[:file]['upfile'].read)
@@ -302,8 +302,8 @@ class ExternalController < ApplicationController
     @param_str += "\""
 
     if (params[:func]) then
-      @file_html = "#{Rails.root}/files/#{@file}.html"
-      @file_prefix = "#{Rails.root}/files/#{@gid}-#{@sid}"
+      @file_html = File.join(RAILS_FILES_DIR, @file + '.html')
+      @file_prefix = File.join(RAILS_FILES_DIR, "#{@gid}-#{@sid}")
       @orient = params[:orient]
 
       @ret = `cd #{Rails.root}; xvfb-run -a wkhtmltopdf --page-size A4 -O #{@orient} #{@file_html} #{@file_prefix}.pdf`
@@ -317,7 +317,7 @@ class ExternalController < ApplicationController
       @ret = `rm -f #{@file_prefix}.zip; zip -j #{@file_prefix}.zip #{@file_prefix}-[0-9]*.pdf`
       @ret = `rm -f #{@file_prefix}-*.pdf`
     else
-      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{Rails.env}\" debug_mode=\"#{debug_mode}\"`
+      @ret = `cd ./app/external; php sht_config.php file=\"#{@file}\" #{@param_str} rails_env=\"#{Rails.env}\" debug_mode=\"#{debug_mode}\" faxocr_root=\"#{FAXOCR_DIR}\"`
       # flash[:notice] = @errmsg
       # flash[:notice] = "セーブしました"
     end
@@ -343,11 +343,11 @@ class ExternalController < ApplicationController
     @file = params[:fileid]
     @group = Group.find(params[:gid])
 
-    @result = `ruby #{Rails.root}/files/#{@file}.rb #{Rails.root} #{@gid}`
+    @result = `ruby #{File.join(RAILS_FILES_DIR, @file + '.rb')} #{Rails.root} #{@gid}`
 
     if debug_mode == 'true'
-      @file_prefix = "#{Rails.root}/files/#{@gid}-#{@sid}"
-      @debug = `cd #{Rails.root}/files/`
+      @file_prefix = File.join(RAILS_FILES_DIR, "#{@gid}-#{@sid}")
+      @debug = `cd #{RAILS_FILES_DIR}`
       @debug = `convert #{@file_prefix}.pdf #{@file_prefix}.tif`
       sendmail "#{@file_prefix}.tif"
     end
@@ -360,13 +360,13 @@ class ExternalController < ApplicationController
 
     @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
     @sid = params[:survey_id]
-    @file_pdf = "#{Rails.root}/files/#{@gid}-#{@sid}.pdf"
+    @file_pdf = File.join(RAILS_FILES_DIR, "#{@gid}-#{@sid}.pdf")
 
-    # send_file("#{Rails.root}/files/simple.zip",
+    # send_file(File.join(RAILS_FILES_DIR, 'simple.zip'),
     #          {:filename => "simple.zip",
     #           :type => "application/zip"})
 
-    # send_file("#{Rails.root}/files/simple.pdf",
+    # send_file(File.join(RAILS_FILES_DIR, 'simple.pdf'),
     #           {:filename => "simple.pdf",
     #             :type => "application/pdf"})
 
@@ -379,7 +379,7 @@ class ExternalController < ApplicationController
 
     @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
     @sid = params[:survey_id]
-    @file_zip = "#{Rails.root}/files/#{@gid}-#{@sid}.zip"
+    @file_zip = File.join(RAILS_FILES_DIR, "#{@gid}-#{@sid}.zip")
 
     send_file(@file_zip,
               {:filename => "#{@gid}-#{@sid}.zip",
@@ -390,7 +390,7 @@ class ExternalController < ApplicationController
 
     @gid = params[:group_id].nil? ? params[:id] : params[:group_id]
     @sid = params[:survey_id]
-    @file_html = "#{Rails.root}/files/#{@gid}-#{@sid}.html"
+    @file_html = File.join(RAILS_FILES_DIR, "#{@gid}-#{@sid}.html")
 
     send_file(@file_html,
               {:filename => "#{@gid}-#{@sid}.html",
@@ -401,7 +401,7 @@ class ExternalController < ApplicationController
 
     @gid = params[:group_id]
     @sid = params[:survey_id]
-    @file_png = "#{Rails.root}/files/#{@gid}-#{@sid}.png"
+    @file_png = File.join(RAILS_FILES_DIR, "#{@gid}-#{@sid}.png")
 
     send_file(@file_png,
               {:filename => "#{@gid}-#{@sid}.png",

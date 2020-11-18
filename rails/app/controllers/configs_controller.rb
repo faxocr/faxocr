@@ -7,14 +7,14 @@ class ConfigsController < ApplicationController
   end
 
   def view_system_config
-    @config_file_path = "#{Rails.root}/../etc/faxocr.conf"
+    @config_file_path = File.join(FAXOCR_ETC_DIR, 'faxocr.conf')
     @raw_config = File.read(@config_file_path)
   end
 
   def update_system_config
     @body = params[:body].to_s.gsub("\r\n", "\n")
 
-    @config_file_path = "#{Rails.root}/../etc/faxocr.conf"
+    @config_file_path = File.join(FAXOCR_ETC_DIR, 'faxocr.conf')
     File.open(@config_file_path, "w") do |f|
       f.write(@body)
     end
@@ -31,13 +31,13 @@ class ConfigsController < ApplicationController
 
   def view_procfax_log
     @page_size = page_size
-    @logdir_path = "#{Rails.root}/../Faxsystem/Log/*"
+    @logdir_path = File.join(FAXOCR_FAXSYSTEM_LOG_DIR, '*')
     files = Dir.glob(@logdir_path).sort.reverse
     @str = get_summary_of_procfax_log(files, @page_size)
   end
 
   def download_all_procfax_log
-    @logdir_path = "#{Rails.root}/../Faxsystem/Log/*"
+    @logdir_path = File.join(FAXOCR_FAXSYSTEM_LOG_DIR, '*')
     files = Dir.glob(@logdir_path).sort.reverse
     str = get_summary_of_procfax_log(files, -1)
     respond_to do |format|
@@ -46,8 +46,8 @@ class ConfigsController < ApplicationController
   end
 
   def procfax_exec
-    @script_path = "#{Rails.root}/../bin/procfax.sh"
-    log_file_path = "#{Rails.root}/../Faxsystem/Log/rails_procfax.log"
+    @script_path = File.join(FAXOCR_BIN_DIR, 'procfax.sh')
+    log_file_path = File.join(FAXOCR_FAXSYSTEM_LOG_DIR, 'rails_procfax.log')
     @raw_config = `sh #{@script_path}`
     @result = $?.exitstatus == 0 ? true : false
     open(log_file_path, "a") do |f|
@@ -57,8 +57,8 @@ class ConfigsController < ApplicationController
   end
 
   def getfax_exec
-    @script_path = "#{Rails.root}/../bin/getfax"
-    @log_file_path = "#{Rails.root}/../Faxsystem/Log/rails_procfax.log"
+    @script_path = File.join(FAXOCR_BIN_DIR, 'getfax')
+    @log_file_path = File.join(FAXOCR_FAXSYSTEM_LOG_DIR, 'rails_procfax.log')
 
     @result = system("sh " + @script_path + " >> " + @log_file_path)
     case @result
@@ -85,7 +85,7 @@ class ConfigsController < ApplicationController
   end
 
   def note
-    @config_file_path = "#{Rails.root}/../etc/note.txt"
+    @config_file_path = File.join(FAXOCR_ETC_DIR, 'note.txt')
 
     if File.exist?(@config_file_path)
       @raw_config = File.read(@config_file_path)
@@ -95,7 +95,7 @@ class ConfigsController < ApplicationController
   def note_update
     @body = params[:body].to_s.gsub("\r\n", "\n")
 
-    @config_file_path = "#{Rails.root}/../etc/note.txt"
+    @config_file_path = File.join(FAXOCR_ETC_DIR, 'note.txt')
     File.open(@config_file_path, "w") do |f|
       f.write(@body)
     end
@@ -107,14 +107,14 @@ class ConfigsController < ApplicationController
 
   def view_sendfax_log
     @page_size = page_size
-    @log_file_path = "#{Rails.root}/../Faxsystem/Log/sendfax.log"
+    @log_file_path = File.join(FAXOCR_FAXSYSTEM_LOG_DIR, 'sendfax.log')
     @raw_config = `tail -10 #{@log_file_path}`
   end
 
   def sendtestfax_exec
-    @script_path = "#{Rails.root}/../bin/sendfax"
-    @fax_data_pdf = "#{Rails.root}/../etc/test.pdf"
-    @log_file_path = "#{Rails.root}/../Faxsystem/Log/rails_sendtestfax.log"
+    @script_path = File.join(FAXOCR_BIN_DIR, 'sendfax')
+    @fax_data_pdf = File.join(FAXOCR_ETC_DIR, 'test.pdf')
+    @log_file_path = File.join(FAXOCR_FAXSYSTEM_LOG_DIR, 'rails_sendtestfax.log')
     @dest_fax_num = params[:dest_fax_num].to_s
 
     if /[^0-9-]/ =~ @dest_fax_num
@@ -136,13 +136,13 @@ class ConfigsController < ApplicationController
   end
 
   def view_faxmail_queue
-    @raw_config = `ls -lt #{Rails.root}/../Maildir/new | tail -n +2 | cat -n`
+    @raw_config = `ls -lt #{MAIL_QUEUE_DIR} | tail -n +2 | cat -n`
 
     if @raw_config.length == 0
       @raw_config = "[No new Fax]"
     end
 
-    @config_file_path = "#{Rails.root}/../etc/faxocr.conf"
+    @config_file_path = File.join(FAXOCR_ETC_DIR, 'faxocr.conf')
     @result = system("sh -c '. " + @config_file_path + '; test "$FAX_RECV_SETTING" = "pop3" && exit 0; exit 1 \'')
     case @result
     when true

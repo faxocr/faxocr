@@ -1,5 +1,7 @@
 #!/bin/sh
 
+script_dir=`dirname "$0"`
+FAXOCR_ROOT=${FAXOCR_ROOT:="`(cd "$script_dir" && cd .. && pwd)`"}
 TMPNAME=fonttest
 
 echo "
@@ -1186,9 +1188,9 @@ vertical-align: middle;
 </style>
 
 <div id=\"ex3\" class=\"jqDnR\" style=\"top:0px; left:0px; z-index: 3; position: relative; width: 960px; height:610.90909090909px; font-size: 12px; \">
-<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;left: 0; width: 41.454545454545px;\"><div style=\"position: absolute; left:82.909090909091px; \"><font style=\"line-height: 41.454545454545px; font-size: 41.454545454545px; font-family: 'OCRB'; \">00000</font></div>
-<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;right: 0; width: 41.454545454545px;\">
-<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: 41.454545454545px;\"><div style=\"position: absolute; left:82.909090909091px; bottom: 0\"><font style=\"line-height: 41.454545454545px; font-size: 41.454545454545px; font-family: 'OCRB'; \">00007</font></div>
+<img src=\"${FAXOCR_ROOT}/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;left: 0; width: 41.454545454545px;\"><div style=\"position: absolute; left:82.909090909091px; \"><font style=\"line-height: 41.454545454545px; font-size: 41.454545454545px; font-family: 'OCRB'; \">00000</font></div>
+<img src=\"${FAXOCR_ROOT}/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; top: 0;right: 0; width: 41.454545454545px;\">
+<img src=\"${FAXOCR_ROOT}/etc/mark.gif\" class=\"mark-img\" style=\"position: absolute; bottom: 0;left: 0; width: 41.454545454545px;\"><div style=\"position: absolute; left:82.909090909091px; bottom: 0\"><font style=\"line-height: 41.454545454545px; font-size: 41.454545454545px; font-family: 'OCRB'; \">00007</font></div>
 <table class=\"sheet\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"960\" height=\"610.90909090909\" style=\"table-layout:fixed; border-collapse: collapse;\" bgcolor=\"#FFFFFF\" >
   <tr height=\"43.636363636364\">
  <td nowrap=\"nowrap\"  class=\"XF15\"  ></td>

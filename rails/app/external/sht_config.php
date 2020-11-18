@@ -68,7 +68,7 @@ put_rails($file_id, $sheet_marker, $rails_env, $conf);
 if ($xls) {
 	$html = put_header();
 	$html .= put_css($xls);
-	$html .= put_excel($xls, $marker_window, $sheet_marker, $field_index, $conf, $debug_mode);
+	$html .= put_excel($xls, $marker_window, $sheet_marker, $field_index, $conf, $debug_mode, $faxocr_root);
 	$html .= put_footer();
 	file_put_contents(DST_DIR . $file_id . ".html", $html);
 
@@ -203,7 +203,7 @@ function put_footer()
 	return $html;
 }
 
-function put_excel($xls, $marker_window, $sheet_marker, $field_index, &$conf, $debug_mode)
+function put_excel($xls, $marker_window, $sheet_marker, $field_index, &$conf, $debug_mode, $faxocr_root)
 {
 	$sid = sprintf("%05d", $conf->get("sid"));
 	$cid = strtok($conf->get("candidate_code"), "-");
@@ -220,15 +220,15 @@ function put_excel($xls, $marker_window, $sheet_marker, $field_index, &$conf, $d
 		$html .= "<div id=\"ex3\" class=\"jqDnR\" style=\"z-index: 3; position: relative; width: " . $sheet_marker->disp_sheet->marker_window->width . "px; height: " . $sheet_marker->disp_sheet->marker_window->height . "px; font-size: 12px; padding: 0px; border: 0px; margin: 0px; \">\n";
 
 		// marker: top - left
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" alt=\"marker\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->position_y . "px; left: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->position_x . "px; width: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->width . "px; height: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->height . "px; z-index: 100; \" />";
+		$html .= "<img src=\"${faxocr_root}/etc/mark.gif\" class=\"mark-img\" alt=\"marker\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->position_y . "px; left: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->position_x . "px; width: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->width . "px; height: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->height . "px; z-index: 100; \" />";
 		// sheet ID: top
 		$html .= "<div style=\"position: absolute; top: " . $sheet_marker->disp_sheet->marker_window->topLeftMarker->position_y . "px; left: " . $sheet_marker->disp_sheet->marker_window->position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-size: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $cid . "</font></div>\n";
 
 		// marker: top - right
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" alt=\"marker\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->marker_window->topRightMarker->position_y . "px; left: " . $sheet_marker->disp_sheet->marker_window->topRightMarker->position_x . "px; width: " . $sheet_marker->disp_sheet->size_of_marker . "px; height: " . $sheet_marker->disp_sheet->size_of_marker . "px; z-index: 100; \" />\n";
+		$html .= "<img src=\"${faxocr_root}/etc/mark.gif\" class=\"mark-img\" alt=\"marker\" style=\"position: absolute; top: " . $sheet_marker->disp_sheet->marker_window->topRightMarker->position_y . "px; left: " . $sheet_marker->disp_sheet->marker_window->topRightMarker->position_x . "px; width: " . $sheet_marker->disp_sheet->size_of_marker . "px; height: " . $sheet_marker->disp_sheet->size_of_marker . "px; z-index: 100; \" />\n";
 
 		// marker: bottom - left
-		$html .= "<img src=\"/home/faxocr/etc/mark.gif\" class=\"mark-img\" alt=\"marker\" style=\"position: absolute; bottom: 0px; left: " . $sheet_marker->disp_sheet->marker_window->bottomLeftMarker->position_y . "px; width: " . $sheet_marker->disp_sheet->marker_window->bottomLeftMarker->width . "px; height: " . $sheet_marker->disp_sheet->marker_window->bottomLeftMarker->height . "px; z-index: 100; \" />";
+		$html .= "<img src=\"${faxocr_root}/etc/mark.gif\" class=\"mark-img\" alt=\"marker\" style=\"position: absolute; bottom: 0px; left: " . $sheet_marker->disp_sheet->marker_window->bottomLeftMarker->position_y . "px; width: " . $sheet_marker->disp_sheet->marker_window->bottomLeftMarker->width . "px; height: " . $sheet_marker->disp_sheet->marker_window->bottomLeftMarker->height . "px; z-index: 100; \" />";
 		// sheet ID: bottom
 		$html .= "<div style=\"position: absolute; bottom: 0px; left: " . $sheet_marker->disp_sheet->marker_window->position_of_sheet_id_from_left_side . "px; z-index: 100; \"><font style=\"line-height: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-size: " . $sheet_marker->disp_sheet->size_of_marker * 0.9 . "px; font-family: 'OCRB'; \">" . $sid . "</font></div>\n";
 
