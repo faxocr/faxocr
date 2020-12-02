@@ -35,7 +35,7 @@ cd "${FAXOCR_ROOT}"
 session_lock_file="$DIR_FAX"/"`basename $0`".lock
 trap 'echo "trapped."; rm -f ${session_lock_file}; exit 1' 1 2 3 15
 
-if ! ln -s $$ "${session_lock_file}"; then
+if ! ln -s $$ "${session_lock_file}" 2> /dev/null; then
 	show_message_to_console 'Cannot run multiple instances.'
 	exit 1
 fi
